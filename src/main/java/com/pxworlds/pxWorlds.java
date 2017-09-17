@@ -51,8 +51,8 @@ public class pxWorlds {
 		glfwWindowHint(GLFW_VISIBLE, GL_FALSE); // the window will stay hidden after creation
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // the window will be resizable
 
-		int WIDTH = 300;
-		int HEIGHT = 300;
+		int WIDTH = 600;
+		int HEIGHT = 600;
 
 		// Create the window
 		window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, NULL);
