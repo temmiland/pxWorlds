@@ -5,6 +5,8 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
 import java.nio.ByteBuffer;
+import java.util.Enumeration;
+import java.util.Properties;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -20,8 +22,24 @@ public class pxWorlds {
 	// The window handle
 	private long window;
 
+	private int HEIGHT;
+	private int WIDTH;
+
+	public pxWorlds(int width, int height) {
+		this.HEIGHT = height;
+		this.WIDTH = width;
+	}
+
 	public void run() {
-		System.out.println("Hello LWJGL " + Sys.getVersion() + "!");
+
+	    // print debug informations in console
+        System.out.println("#############################################################");
+        System.out.println("OS name: " + System.getProperties().getProperty("os.name"));
+        System.out.println("OS architecture: " + System.getProperties().getProperty("os.arch"));
+        System.out.println("Java class version: " + System.getProperties().getProperty("java.class.version"));
+        System.out.println("Java version: " + System.getProperties().getProperty("java.version"));
+        System.out.println("Java vendor: " + System.getProperties().getProperty("java.vendor"));
+        System.out.println("#############################################################");
 
 		try {
 			init();
@@ -51,8 +69,6 @@ public class pxWorlds {
 		glfwWindowHint(GLFW_VISIBLE, GL_FALSE); // the window will stay hidden after creation
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // the window will be resizable
 
-		int WIDTH = 600;
-		int HEIGHT = 600;
 
 		// Create the window
 		window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, NULL);
@@ -110,9 +126,6 @@ public class pxWorlds {
 		}
 	}
 
-	public static void main(String[] args) {
-		SharedLibraryLoader.load();
-		new pxWorlds().run();
-	}
+
 
 }
