@@ -1,6 +1,8 @@
 package com.pxworlds;
 
 
+import com.pxworlds.game.pxWorlds;
+
 public class Main {
 
     private static final String applicationName = "pxWorlds - Let's adventure!";
@@ -9,7 +11,7 @@ public class Main {
 
     public static void main(String[] args) {
         SharedLibraryLoader.load();
-        new pxWorlds(applicationWidth, applicationHeight, applicationName).run();
+        new pxWorlds(applicationWidth, applicationHeight, applicationName).start();
     }
 
 }

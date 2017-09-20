@@ -1,4 +1,4 @@
-package com.pxworlds;
+package com.pxworlds.game;
 
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -17,20 +17,15 @@ import static org.lwjgl.system.MemoryUtil.*;
  * @version 0.1
  */
 
-public class pxWorlds {
+public class pxWorlds implements  Runnable {
 
     private String TITLE;
 	private int WIDTH;
     private int HEIGHT;
 
-    // We need to strongly reference callback instances.
-    private GLFWErrorCallback errorCallback;
-
-    /* Is not used this time
-    private GLFWKeyCallback   keyCallback; */
-
-    // The window handle
     private long window;
+    private Thread thread;
+    private boolean running = false;
 
     /**
      * Method to instantiate the gamescreen object
@@ -49,6 +44,18 @@ public class pxWorlds {
 	}
 
     /**
+     * Method to start the game process
+     *
+     * @author "tomxpcvx <privat@<API_URL>>"
+     */
+
+    public void start() {
+        running = true;
+        thread = new Thread(this,"pxWorlds");
+        thread.start();
+    }
+
+    /**
      * Method to run the gamescreen
      *
      * @author "tomxpcvx <privat@<API_URL>>"
@@ -58,20 +65,15 @@ public class pxWorlds {
 
 		printDebugInformations();
 
-		try {
-			init();
-			loop();
+		init();
+		while(running) {
+		    update();
+		    render();
 
-			// Release window and window callbacks
-			glfwDestroyWindow(window);
-
-			/* Is not used this time
-			keyCallback.release(); */
-		} finally {
-			// Terminate GLFW and release the GLFWerrorfun
-			glfwTerminate();
-			errorCallback.release();
-		}
+		    if(glfwWindowShouldClose(window) == GL_TRUE) {
+		        running = false;
+            }
+        }
 	}
 
     /**
@@ -81,10 +83,6 @@ public class pxWorlds {
      */
 
 	private void init() {
-
-		// Setup an error callback. The default implementation
-		// will print the error message in System.err.
-		glfwSetErrorCallback(errorCallback = errorCallbackPrint(System.err));
 
 		// Initialize GLFW. Most GLFW functions will not work before doing this.
 		if ( glfwInit() != GL11.GL_TRUE )
@@ -101,27 +99,11 @@ public class pxWorlds {
 		if ( window == NULL )
 			throw new RuntimeException("Failed to create the GLFW window");
 
-		/* Is not used this time
-
-		Setup a key callback. It will be called every time a key is pressed, repeated or released.
-
-		glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
-			@Override
-			public void invoke(long window, int key, int scancode, int action, int mods) {
-				if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
-					glfwSetWindowShouldClose(window, GL_TRUE); // We will detect this in our rendering loop
-			}
-		}); */
-
 		// Get the resolution of the primary monitor
 		ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
 		// Center our window
-		glfwSetWindowPos(
-				window,
-				(GLFWvidmode.width(vidmode) - WIDTH) / 2,
-				(GLFWvidmode.height(vidmode) - HEIGHT) / 2
-		);
+		glfwSetWindowPos(window,(GLFWvidmode.width(vidmode) - WIDTH) / 2,(GLFWvidmode.height(vidmode) - HEIGHT) / 2);
 
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(window);
@@ -138,28 +120,13 @@ public class pxWorlds {
      * @author "tomxpcvx <privat@<API_URL>>"
      */
 
-    private void loop() {
-		// This line is critical for LWJGL's interoperation with GLFW's
-		// OpenGL context, or any context that is managed externally.
-		// LWJGL detects the context that is current in the current thread,
-		// creates the ContextCapabilities instance and makes the OpenGL
-		// bindings available for use.
-		GLContext.createFromCurrent();
-
-		// Set the clear color
-		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-
-		// Run the rendering loop until the user has attempted to close the window
-		while ( glfwWindowShouldClose(window) == GL_FALSE ) {
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-
-			glfwSwapBuffers(window); // swap the color buffers
-
-			// Poll for window events. The key callback above will only be
-			// invoked during this call.
-			glfwPollEvents();
-		}
+    private void update() {
+		glfwPollEvents();
 	}
+
+    private void render() {
+        glfwSwapBuffers(window);
+    }
 
 	/**
 	 *  It prints informations about the os and the java installation in the console
