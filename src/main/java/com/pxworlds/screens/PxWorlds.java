@@ -2,14 +2,14 @@ package com.pxworlds.screens;
 
 import javax.swing.*;
 
-public class pxWorlds extends JFrame {
+public class PxWorlds extends JFrame {
 
     private String TITLE;
     private int WIDTH;
     private int HEIGHT;
     private boolean FULLSCREEN;
 
-    public pxWorlds(String title, int width, int height, boolean fullscreen) {
+    public PxWorlds(String title, int width, int height, boolean fullscreen) {
 
         super(title);
 
