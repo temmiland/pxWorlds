@@ -1,6 +1,5 @@
 package com.pxworlds.configuration;
 
-import com.google.gson.reflect.TypeToken;
 import com.pxworlds.Bootstrap;
 import com.pxworlds.Constants;
 
@@ -9,19 +8,14 @@ import java.lang.reflect.Type;
 
 public class JsonConfig {
 
-    public boolean isConfigurationExisting(String fileName) {
-        File file = new File(fileName);
-        return file.isFile();
-    }
-
     public String generateConfigName(String configName) {
         return Constants.CONFIG_DIRECTORY_PATH + configName + ".json";
     }
 
     public void saveConfig(Configuration configuration, String fileName) {
         try {
-            Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName), "utf-8"));
-            writer.write(Bootstrap.getInstance().getGson().toJson(configuration));
+            Writer writer = new OutputStreamWriter(new FileOutputStream(fileName));
+            writer.write(configuration.serializeToJson());
             writer.flush();
             writer.close();
         } catch (IOException e) {
@@ -29,7 +23,7 @@ public class JsonConfig {
         }
     }
 
-    public <T extends Configuration> T readConfiguration(String fileName) {
+    public <T extends Configuration> T readConfiguration(String fileName, Type type) {
         StringBuilder stringBuilder = new StringBuilder();
         File          file          = new File(fileName);
         try {
@@ -39,12 +33,16 @@ public class JsonConfig {
             while ((currentLine = bufferedReader.readLine()) != null) {
                 stringBuilder.append(currentLine);
             }
+            bufferedReader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Type typeToken = new TypeToken<T>() {
-        }.getType();
-        return Bootstrap.getInstance().getGson().<T>fromJson(stringBuilder.toString(), typeToken);
+        try {
+            return Bootstrap.getInstance().getGson().fromJson(stringBuilder.toString(), type);
+        }catch(Exception e){
+            saveConfig(new Configuration(), fileName);
+            return Bootstrap.getInstance().getGson().fromJson("{}", type);
+        }
     }
 
 }

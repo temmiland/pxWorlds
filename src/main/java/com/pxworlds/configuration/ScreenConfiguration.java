@@ -1,10 +1,12 @@
 package com.pxworlds.configuration;
 
+import com.pxworlds.Bootstrap;
+
 public class ScreenConfiguration extends Configuration {
 
     private boolean fullscreen = false;
-    private int     lastWidth  = 0;
-    private int     lastHeight = 0;
+    private int     lastWidth  = ((int) Bootstrap.getInstance().getDimension().getWidth());
+    private int     lastHeight = ((int) Bootstrap.getInstance().getDimension().getHeight());
 
     public ScreenConfiguration() {
     }
@@ -34,5 +36,14 @@ public class ScreenConfiguration extends Configuration {
     public ScreenConfiguration setLastHeight(int lastHeight) {
         this.lastHeight = lastHeight;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "ScreenConfiguration{" +
+                "fullscreen=" + fullscreen +
+                ", lastWidth=" + lastWidth +
+                ", lastHeight=" + lastHeight +
+                '}';
     }
 }
