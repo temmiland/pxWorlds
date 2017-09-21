@@ -4,9 +4,9 @@ import javax.swing.*;
 
 public class PxWorlds extends JFrame {
 
-    private String TITLE;
-    private int WIDTH;
-    private int HEIGHT;
+    private String  TITLE;
+    private int     WIDTH;
+    private int     HEIGHT;
     private boolean FULLSCREEN;
 
     public PxWorlds(String title, int width, int height, boolean fullscreen) {
@@ -22,7 +22,7 @@ public class PxWorlds extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        if(fullscreen) {
+        if (fullscreen) {
             setExtendedState(JFrame.MAXIMIZED_BOTH);
             setUndecorated(true);
         }
