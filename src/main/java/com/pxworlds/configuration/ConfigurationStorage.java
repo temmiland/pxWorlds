@@ -2,9 +2,7 @@ package com.pxworlds.configuration;
 
 import com.pxworlds.Bootstrap;
 import com.pxworlds.Constants;
-import jdk.internal.dynalink.support.BottomGuardingDynamicLinker;
 
-import javax.script.ScriptEngine;
 import java.io.File;
 import java.io.IOException;
 
@@ -13,20 +11,29 @@ public class ConfigurationStorage {
     private ScreenConfiguration screenConfiguration;
 
     public void init() {
-        if (!Bootstrap.getInstance().getJsonConfig().isConfigurationExisting(Bootstrap.getInstance().getJsonConfig().generateConfigName("screen_configuration"))) {
-            File file = new File(Constants.CONFIG_DIRECTORY_PATH);
+        createScreenConfigurationIfNotExists();
+    }
+
+    public void createConfigDirectoryIfNotExisting() {
+        File file = new File(Constants.CONFIG_DIRECTORY_PATH);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+    }
+
+    public void createScreenConfigurationIfNotExists() {
+        createConfigDirectoryIfNotExisting();
+        File file = new File(Constants.CONFIG_DIRECTORY_PATH, "screen_configuration.json");
+        if (!file.exists()) {
             try {
-                file.mkdirs();
-                file = new File(Constants.CONFIG_DIRECTORY_PATH, "screen_configuration.json");
                 file.createNewFile();
-                ScreenConfiguration screenConfiguration = new ScreenConfiguration().setFullscreen(true);
+                ScreenConfiguration screenConfiguration = new ScreenConfiguration();
                 Bootstrap.getInstance().getJsonConfig().saveConfig(screenConfiguration, Bootstrap.getInstance().getJsonConfig().generateConfigName("screen_configuration"));
-                System.out.println("Set file?");
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        setScreenConfiguration(Bootstrap.getInstance().getJsonConfig().<ScreenConfiguration>readConfiguration(Bootstrap.getInstance().getJsonConfig().generateConfigName("screen_configuration")));
+        setScreenConfiguration(Bootstrap.getInstance().getJsonConfig().<ScreenConfiguration>readConfiguration(Bootstrap.getInstance().getJsonConfig().generateConfigName("screen_configuration"), Configuration.ConfigurationType.SCREEN_CONFIGURATION.getType()));
     }
 
     public ScreenConfiguration getScreenConfiguration() {
@@ -35,6 +42,17 @@ public class ConfigurationStorage {
 
     public ConfigurationStorage setScreenConfiguration(ScreenConfiguration screenConfiguration) {
         this.screenConfiguration = screenConfiguration;
+        return this;
+    }
+
+    public ConfigurationStorage saveAllConfigurtations() {
+        saveScreenConfiguration();
+        return this;
+    }
+
+    public ConfigurationStorage saveScreenConfiguration() {
+        createScreenConfigurationIfNotExists();
+        Bootstrap.getInstance().getJsonConfig().saveConfig(getScreenConfiguration(), Bootstrap.getInstance().getJsonConfig().generateConfigName("screen_configuration"));
         return this;
     }
 }
