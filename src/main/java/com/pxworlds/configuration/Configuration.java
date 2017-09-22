@@ -12,7 +12,10 @@ public class Configuration {
     }
 
     public enum ConfigurationType {
-        SCREEN_CONFIGURATION(new TypeToken<ScreenConfiguration>(){}.getType());
+        SCREEN_CONFIGURATION(new TypeToken<ScreenConfiguration>() {
+        }.getType()),
+        PROFILES_CONFIGURATION(new TypeToken<ProfilesConfiguration>() {
+        }.getType());
 
         private Type type;
 

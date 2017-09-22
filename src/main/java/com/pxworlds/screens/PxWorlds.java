@@ -43,7 +43,7 @@ public class PxWorlds extends JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-                Bootstrap.getInstance().getConfigurationStorage().saveAllConfigurtations();
+                Bootstrap.getInstance().getConfigurationStorage().saveAllConfigurations();
             }
         });
 
