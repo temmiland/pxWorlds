@@ -6,7 +6,7 @@
 
     <groupId>com.pxworlds</groupId>
     <artifactId>pxWorlds</artifactId>
-    <version>0.1-PREALPHA</version>
+    <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -22,8 +22,36 @@
         <natives.version>0.0.6</natives.version>
     </properties>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>Maven Snapshots</id>
+            <url>http://snapshots.maven.codehaus.org/maven2/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>com.pxworlds.Main</mainClass>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>com.googlecode.mavennatives</groupId>
                 <artifactId>maven-nativedependencies-plugin</artifactId>
