@@ -1,4 +1,4 @@
-package com.pxworlds.screens;
+package com.pxworlds.game.screens;
 
 import com.pxworlds.Bootstrap;
 import com.pxworlds.configuration.ScreenConfiguration;
@@ -21,6 +21,7 @@ public class PxWorlds extends JFrame {
         setSize(width, height);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        add(new GamePanel());
 
         if (fullscreen) {
             setExtendedState(JFrame.MAXIMIZED_BOTH);
