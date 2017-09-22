@@ -8,13 +8,15 @@ import java.io.IOException;
 
 public class ConfigurationStorage {
 
-    private ScreenConfiguration screenConfiguration;
+    private ScreenConfiguration   screenConfiguration;
+    private ProfilesConfiguration profilesConfiguration;
 
     public void init() {
         createScreenConfigurationIfNotExists();
+        createProfilesConfigurationIfNotExists();
     }
 
-    public void createConfigDirectoryIfNotExisting() {
+    public void createConfigDirectoryIfNotExists() {
         File file = new File(Constants.CONFIG_DIRECTORY_PATH);
         if (!file.exists()) {
             file.mkdirs();
@@ -22,7 +24,7 @@ public class ConfigurationStorage {
     }
 
     public void createScreenConfigurationIfNotExists() {
-        createConfigDirectoryIfNotExisting();
+        createConfigDirectoryIfNotExists();
         File file = new File(Constants.CONFIG_DIRECTORY_PATH, "screen_configuration.json");
         if (!file.exists()) {
             try {
@@ -36,6 +38,21 @@ public class ConfigurationStorage {
         setScreenConfiguration(Bootstrap.getInstance().getJsonConfig().<ScreenConfiguration>readConfiguration(Bootstrap.getInstance().getJsonConfig().generateConfigName("screen_configuration"), Configuration.ConfigurationType.SCREEN_CONFIGURATION.getType()));
     }
 
+    public void createProfilesConfigurationIfNotExists() {
+        createConfigDirectoryIfNotExists();
+        File file = new File(Constants.CONFIG_DIRECTORY_PATH, "profiles.json");
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+                ProfilesConfiguration profilesConfiguration = new ProfilesConfiguration();
+                Bootstrap.getInstance().getJsonConfig().saveConfig(profilesConfiguration, Bootstrap.getInstance().getJsonConfig().generateConfigName("profiles"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        setProfilesConfiguration(Bootstrap.getInstance().getJsonConfig().<ProfilesConfiguration>readConfiguration(Bootstrap.getInstance().getJsonConfig().generateConfigName("profiles"), Configuration.ConfigurationType.PROFILES_CONFIGURATION.getType()));
+    }
+
     public ScreenConfiguration getScreenConfiguration() {
         return screenConfiguration;
     }
@@ -45,14 +62,30 @@ public class ConfigurationStorage {
         return this;
     }
 
-    public ConfigurationStorage saveAllConfigurtations() {
+    public ProfilesConfiguration getProfilesConfiguration() {
+        return profilesConfiguration;
+    }
+
+    public ConfigurationStorage setProfilesConfiguration(ProfilesConfiguration profilesConfiguration) {
+        this.profilesConfiguration = profilesConfiguration;
+        return this;
+    }
+
+    public ConfigurationStorage saveAllConfigurations() {
         saveScreenConfiguration();
+        saveProfilesConfiguration();
         return this;
     }
 
     public ConfigurationStorage saveScreenConfiguration() {
         createScreenConfigurationIfNotExists();
         Bootstrap.getInstance().getJsonConfig().saveConfig(getScreenConfiguration(), Bootstrap.getInstance().getJsonConfig().generateConfigName("screen_configuration"));
+        return this;
+    }
+
+    public ConfigurationStorage saveProfilesConfiguration() {
+        createProfilesConfigurationIfNotExists();
+        Bootstrap.getInstance().getJsonConfig().saveConfig(getProfilesConfiguration(), Bootstrap.getInstance().getJsonConfig().generateConfigName("profiles"));
         return this;
     }
 }
