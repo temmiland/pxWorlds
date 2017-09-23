@@ -1,10 +1,6 @@
 package com.pxworlds.game.screens;
 
-import com.pxworlds.configuration.Configuration;
-import com.pxworlds.configuration.ConfigurationStorage;
-import com.pxworlds.configuration.ScreenConfiguration;
 import com.pxworlds.game.states.GameStateManager;
-import javafx.stage.Screen;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,9 +10,9 @@ import java.awt.image.BufferedImage;
 
 public class GamePanel extends JPanel implements Runnable, KeyListener {
 
-    public static final int WIDTH = 1280;
-    public static final int HEIGHT = 720;
-    public static final int SCALE = 1;
+    public static int WIDTH;
+    public static int HEIGHT;
+    public static double SCALE;
 
     private Thread thread;
     private boolean running;
@@ -28,9 +24,13 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     private GameStateManager gsm;
 
-    public GamePanel() {
+    public GamePanel(int width, int height, double scale) {
         super();
-        setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
+
+        this.WIDTH = width;
+        this.HEIGHT = height;
+        this.SCALE = scale;
+
         setFocusable(true);
         requestFocus();
 
@@ -67,7 +67,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     private void drawToScreen() {
         Graphics2D g2 = (Graphics2D) getGraphics();
-        g2.drawImage(image, 0,0, WIDTH * SCALE, HEIGHT * SCALE, null);
+        g2.drawImage(image, 0,0, (int)(WIDTH * SCALE), (int)(HEIGHT * SCALE), null);
         g2.dispose();
     }
 
