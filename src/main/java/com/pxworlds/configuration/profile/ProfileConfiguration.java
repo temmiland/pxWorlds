@@ -1,4 +1,6 @@
-package com.pxworlds.configuration;
+package com.pxworlds.configuration.profile;
+
+import com.pxworlds.configuration.Configuration;
 
 import java.util.UUID;
 

@@ -2,13 +2,15 @@ package com.pxworlds.configuration;
 
 import com.pxworlds.Bootstrap;
 import com.pxworlds.Constants;
+import com.pxworlds.configuration.profile.ProfilesConfiguration;
+import com.pxworlds.configuration.screen.ScreenConfiguration;
 
 import java.io.File;
 import java.io.IOException;
 
 public class ConfigurationStorage {
 
-    private ScreenConfiguration   screenConfiguration;
+    private ScreenConfiguration screenConfiguration;
     private ProfilesConfiguration profilesConfiguration;
 
     public void init() {

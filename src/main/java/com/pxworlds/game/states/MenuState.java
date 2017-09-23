@@ -29,8 +29,8 @@ public class MenuState extends GameState {
             bg.setVector(-0.1, 0);
 
             titleColor = new Color(128, 0 ,0);
-            titleFont = new Font("Century Gothic", Font.PLAIN, 28);
-            font = new Font("Arial", Font.PLAIN, 12);
+            titleFont = new Font("Century Gothic", Font.PLAIN, 50);
+            font = new Font("Century Gothic", Font.PLAIN, 30);
 
         } catch(Exception e) {
             e.printStackTrace();
@@ -52,7 +52,7 @@ public class MenuState extends GameState {
         bg.draw(g);
         g.setColor(titleColor);
         g.setFont(titleFont);
-        g.drawString("pxWorlds", 150, 70);
+        g.drawString("pxWorlds", 290, 120);
 
         g.setFont(font);
         for(int i = 0; i < options.length; i++) {
@@ -61,7 +61,7 @@ public class MenuState extends GameState {
             } else {
                 g.setColor(Color.BLACK);
             }
-            g.drawString(options[i], 145, 140 + i * 15);
+            g.drawString(options[i], 360, 300 + i * 30);
         }
     }
 
