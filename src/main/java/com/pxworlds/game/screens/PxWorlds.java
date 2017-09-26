@@ -1,7 +1,8 @@
-package com.pxworlds.screens;
+package com.pxworlds.game.screens;
 
 import com.pxworlds.Bootstrap;
-import com.pxworlds.configuration.ScreenConfiguration;
+import com.pxworlds.configuration.screen.ScreenConfiguration;
+import com.pxworlds.configuration.screen.ScreenResolutions;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,9 +19,14 @@ public class PxWorlds extends JFrame {
 
         System.out.println("width: " + width + ", height: " + height + ", fullscreen: " + fullscreen);
 
+        setLayout(new BorderLayout());
+        add(new GamePanel(width, height, ScreenResolutions.getResolution(width, height).getScale()), BorderLayout.CENTER);
+        pack();
         setSize(width, height);
+        setResizable(false);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+
 
         if (fullscreen) {
             setExtendedState(JFrame.MAXIMIZED_BOTH);

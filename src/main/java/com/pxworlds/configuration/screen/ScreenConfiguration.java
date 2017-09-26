@@ -1,6 +1,7 @@
-package com.pxworlds.configuration;
+package com.pxworlds.configuration.screen;
 
 import com.pxworlds.Bootstrap;
+import com.pxworlds.configuration.Configuration;
 
 public class ScreenConfiguration extends Configuration {
 
