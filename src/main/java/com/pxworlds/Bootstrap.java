@@ -3,7 +3,7 @@ package com.pxworlds;
 import com.google.gson.Gson;
 import com.pxworlds.configuration.ConfigurationStorage;
 import com.pxworlds.configuration.JsonConfig;
-import com.pxworlds.screens.PxWorlds;
+import com.pxworlds.game.screens.PxWorlds;
 
 import java.awt.*;
 
