@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 /**
  * Created by tompi on 22.09.2017.
  */
-public class Background {
+public class Image {
 
     private BufferedImage image;
     private double x;
@@ -18,7 +18,11 @@ public class Background {
     private double dy;
     private double moveScale;
 
-    public Background(String s, double ms) {
+    public Image(String s, double ms) {
+        setImage(s, ms);
+    }
+
+    public void setImage(String s, double ms) {
         try {
             image = ImageIO.read(
                     getClass().getResourceAsStream(s)
