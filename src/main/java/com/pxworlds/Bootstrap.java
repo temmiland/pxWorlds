@@ -3,7 +3,7 @@ package com.pxworlds;
 import com.google.gson.Gson;
 import com.pxworlds.configuration.ConfigurationStorage;
 import com.pxworlds.configuration.JsonConfig;
-import com.pxworlds.game.screens.PxWorlds;
+import com.pxworlds.game.PxWorlds;
 
 import java.awt.*;
 
@@ -29,7 +29,7 @@ public class Bootstrap {
 
         getConfigurationStorage().init();
 
-        new PxWorlds(TITLE, getConfigurationStorage().getScreenConfiguration().getLastWidth(), getConfigurationStorage().getScreenConfiguration().getLastHeight(), getConfigurationStorage().getScreenConfiguration().isFullscreen());
+        new PxWorlds(TITLE, getConfigurationStorage().getScreenConfiguration().getLastWidth(), getConfigurationStorage().getScreenConfiguration().getLastHeight(), getConfigurationStorage().getScreenConfiguration().isFullscreen()).run();
 
     }
 
