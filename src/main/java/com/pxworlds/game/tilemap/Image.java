@@ -6,9 +6,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-/**
- * Created by tompi on 22.09.2017.
- */
 public class Image {
 
     private BufferedImage image;
