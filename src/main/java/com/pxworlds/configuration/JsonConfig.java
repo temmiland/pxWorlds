@@ -25,7 +25,7 @@ public class JsonConfig {
 
     public <T extends Configuration> T readConfiguration(String fileName, Type type) {
         StringBuilder stringBuilder = new StringBuilder();
-        File          file          = new File(fileName);
+        File file          = new File(fileName);
         try {
             FileReader     fileReader     = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
