@@ -19,6 +19,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     private int FPS = 60;
     private long targetTime = 1000 / FPS;
 
+    private long timeBefore;
+    private int fpsCount;
+    private int fps;
+
     private BufferedImage image;
     private Graphics2D g;
 
@@ -54,7 +58,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         running = true;
 
         gsm = new GameStateManager();
-
+        this.timeBefore = System.currentTimeMillis();
     }
 
     private void update() {
@@ -63,6 +67,15 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     private void draw() {
         gsm.draw(g);
+        g.drawString("FPS: " + fps, 50, 50);
+        fpsCount++;
+        long timeNow = System.currentTimeMillis();
+        long diff = timeNow - timeBefore;
+        if(diff >= 1000) {
+            fps = fpsCount;
+            fpsCount = 0;
+            timeBefore = timeNow;
+        }
     }
 
     private void drawToScreen() {
