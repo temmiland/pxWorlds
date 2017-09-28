@@ -3,6 +3,7 @@ package com.pxworlds.gui;
 import com.pxworlds.assets.Assets;
 import com.pxworlds.collision.AABB;
 import com.pxworlds.collision.Collision;
+import com.pxworlds.game.PxWorlds;
 import com.pxworlds.io.Input;
 import com.pxworlds.render.Camera;
 import com.pxworlds.render.Shader;
@@ -35,6 +36,7 @@ public class Button {
 			
 			if (input.isMouseButtonDown(0)) {
 				selectedState = STATE_CLICKED;
+                PxWorlds.getInstance().gsm.setState(2);
 			}
 		}
 		else selectedState = STATE_IDLE;
