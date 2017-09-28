@@ -31,9 +31,9 @@ public class World {
 	
 	public World(String world, Camera camera) {
 		try {
-			BufferedImage tile_sheet = ImageIO.read(new File("./levels/" + world + "/tiles.png"));
-			BufferedImage entity_sheet = ImageIO.read(new File("./levels/" + world + "/entities.png"));
-			
+			BufferedImage tile_sheet = ImageIO.read(getClass().getResourceAsStream("/levels/" + world + "/tiles.png"));
+			BufferedImage entity_sheet = ImageIO.read(getClass().getResourceAsStream("/levels/" + world + "/entities.png"));
+
 			width = tile_sheet.getWidth();
 			height = tile_sheet.getHeight();
 			scale = 32;
