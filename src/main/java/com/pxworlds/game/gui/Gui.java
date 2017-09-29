@@ -1,12 +1,12 @@
-package com.pxworlds.gui;
+package com.pxworlds.game.gui;
 
-import com.pxworlds.render.Camera;
-import com.pxworlds.render.Shader;
-import com.pxworlds.render.TileSheet;
+import com.pxworlds.game.render.Camera;
+import com.pxworlds.game.render.Shader;
+import com.pxworlds.game.render.TileSheet;
 import org.joml.Vector2f;
 
-import com.pxworlds.io.Input;
-import com.pxworlds.io.Window;
+import com.pxworlds.game.io.Input;
+import com.pxworlds.game.io.Window;
 
 public class Gui {
     private Window window;

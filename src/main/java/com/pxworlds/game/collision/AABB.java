@@ -1,4 +1,4 @@
-package com.pxworlds.collision;
+package com.pxworlds.game.collision;
 
 import org.joml.Vector2f;
 

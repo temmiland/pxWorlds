@@ -1,20 +1,19 @@
-package com.pxworlds.world;
+package com.pxworlds.game.world;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.pxworlds.collision.AABB;
-import com.pxworlds.entity.Entity;
-import com.pxworlds.entity.Player;
-import com.pxworlds.entity.Transform;
-import com.pxworlds.io.Window;
-import com.pxworlds.render.Camera;
-import com.pxworlds.render.Shader;
+import com.pxworlds.game.collision.AABB;
+import com.pxworlds.game.entity.Entity;
+import com.pxworlds.game.entity.Player;
+import com.pxworlds.game.entity.Transform;
+import com.pxworlds.game.io.Window;
+import com.pxworlds.game.render.Camera;
+import com.pxworlds.game.render.Shader;
 import org.joml.*;
 
 public class World {

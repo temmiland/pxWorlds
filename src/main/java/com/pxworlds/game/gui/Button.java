@@ -1,13 +1,13 @@
-package com.pxworlds.gui;
+package com.pxworlds.game.gui;
 
-import com.pxworlds.assets.Assets;
-import com.pxworlds.collision.AABB;
-import com.pxworlds.collision.Collision;
+import com.pxworlds.game.assets.Assets;
+import com.pxworlds.game.collision.AABB;
+import com.pxworlds.game.collision.Collision;
 import com.pxworlds.game.PxWorlds;
-import com.pxworlds.io.Input;
-import com.pxworlds.render.Camera;
-import com.pxworlds.render.Shader;
-import com.pxworlds.render.TileSheet;
+import com.pxworlds.game.io.Input;
+import com.pxworlds.game.render.Camera;
+import com.pxworlds.game.render.Shader;
+import com.pxworlds.game.render.TileSheet;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 

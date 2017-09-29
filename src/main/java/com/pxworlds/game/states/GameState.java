@@ -1,6 +1,6 @@
 package com.pxworlds.game.states;
 
-import com.pxworlds.io.Window;
+import com.pxworlds.game.io.Window;
 
 /**
  * Created by tompi on 28.09.2017.

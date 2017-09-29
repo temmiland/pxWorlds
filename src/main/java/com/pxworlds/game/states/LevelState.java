@@ -1,10 +1,10 @@
 package com.pxworlds.game.states;
 
-import com.pxworlds.io.Window;
-import com.pxworlds.render.Camera;
-import com.pxworlds.render.Shader;
-import com.pxworlds.world.TileRenderer;
-import com.pxworlds.world.World;
+import com.pxworlds.game.io.Window;
+import com.pxworlds.game.render.Camera;
+import com.pxworlds.game.render.Shader;
+import com.pxworlds.game.world.TileRenderer;
+import com.pxworlds.game.world.World;
 
 /**
  * Created by tompi on 28.09.2017.

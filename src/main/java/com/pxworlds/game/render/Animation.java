@@ -1,6 +1,6 @@
-package com.pxworlds.render;
+package com.pxworlds.game.render;
 
-import com.pxworlds.io.Timer;
+import com.pxworlds.game.io.Timer;
 
 public class Animation {
 	private Texture[] frames;

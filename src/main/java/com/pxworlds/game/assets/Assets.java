@@ -1,6 +1,6 @@
-package com.pxworlds.assets;
+package com.pxworlds.game.assets;
 
-import com.pxworlds.render.Model;
+import com.pxworlds.game.render.Model;
 
 public class Assets {
 	private static Model model;
