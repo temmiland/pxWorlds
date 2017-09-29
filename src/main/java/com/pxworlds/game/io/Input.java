@@ -1,4 +1,4 @@
-package com.pxworlds.io;
+package com.pxworlds.game.io;
 
 import static org.lwjgl.glfw.GLFW.*;
 

@@ -1,13 +1,13 @@
-package com.pxworlds.entity;
+package com.pxworlds.game.entity;
 
-import com.pxworlds.assets.Assets;
-import com.pxworlds.collision.AABB;
-import com.pxworlds.collision.Collision;
-import com.pxworlds.io.Window;
-import com.pxworlds.render.Animation;
-import com.pxworlds.render.Camera;
-import com.pxworlds.render.Shader;
-import com.pxworlds.world.World;
+import com.pxworlds.game.assets.Assets;
+import com.pxworlds.game.collision.AABB;
+import com.pxworlds.game.collision.Collision;
+import com.pxworlds.game.io.Window;
+import com.pxworlds.game.render.Animation;
+import com.pxworlds.game.render.Camera;
+import com.pxworlds.game.render.Shader;
+import com.pxworlds.game.world.World;
 import org.joml.*;
 
 

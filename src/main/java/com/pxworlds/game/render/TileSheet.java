@@ -1,4 +1,4 @@
-package com.pxworlds.render;
+package com.pxworlds.game.render;
 
 import org.joml.Matrix4f;
 

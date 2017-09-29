@@ -1,4 +1,4 @@
-package com.pxworlds.world;
+package com.pxworlds.game.world;
 
 public class Tile {
 	public static Tile tiles[] = new Tile[255];

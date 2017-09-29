@@ -1,4 +1,4 @@
-package com.pxworlds.entity;
+package com.pxworlds.game.entity;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

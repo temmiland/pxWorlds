@@ -29,7 +29,12 @@ public class Bootstrap {
 
         getConfigurationStorage().init();
 
-        new PxWorlds(TITLE, getConfigurationStorage().getScreenConfiguration().getLastWidth(), getConfigurationStorage().getScreenConfiguration().getLastHeight(), getConfigurationStorage().getScreenConfiguration().isFullscreen(), getConfigurationStorage().getScreenConfiguration().getFrameRate()).run();
+        int width = getConfigurationStorage().getScreenConfiguration().getLastWidth();
+        int height = getConfigurationStorage().getScreenConfiguration().getLastHeight();
+        int frameRate = getConfigurationStorage().getScreenConfiguration().getFrameRate();
+        boolean fullscreen = getConfigurationStorage().getScreenConfiguration().isFullscreen();
+
+        new PxWorlds(TITLE, width, height, fullscreen, frameRate).run();
 
     }
 
