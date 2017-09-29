@@ -1,6 +1,6 @@
 package com.pxworlds.game.states;
 
-import com.pxworlds.io.Window;
+import com.pxworlds.game.io.Window;
 
 import java.util.concurrent.TimeUnit;
 
@@ -34,7 +34,7 @@ public class BrandState extends GameState {
     public void render() {
         System.out.println("IAM IN BRANDSTATE!!!");
         try {
-            TimeUnit.SECONDS.sleep(5);
+            TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

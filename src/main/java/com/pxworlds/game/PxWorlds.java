@@ -1,21 +1,13 @@
 package com.pxworlds.game;
 
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
-
-import com.pxworlds.game.states.GameState;
+import com.pxworlds.game.assets.Assets;
 import com.pxworlds.game.states.GameStateManager;
-import com.pxworlds.game.states.MenuState;
+import com.pxworlds.game.io.Timer;
+import com.pxworlds.game.io.Window;
 import org.lwjgl.opengl.GL;
 
-import com.pxworlds.assets.Assets;
-import com.pxworlds.gui.Gui;
-import com.pxworlds.io.Timer;
-import com.pxworlds.io.Window;
-import com.pxworlds.render.Camera;
-import com.pxworlds.render.Shader;
-import com.pxworlds.world.TileRenderer;
-import com.pxworlds.world.World;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
 
 public class PxWorlds {
 

@@ -1,11 +1,11 @@
-package com.pxworlds.world;
+package com.pxworlds.game.world;
 
 import java.util.HashMap;
 
-import com.pxworlds.render.Camera;
-import com.pxworlds.render.Model;
-import com.pxworlds.render.Shader;
-import com.pxworlds.render.Texture;
+import com.pxworlds.game.render.Camera;
+import com.pxworlds.game.render.Model;
+import com.pxworlds.game.render.Shader;
+import com.pxworlds.game.render.Texture;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 

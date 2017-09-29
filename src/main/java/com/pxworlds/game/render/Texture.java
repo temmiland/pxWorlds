@@ -1,4 +1,4 @@
-package com.pxworlds.render;
+package com.pxworlds.game.render;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;

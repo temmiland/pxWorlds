@@ -1,13 +1,13 @@
-package com.pxworlds.entity;
+package com.pxworlds.game.entity;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
-import com.pxworlds.io.Window;
-import com.pxworlds.render.Animation;
-import com.pxworlds.render.Camera;
-import com.pxworlds.world.World;
+import com.pxworlds.game.io.Window;
+import com.pxworlds.game.render.Animation;
+import com.pxworlds.game.render.Camera;
+import com.pxworlds.game.world.World;
 
 public class Player extends Entity {
 	public static final int ANIM_IDLE = 0;
