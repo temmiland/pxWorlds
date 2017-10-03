@@ -4,7 +4,6 @@ import com.pxworlds.Bootstrap;
 import com.pxworlds.Constants;
 import com.pxworlds.configuration.profile.ProfilesConfiguration;
 import com.pxworlds.configuration.screen.ScreenConfiguration;
-import com.pxworlds.configuration.world.WorldConfiguration;
 
 import java.io.File;
 import java.io.IOException;
