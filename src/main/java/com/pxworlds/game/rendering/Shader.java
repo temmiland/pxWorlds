@@ -1,4 +1,4 @@
-package com.pxworlds.game.render;
+package com.pxworlds.game.rendering;
 
 import static org.lwjgl.opengl.GL20.*;
 

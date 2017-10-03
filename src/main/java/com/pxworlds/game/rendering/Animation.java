@@ -1,4 +1,4 @@
-package com.pxworlds.game.render;
+package com.pxworlds.game.rendering;
 
 import com.pxworlds.game.io.Timer;
 

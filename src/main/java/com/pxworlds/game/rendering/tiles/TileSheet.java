@@ -1,5 +1,7 @@
-package com.pxworlds.game.render;
+package com.pxworlds.game.rendering.tiles;
 
+import com.pxworlds.game.rendering.Shader;
+import com.pxworlds.game.rendering.Texture;
 import org.joml.Matrix4f;
 
 public class TileSheet {

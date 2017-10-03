@@ -1,5 +1,6 @@
 package com.pxworlds.game;
 
+import com.pxworlds.Bootstrap;
 import com.pxworlds.game.assets.Assets;
 import com.pxworlds.game.states.GameStateManager;
 import com.pxworlds.game.io.Timer;
@@ -109,9 +110,9 @@ public class PxWorlds {
 				frames++;
 			}
 		}
-		
+
 		Assets.deleteAsset();
-		
+        Bootstrap.getInstance().getConfigurationStorage().saveAllConfigurations();
 		glfwTerminate();
 	}
 	
