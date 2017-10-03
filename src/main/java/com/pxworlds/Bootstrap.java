@@ -1,6 +1,7 @@
 package com.pxworlds;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.pxworlds.configuration.ConfigurationStorage;
 import com.pxworlds.configuration.JsonConfig;
 import com.pxworlds.game.PxWorlds;
@@ -47,7 +48,7 @@ public class Bootstrap {
     }
 
     public void initGson() {
-        gson = new Gson();
+        gson = new GsonBuilder().enableComplexMapKeySerialization().setPrettyPrinting().create();
     }
 
     public void initJsonConfig() {

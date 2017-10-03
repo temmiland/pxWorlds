@@ -4,9 +4,9 @@ import com.pxworlds.game.assets.Assets;
 import com.pxworlds.game.collision.AABB;
 import com.pxworlds.game.collision.Collision;
 import com.pxworlds.game.io.Window;
-import com.pxworlds.game.render.Animation;
-import com.pxworlds.game.render.Camera;
-import com.pxworlds.game.render.Shader;
+import com.pxworlds.game.rendering.Animation;
+import com.pxworlds.game.rendering.Camera;
+import com.pxworlds.game.rendering.Shader;
 import com.pxworlds.game.world.World;
 import org.joml.*;
 

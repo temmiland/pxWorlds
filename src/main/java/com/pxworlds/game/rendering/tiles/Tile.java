@@ -1,21 +1,24 @@
-package com.pxworlds.game.world;
+package com.pxworlds.game.rendering.tiles;
+
+import com.pxworlds.game.rendering.tiles.tile.Brick;
+import com.pxworlds.game.rendering.tiles.tile.Grass;
 
 public class Tile {
 	public static Tile tiles[] = new Tile[255];
 	public static byte not = 0;
 	
-	public static final Tile test_tile = new Tile("grass");
-	public static final Tile test2 = new Tile("checker").setSolid();
+	public static final Tile GRASS = new Grass();
+	public static final Tile BRICK = new Brick();
 	
 	private byte id;
 	private boolean solid;
 	private String texture;
 	
-	public Tile(String texture) {
+	public Tile(String texture, boolean solid) {
 		this.id = not;
 		not++;
 		this.texture = texture;
-		this.solid = false;
+		this.solid = solid;
 		if (tiles[id] != null) throw new IllegalStateException("Tiles at [" + id + "] is already being used!");
 		tiles[id] = this;
 	}
@@ -36,4 +39,8 @@ public class Tile {
 	public String getTexture() {
 		return texture;
 	}
+
+    public static Tile[] getTiles() {
+        return tiles;
+    }
 }

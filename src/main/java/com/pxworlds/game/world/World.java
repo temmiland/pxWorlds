@@ -12,8 +12,10 @@ import com.pxworlds.game.entity.Entity;
 import com.pxworlds.game.entity.Player;
 import com.pxworlds.game.entity.Transform;
 import com.pxworlds.game.io.Window;
-import com.pxworlds.game.render.Camera;
-import com.pxworlds.game.render.Shader;
+import com.pxworlds.game.rendering.Camera;
+import com.pxworlds.game.rendering.Shader;
+import com.pxworlds.game.rendering.tiles.Tile;
+import com.pxworlds.game.rendering.tiles.TileRenderer;
 import org.joml.*;
 
 public class World {
@@ -28,15 +30,16 @@ public class World {
 	
 	private Matrix4f world;
 	
-	public World(String world, Camera camera) {
+	public World(String world, Camera camera, boolean playable, int scale) {
+
 		try {
 			BufferedImage tile_sheet = ImageIO.read(getClass().getResourceAsStream("/levels/" + world + "/tiles.png"));
 			BufferedImage entity_sheet = ImageIO.read(getClass().getResourceAsStream("/levels/" + world + "/entities.png"));
 
 			width = tile_sheet.getWidth();
 			height = tile_sheet.getHeight();
-			scale = 32;
-			
+            this.scale = scale;
+
 			this.world = new Matrix4f().setTranslation(new Vector3f(0));
 			this.world.scale(scale);
 			
@@ -70,9 +73,12 @@ public class World {
 						transform.pos.x = x * 2;
 						transform.pos.y = -y * 2;
 						switch (entity_index) {
-							case 1 :							// Player
-								Player player = new Player(transform);
-								entities.add(player);
+							case 1 :
+							    if(playable) {
+                                    // Player
+                                    Player player = new Player(transform);
+                                    entities.add(player);
+                                }
 								camera.getPosition().set(transform.pos.mul(-scale, new Vector3f()));
 								break;
 							default :

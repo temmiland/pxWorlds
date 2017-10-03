@@ -5,9 +5,9 @@ import com.pxworlds.game.collision.AABB;
 import com.pxworlds.game.collision.Collision;
 import com.pxworlds.game.PxWorlds;
 import com.pxworlds.game.io.Input;
-import com.pxworlds.game.render.Camera;
-import com.pxworlds.game.render.Shader;
-import com.pxworlds.game.render.TileSheet;
+import com.pxworlds.game.rendering.Camera;
+import com.pxworlds.game.rendering.Shader;
+import com.pxworlds.game.rendering.tiles.TileSheet;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
