@@ -5,8 +5,8 @@ import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 import com.pxworlds.game.io.Window;
-import com.pxworlds.game.render.Animation;
-import com.pxworlds.game.render.Camera;
+import com.pxworlds.game.rendering.Animation;
+import com.pxworlds.game.rendering.Camera;
 import com.pxworlds.game.world.World;
 
 public class Player extends Entity {

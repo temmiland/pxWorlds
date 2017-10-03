@@ -1,44 +1,62 @@
 package com.pxworlds.game.gui;
 
-import com.pxworlds.game.render.Camera;
-import com.pxworlds.game.render.Shader;
-import com.pxworlds.game.render.TileSheet;
-import org.joml.Vector2f;
-
 import com.pxworlds.game.io.Input;
 import com.pxworlds.game.io.Window;
+import com.pxworlds.game.rendering.Camera;
+import com.pxworlds.game.rendering.Shader;
+import com.pxworlds.game.rendering.tiles.TileSheet;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Gui {
+
     private Window window;
-	private Shader shader;
-	private Camera camera;
-	private TileSheet sheet;
-	
-	private Button playButton;
-	private Button exitButton;
+    private Shader shader;
+    private Camera camera;
+    private TileSheet sheet;
 
-	public Gui(Window window) {
+    public ArrayList<Button> buttons;
+    public ArrayList<Logo> logos;
+
+    public Gui(Window window, String tileSheetTexture, int amountOfTiles) {
         this.window = window;
-		shader = new Shader("gui");
-		camera = new Camera(window.getWidth(), window.getHeight());
-		sheet = new TileSheet("gui.png", 9);
+        shader = new Shader("gui");
+        camera = new Camera(window.getWidth(), window.getHeight());
+        sheet = new TileSheet(tileSheetTexture + ".png", amountOfTiles);
+        this.buttons = new ArrayList<>();
+        this.logos = new ArrayList<>();
+    }
 
-		playButton = new Button(new Vector2f(-32, -32), new Vector2f(100, 30));
-		exitButton = new Button(new Vector2f(-32, -132), new Vector2f(100, 30));
-	}
-	
-	public void resizeCamera() {
-		camera.setProjection(window.getWidth(), window.getHeight());
-	}
-	
-	public void update(Input input) {
-		playButton.update(input);
-		exitButton.update(input);
-	}
-	
-	public void render() {
-		shader.bind();
-		playButton.render(camera, sheet, shader);
-		exitButton.render(camera, sheet, shader);
-	}
+    public void resizeCamera() {
+        camera.setProjection(window.getWidth(), window.getHeight());
+    }
+
+    public void update(Input input) {
+        for(Button button : buttons) {
+            button.update(input);
+        }
+        for(Logo logo : logos) {
+            logo.update(input);
+        }
+    }
+
+    public void render() {
+        shader.bind();
+        for(Button button : buttons) {
+            button.render(camera, sheet, shader);
+        }
+        for(Logo logo : logos) {
+            logo.render(camera, sheet, shader);
+        }
+    }
+
+    public void registerButtons(Button... buttons) {
+        this.buttons.addAll(Arrays.asList(buttons));
+    }
+
+    public void registerLogos(Logo... logos) {
+        this.logos.addAll(Arrays.asList(logos));
+    }
+
 }
