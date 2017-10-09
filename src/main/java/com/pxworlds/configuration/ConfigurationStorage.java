@@ -20,9 +20,7 @@ public class ConfigurationStorage {
 
         public void createConfigDirectoryIfNotExists() {
             File file = new File(Constants.CONFIG_DIRECTORY_PATH);
-            if (!file.exists()) {
-                file.mkdirs();
-            }
+            if (!file.exists()) file.mkdirs();
         }
 
         public void createScreenConfigurationIfNotExists() {

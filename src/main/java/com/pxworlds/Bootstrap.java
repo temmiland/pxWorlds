@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.pxworlds.configuration.ConfigurationStorage;
 import com.pxworlds.configuration.JsonConfig;
 import com.pxworlds.game.PxWorlds;
+import com.pxworlds.worlds.WorldManager;
 
 import java.awt.*;
 
@@ -17,6 +18,8 @@ public class Bootstrap {
     private Gson                 gson;
     private JsonConfig           jsonConfig;
     private ConfigurationStorage configurationStorage;
+    private WorldManager         worldManager;
+    private String               apiKey;
 
     /**
      * The method which is the entrance point after psvm
@@ -24,11 +27,15 @@ public class Bootstrap {
     public void onEnable() {
         instance = this;
 
+        this.apiKey = "abc";
+
         initGson();
         initJsonConfig();
         initConfigurationStorage();
+        initWorldManager();
 
         getConfigurationStorage().init();
+        getWorldManager().init();
 
         int width = getConfigurationStorage().getScreenConfiguration().getLastWidth();
         int height = getConfigurationStorage().getScreenConfiguration().getLastHeight();
@@ -59,6 +66,10 @@ public class Bootstrap {
         configurationStorage = new ConfigurationStorage();
     }
 
+    public void initWorldManager() {
+        worldManager = new WorldManager();
+    }
+
     public Gson getGson() {
         return gson;
     }
@@ -69,5 +80,13 @@ public class Bootstrap {
 
     public ConfigurationStorage getConfigurationStorage() {
         return configurationStorage;
+    }
+
+    public WorldManager getWorldManager() {
+        return worldManager;
+    }
+
+    public String getApiKey() {
+        return apiKey;
     }
 }
