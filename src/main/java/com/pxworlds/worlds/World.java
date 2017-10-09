@@ -1,7 +1,6 @@
 package com.pxworlds.worlds;
 
 
-import com.pxworlds.Bootstrap;
 import com.pxworlds.game.rendering.tiles.TileLayer;
 
 import java.util.ArrayList;

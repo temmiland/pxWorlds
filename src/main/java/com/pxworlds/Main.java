@@ -1,11 +1,11 @@
 package com.pxworlds;
 
-/**
- * Created by tompi on 27.09.2017.
- */
+import com.pxworlds.util.SharedLibraryLoader;
+
 public class Main {
 
     public static void main(String[] args) {
+        SharedLibraryLoader.load();
         new Bootstrap().onEnable();
     }
 
