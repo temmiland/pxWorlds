@@ -96,7 +96,7 @@ public class PxWorlds {
 				
 				if (frame_time >= 1.0) {
 					frame_time = 0;
-					System.out.println("FPS: " + frames);
+					//TODO System.out.println("FPS: " + frames);
 					frames = 0;
 				}
 			}
