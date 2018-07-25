@@ -32,7 +32,6 @@ public class BrandState extends GameState {
 
     @Override
     public void render() {
-        System.out.println("IAM IN BRANDSTATE!!!");
         try {
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
