@@ -12,43 +12,50 @@ import org.joml.Vector2f;
 
 public class Logo {
 
-    private static final int STATE_IDLE = 0;
-    private static final int STATE_SELECTED = 1;
-    private static final int STATE_CLICKED = 2;
-
     private AABB boundingBox;
-    private int selectedState;
 
     private static Matrix4f transform = new Matrix4f();
 
     public Logo(Vector2f position, Vector2f scale) {
         this.boundingBox = new AABB(position, scale);
-        selectedState = STATE_IDLE;
     }
 
     public void update(Input input) {
-        Collision data = boundingBox.getCollision(input.getMousePosition());
 
-        if (data.isIntersecting) {
-            selectedState = STATE_SELECTED;
-
-            if (input.isMouseButtonDown(0)) {
-                selectedState = STATE_CLICKED;
-            }
-        }
-        else selectedState = STATE_IDLE;
     }
 
     public void render(Camera camera, TileSheet sheet, Shader shader) {
-        Vector2f position = boundingBox.getCenter(), scale = boundingBox.getHalfExtent();
-        transform.identity().translate(position.x, position.y, 0).scale(scale.x, scale.y, 1); // Middle/Fill
+        renderLine(10, 0, camera, sheet, shader);
+        renderLine(8, 1, camera, sheet, shader);
+        renderLine(6, 2, camera, sheet, shader);
+        renderLine(4, 3, camera, sheet, shader);
+        renderLine(2, 4, camera, sheet, shader);
+        renderLine(0, 5, camera, sheet, shader);
+        renderLine(-2, 6, camera, sheet, shader);
+        renderLine(-4, 7, camera, sheet, shader);
+        renderLine(-6, 8, camera, sheet, shader);
+        renderLine(-8, 9, camera, sheet, shader);
+        renderLine(-10, 10, camera, sheet, shader);
+    }
 
-            shader.setUniform("projection", camera.getProjection().mul(transform));
-            //TileRenderer rendering = new TileRenderer();
-            //rendering.renderTile(Tile.BRICK, 50,50, shader, transform, camera);
-            Assets.getModel().render();
+    private void renderLine(int factor, int sheetLine, Camera camera, TileSheet sheet, Shader shader) {
+        Vector2f position = boundingBox.getCenter();
+        Vector2f scale = boundingBox.getHalfExtent();
 
-        }
+        transform.identity().translate(position.x - (scale.x * factor), position.y + (scale.y * 2), 0).scale(scale.x, scale.y, 1); // Top
+        shader.setUniform("projection", camera.getProjection().mul(transform));
+        sheet.bindTile(shader, sheetLine, 3);
+        Assets.getModel().render();
 
+        transform.identity().translate(position.x - (scale.x * factor), position.y, 0).scale(scale.x, scale.y, 1); // Middle/Fill
+        shader.setUniform("projection", camera.getProjection().mul(transform));
+        sheet.bindTile(shader, sheetLine, 4);
+        Assets.getModel().render();
+
+        transform.identity().translate(position.x - (scale.x * factor), position.y - (scale.y * 2), 0).scale(scale.x, scale.y, 1); // Bottom
+        shader.setUniform("projection", camera.getProjection().mul(transform));
+        sheet.bindTile(shader, sheetLine, 5);
+        Assets.getModel().render();
+    }
 
 }
