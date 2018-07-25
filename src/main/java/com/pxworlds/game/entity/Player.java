@@ -30,14 +30,20 @@ public class Player extends Entity {
 	@Override
 	public void update(float delta, Window window, Camera camera, World world) {
 		Vector2f movement = new Vector2f();
+        float movementP = movementSpeed * delta;
+        float movementN = -movementSpeed * delta;
+        boolean isADown = window.getInput().isKeyDown(GLFW.GLFW_KEY_A);
+        boolean isDDown = window.getInput().isKeyDown(GLFW.GLFW_KEY_D);
+        boolean isWDown = window.getInput().isKeyDown(GLFW.GLFW_KEY_W);
+        boolean isSDown = window.getInput().isKeyDown(GLFW.GLFW_KEY_S);
 
-        if (window.getInput().isKeyDown(GLFW.GLFW_KEY_A)) movement.add(-movementSpeed * delta, 0);
+        if (isADown) movement.add(isWDown || isSDown ? movementN / 1.5f : movementN, 0);
 		
-		if (window.getInput().isKeyDown(GLFW.GLFW_KEY_D)) movement.add(movementSpeed * delta, 0);
-		
-		if (window.getInput().isKeyDown(GLFW.GLFW_KEY_W)) movement.add(0, movementSpeed * delta);
-		
-		if (window.getInput().isKeyDown(GLFW.GLFW_KEY_S)) movement.add(0, -movementSpeed * delta);
+		if (isDDown) movement.add(isWDown || isSDown ? movementP / 1.5f : movementP, 0);
+
+		if (isWDown) movement.add(0, isADown || isDDown ? movementP / 1.5f : movementP);
+
+		if (isSDown) movement.add(0, isADown || isDDown ? movementN / 1.5f : movementN);
 
         setMovementSpeed(window.getInput().isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) ? MovementSpeed.RUNNING : MovementSpeed.WALKING);
 		move(movement);
