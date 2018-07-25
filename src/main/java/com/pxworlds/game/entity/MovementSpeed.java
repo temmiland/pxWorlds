@@ -12,7 +12,7 @@ public enum MovementSpeed {
     }
 
 
-    public int getSpeedValue() {
+    public int getValue() {
         return movementSpeed;
     }
 }

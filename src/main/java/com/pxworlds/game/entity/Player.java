@@ -12,17 +12,19 @@ import com.pxworlds.game.world.World;
 public class Player extends Entity {
 	public static final int ANIM_IDLE = 0;
 	public static final int ANIM_WALK = 1;
-	public static final int ANIM_SIZE = 2;
-    private int movementSpeed = 5;
+	public static final int ANIM_RUN = 2;
+    public static final int ANIM_SIZE = 3;
+    private int movementSpeed = MovementSpeed.WALKING.getValue();
 
     public Player(Transform transform) {
 		super(ANIM_SIZE, transform);
 		setAnimation(ANIM_IDLE, new Animation(4, 3, "player/idle"));
-		setAnimation(ANIM_WALK, new Animation(4, 8, "player/walking"));
+		setAnimation(ANIM_WALK, new Animation(4, MovementSpeed.WALKING.getValue(), "player/walking"));
+		setAnimation(ANIM_RUN, new Animation(4, MovementSpeed.RUNNING.getValue(), "player/walking"));
 	}
 
 	public void setMovementSpeed(MovementSpeed movementSpeed) {
-        this.movementSpeed = movementSpeed.getSpeedValue();
+        this.movementSpeed = movementSpeed.getValue();
     }
 	
 	@Override
@@ -38,12 +40,8 @@ public class Player extends Entity {
 		if (window.getInput().isKeyDown(GLFW.GLFW_KEY_S)) movement.add(0, -movementSpeed * delta);
 
         setMovementSpeed(window.getInput().isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) ? MovementSpeed.RUNNING : MovementSpeed.WALKING);
-
 		move(movement);
-		
-		if (movement.x != 0 || movement.y != 0)
-			useAnimation(ANIM_WALK);
-		else useAnimation(ANIM_IDLE);
+        useAnimation(movement.x != 0 || movement.y != 0 ? movementSpeed == MovementSpeed.WALKING.getValue() ? ANIM_WALK : ANIM_RUN : ANIM_IDLE);
 		
 		camera.getPosition().lerp(transform.pos.mul(-world.getScale(), new Vector3f()), 0.05f);
 	}
