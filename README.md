@@ -1,4 +1,4 @@
-# pxWorlds - [![Build Status](https://travis-ci.com/tomxpcvx/pxWorlds.svg?token=2dxqrLRwQZdmsL3aSMPB&branch=master)](https://travis-ci.com/tomxpcvx/pxWorlds)
+# pxWorlds - ![Run Gradle](https://github.com/tomxpcvx/pxWorlds/workflows/Run%20Gradle/badge.svg)
 
 Java game written with LWJGL.
 
