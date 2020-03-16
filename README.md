@@ -12,7 +12,7 @@ pxWorlds uses Gradle as build system.
 
 ### Requirements
 * Git
-* Java 8
+* Java 13
 
 ### Checkout sources
 Open a shell and type:
