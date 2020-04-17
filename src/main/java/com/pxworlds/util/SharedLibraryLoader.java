@@ -171,7 +171,7 @@ public class SharedLibraryLoader {
 
 	private InputStream readFile (String path) {
 		if (nativesJar == null) {
-			InputStream input = SharedLibraryLoader.class.getResourceAsStream("/" + path);
+			InputStream input = SharedLibraryLoader.class.getResourceAsStream("/natives/windows/x64/com/lwjgl/" + path);
 			if (input == null) throw new RuntimeException("Unable to read file for extraction: " + path);
 			return input;
 		}
