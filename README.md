@@ -30,4 +30,4 @@ Use this command to run the source code with gradle:
 If you make any changes or improvements to this project, please make a pull request to merge your changes with the upstream.
 
 ## License
-pxWorlds is licensed under the MIT license. Please see [`LICENSE`](https://github.com/tomxpcvx/pxWorlds/blob/master/LICENSE) for more info.
+pxWorlds is licensed under the MIT license. Please see [`LICENSE`](https://github.com/tomxpcvx/pxWorlds/blob/main/LICENSE) for more info.
