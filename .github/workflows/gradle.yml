@@ -4,10 +4,11 @@ on:
     - cron: "0 0 * * 5"
   pull_request:
     branches:
-      - master
+      - main
   push:
     branches:
-      - master
+      - main
+  workflow_dispatch:
 
 jobs:
   gradle:
