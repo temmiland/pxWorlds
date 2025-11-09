@@ -29,9 +29,13 @@ public enum ScreenResolutions {
     R_1024_768("1024x768", 1024, 768, 0),
     R_800_600("800x600", 800, 600, 1);
 
+    /** The display name of the resolution. */
     private String displayName = "";
+    /** The width of the resolution. */
     private int width = 0;
+    /** The height of the resolution. */
     private int height = 0;
+    /** The scale factor for the resolution. */
     private double scale = 1;
 
     ScreenResolutions(String displayName, int width, int height, double scale) {

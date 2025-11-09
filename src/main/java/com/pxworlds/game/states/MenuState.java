@@ -12,12 +12,18 @@ import com.pxworlds.game.world.World;
  */
 public class MenuState extends GameState {
 
+    /** The menu GUI. */
     private MenuGui gui;
 
+    /** The world being rendered. */
     private World world;
+    /** The camera for rendering. */
     private Camera camera;
+    /** The tile renderer. */
     private TileRenderer tiles;
+    /** The shader for rendering. */
     private Shader shader;
+    /** The window. */
     private Window window;
 
     public MenuState(GameStateManager gsm) {
@@ -49,8 +55,8 @@ public class MenuState extends GameState {
     }
 
     @Override
-    public void update(double frame_cap)  {
-        world.update((float) frame_cap, window, camera);
+    public void update(double frameCap)  {
+        world.update((float) frameCap, window, camera);
         world.correctCamera(camera, window);
         gui.update(window.getInput());
     }

@@ -5,12 +5,13 @@ package com.pxworlds.configuration.screen;
  */
 public enum ScreenTypes {
 
-
     WINDOWED("Fenstermodus", 0),
     WINDOWED_FULLSCREEN("Fenstermodus ohne Rahmen", 1),
     FULLSCREEN("Vollbild", 2);
 
+    /** The display name of the screen type. */
     private String displayName = "";
+    /** The integer value representing the screen type. */
     private int screenType = 0;
 
     ScreenTypes(String displayName, int screenType) {

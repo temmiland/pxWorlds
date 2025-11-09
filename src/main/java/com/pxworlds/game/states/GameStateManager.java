@@ -9,8 +9,11 @@ import java.util.ArrayList;
  */
 public class GameStateManager {
 
+    /** The list of game states. */
     private ArrayList<GameState> gameStates;
+    /** The index of the current state. */
     private int currentState;
+    /** The window. */
     private Window window;
 
     public GameStateManager() {
@@ -39,8 +42,8 @@ public class GameStateManager {
         gameStates.get(currentState).resize();
     }
 
-    public void update(double frame_cap)  {
-        gameStates.get(currentState).update(frame_cap);
+    public void update(double frameCap)  {
+        gameStates.get(currentState).update(frameCap);
     }
 
     public void render() {

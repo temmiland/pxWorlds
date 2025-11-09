@@ -11,10 +11,15 @@ import com.pxworlds.game.world.World;
  */
 public class LevelState extends GameState {
 
+    /** The camera for rendering. */
     private Camera camera;
+    /** The world being rendered. */
     private World world;
+    /** The tile renderer. */
     private TileRenderer tiles;
+    /** The shader for rendering. */
     private Shader shader;
+    /** The window. */
     private Window window;
 
     public LevelState(GameStateManager gsm) {
@@ -44,8 +49,8 @@ public class LevelState extends GameState {
     }
 
     @Override
-    public void update(double frame_cap) {
-        world.update((float) frame_cap, window, camera);
+    public void update(double frameCap) {
+        world.update((float) frameCap, window, camera);
         world.correctCamera(camera, window);
     }
 

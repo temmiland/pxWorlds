@@ -10,14 +10,18 @@ import java.nio.IntBuffer;
 import org.lwjgl.BufferUtils;
 
 public class Model implements AutoCloseable {
+	/** The number of elements to draw. */
 	private int drawCount;
 
+	/** The OpenGL vertex buffer object. */
 	private int vertexObject;
+	/** The OpenGL texture coordinate buffer object. */
 	private int textureCoordObject;
 
+	/** The OpenGL index buffer object. */
 	private int indexObject;
 
-	public Model(float[] vertices, float[] tex_coords, int[] indices) {
+	public Model(float[] vertices, float[] textureCoords, int[] indices) {
 		drawCount = indices.length;
 
 		vertexObject = glGenBuffers();

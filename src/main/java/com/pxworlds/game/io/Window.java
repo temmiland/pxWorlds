@@ -6,13 +6,23 @@ import static org.lwjgl.glfw.GLFW.*;
 import org.lwjgl.glfw.*;
 
 public class Window {
+	/** The default window width. */
+	private static final int DEFAULT_WIDTH = 640;
+	/** The default window height. */
+	private static final int DEFAULT_HEIGHT = 480;
+	/** The GLFW window handle. */
 	private long window;
 
+	/** The width of the window. */
 	private int width, height;
+	/** Whether the window is in fullscreen mode. */
 	private boolean fullscreen;
+	/** Whether the window has been resized. */
 	private boolean hasResized;
+	/** The callback for window size changes. */
 	private GLFWWindowSizeCallback windowSizeCallback;
 
+	/** The input handler. */
 	private Input input;
 
 	public static void setCallbacks() {
@@ -38,7 +48,7 @@ public class Window {
 	}
 
 	public Window() {
-		setSize(640, 480);
+		setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		setFullscreen(false);
 		hasResized = false;
 	}

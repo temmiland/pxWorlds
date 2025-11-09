@@ -13,10 +13,14 @@ import static com.pxworlds.Constants.TITLE;
 
 public class Bootstrap {
 
+    /** The singleton instance of Bootstrap. */
     private static Bootstrap instance;
 
+    /** The Gson instance for JSON handling. */
     private Gson                 gson;
+    /** The JSON configuration. */
     private JsonConfig           jsonConfig;
+    /** The configuration storage. */
     private ConfigurationStorage configurationStorage;
     private WorldManager         worldManager;
     private String               apiKey;

@@ -14,9 +14,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Shader implements AutoCloseable {
-	private static final Logger logger = LoggerFactory.getLogger(Shader.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Shader.class);
+	/** The OpenGL program object ID. */
 	private int programObject;
+	/** The OpenGL vertex shader object ID. */
 	private int vertexShaderObject;
+	/** The OpenGL fragment shader object ID. */
 	private int fragmentShaderObject;
 
 	public Shader(String filename) {
@@ -100,8 +103,7 @@ public class Shader implements AutoCloseable {
 				outputString.append("\n");
 			}
 			bufferedReader.close();
-		}
-		catch (IOException | URISyntaxException e) {
+		} catch (IOException | URISyntaxException e) {
 			e.printStackTrace();
 		}
 		return outputString.toString();

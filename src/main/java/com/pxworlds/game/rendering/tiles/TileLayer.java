@@ -2,7 +2,9 @@ package com.pxworlds.game.rendering.tiles;
 
 public class TileLayer {
 
+    /** The type of the tile layer. */
     private TileLayerType tileLayerType;
+    /** The tile in this layer. */
     private Tile tile;
 
     public TileLayer(TileLayerType tileLayerType, Tile tile) {
