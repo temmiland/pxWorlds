@@ -1,36 +1,35 @@
-# pxWorlds - ![Run Gradle](https://github.com/temmiland/pxWorlds/workflows/Run%20Gradle/badge.svg) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ftomxpcvx%2FpxWorlds.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Ftomxpcvx%2FpxWorlds?ref=badge_shield)
+# 🦚 pxWorlds
 
-Java game written with LWJGL.
+[![Stars](https://img.shields.io/github/stars/temmiland/pxWorlds?style=social)](https://github.com/temmiland/pxWorlds/stargazers)
+[![License](https://img.shields.io/github/license/temmiland/pxWorlds)](./LICENSE)
 
-Inspired by this tutorial series: [YouTube](https://www.youtube.com/watch?v=VH9KAhjXVFM&list=PLILiqflMilIxta2xKk2EftiRHD4nQGW0u)
+> **pxWorlds** is a prototype game built with **LWJGL**, inspired by classic tutorials and open-world creativity.
+> 🎓 Inspired by: [3D Game Development Series on YouTube](https://www.youtube.com/watch?v=VH9KAhjXVFM&list=PLILiqflMilIxta2xKk2EftiRHD4nQGW0u)
 
-[![forthebadge](https://forthebadge.com/images/badges/made-with-java.svg)](https://forthebadge.com)
-[![forthebadge](https://forthebadge.com/images/badges/designed-in-ms-paint.svg)](https://forthebadge.com)
+## 🚀 Getting Started
 
-## Build
-pxWorlds uses Gradle as build system.
+### 1. Clone the repository
 
-### Requirements
-* Git
-* Java 13
-
-### Checkout sources
-Open a shell and type:
-```
+```bash
 git clone https://github.com/temmiland/pxWorlds.git
 cd pxWorlds/
 ```
-Use this command to run the source code with gradle:
+
+### 2. Build the project
+
+Make sure you have Git and Java 21+ installed.
+
+```bash
+./mvnw clean install
 ```
-./gradlew build
+
+### 3. Run the project
+
+```bash
+./mvnw exec:exec
 ```
 
-## Contribute
-#### Pull Requests
-If you make any changes or improvements to this project, please make a pull request to merge your changes with the upstream.
+## 🧾 License
 
-## License
-pxWorlds is licensed under the MIT license. Please see [`LICENSE`](https://github.com/temmiland/pxWorlds/blob/main/LICENSE) for more info.
-
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ftomxpcvx%2FpxWorlds.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Ftomxpcvx%2FpxWorlds?ref=badge_large)
+This project is licensed under the MIT License.
+Please see [`LICENSE`](https://github.com/temmiland/pxWorlds/blob/master/LICENSE) for more info.
