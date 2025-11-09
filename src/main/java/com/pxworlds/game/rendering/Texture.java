@@ -14,7 +14,7 @@ import javax.imageio.ImageIO;
 
 import org.lwjgl.BufferUtils;
 
-public class Texture {
+public class Texture implements AutoCloseable {
 	private int textureObject;
 	private int width;
 	private int height;
@@ -22,20 +22,14 @@ public class Texture {
 	public Texture(String filename) {
 		BufferedImage bufferedImage;
 		try {
-            System.out.println(filename);
             URI file = getClass().getResource("/textures/" + filename).toURI();
 			bufferedImage = ImageIO.read(new File(file));
 			width = bufferedImage.getWidth();
 			height = bufferedImage.getHeight();
 
-			System.out.println(width * height * 4);
-
 			int[] pixels_raw = new int[width * height * 4];
-			System.out.println(pixels_raw.length);
 			pixels_raw = bufferedImage.getRGB(0, 0, width, height, null, 0, width);
-			System.out.println(pixels_raw.length);
 			ByteBuffer pixels = BufferUtils.createByteBuffer(width * height * 4);
-			System.out.println(pixels);
 			for (int i = 0; i < width; i++) {
 				for (int j = 0; j < height; j++) {
 					int pixel = pixels_raw[i * width + j];
@@ -64,9 +58,8 @@ public class Texture {
 	}
 
 	@Override
-	protected void finalize() throws Throwable {
+	public void close() {
 		glDeleteTextures(textureObject);
-		super.finalize();
 	}
 
 	public void bind(int sampler) {
