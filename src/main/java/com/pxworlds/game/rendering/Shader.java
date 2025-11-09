@@ -10,80 +10,84 @@ import java.nio.FloatBuffer;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class Shader {
+public class Shader implements AutoCloseable {
+	private static final Logger logger = LoggerFactory.getLogger(Shader.class);
 	private int programObject;
 	private int vertexShaderObject;
 	private int fragmentShaderObject;
-	
+
 	public Shader(String filename) {
 		programObject = glCreateProgram();
-		
+
 		vertexShaderObject = glCreateShader(GL_VERTEX_SHADER);
 		glShaderSource(vertexShaderObject, readFile(filename + ".vs"));
 		glCompileShader(vertexShaderObject);
 		if (glGetShaderi(vertexShaderObject, GL_COMPILE_STATUS) != 1) {
-			System.err.println(glGetShaderInfoLog(vertexShaderObject));
-			System.exit(1);
+			String errorLog = glGetShaderInfoLog(vertexShaderObject);
+			logger.error("Vertex shader compilation failed: {}", errorLog);
+			throw new RuntimeException("Failed to compile vertex shader: " + errorLog);
 		}
-		
+
 		fragmentShaderObject = glCreateShader(GL_FRAGMENT_SHADER);
 		glShaderSource(fragmentShaderObject, readFile(filename + ".fs"));
 		glCompileShader(fragmentShaderObject);
 		if (glGetShaderi(fragmentShaderObject, GL_COMPILE_STATUS) != 1) {
-			System.err.println(glGetShaderInfoLog(fragmentShaderObject));
-			System.exit(1);
-		}
-		
-		glAttachShader(programObject, vertexShaderObject);
+			String errorLog = glGetShaderInfoLog(fragmentShaderObject);
+			logger.error("Fragment shader compilation failed: {}", errorLog);
+			throw new RuntimeException("Failed to compile fragment shader: " + errorLog);
+		}		glAttachShader(programObject, vertexShaderObject);
 		glAttachShader(programObject, fragmentShaderObject);
-		
+
 		glBindAttribLocation(programObject, 0, "vertices");
 		glBindAttribLocation(programObject, 1, "textures");
-		
+
 		glLinkProgram(programObject);
 		if (glGetProgrami(programObject, GL_LINK_STATUS) != 1) {
-			System.err.println(glGetProgramInfoLog(programObject));
-			System.exit(1);
+			String errorLog = glGetProgramInfoLog(programObject);
+			logger.error("Shader program linking failed: {}", errorLog);
+			throw new RuntimeException("Failed to link shader program: " + errorLog);
 		}
 		glValidateProgram(programObject);
 		if (glGetProgrami(programObject, GL_VALIDATE_STATUS) != 1) {
-			System.err.println(glGetProgramInfoLog(programObject));
-			System.exit(1);
+			String errorLog = glGetProgramInfoLog(programObject);
+			logger.error("Shader program validation failed: {}", errorLog);
+			throw new RuntimeException("Failed to validate shader program: " + errorLog);
 		}
 	}
-	
+
 	@Override
-	protected void finalize() throws Throwable {
+	public void close() {
 		glDetachShader(programObject, vertexShaderObject);
 		glDetachShader(programObject, fragmentShaderObject);
 		glDeleteShader(vertexShaderObject);
 		glDeleteShader(fragmentShaderObject);
 		glDeleteProgram(programObject);
-		super.finalize();
 	}
-	
+
 	public void setUniform(String uniformName, int value) {
 		int location = glGetUniformLocation(programObject, uniformName);
 		if (location != -1) glUniform1i(location, value);
 	}
-	
+
 	public void setUniform(String uniformName, Vector4f value) {
 		int location = glGetUniformLocation(programObject, uniformName);
 		if (location != -1) glUniform4f(location, value.x, value.y, value.z, value.w);
 	}
-	
+
 	public void setUniform(String uniformName, Matrix4f value) {
 		int location = glGetUniformLocation(programObject, uniformName);
 		FloatBuffer matrixData = BufferUtils.createFloatBuffer(16);
 		value.get(matrixData);
 		if (location != -1) glUniformMatrix4fv(location, false, matrixData);
 	}
-	
+
 	public void bind() {
 		glUseProgram(programObject);
 	}
-	
+
 	private String readFile(String filename) {
 		StringBuilder outputString = new StringBuilder();
 		BufferedReader bufferedReader;
