@@ -29,7 +29,16 @@ Make sure you have Git and Java 21+ installed.
 ./mvnw exec:exec
 ```
 
-## 🧾 License
+### 4. Running the JAR (Standalone Executable)
+
+After building, you can run the game using the generated JAR files. Download the appropriate JAR for your platform from the [Releases](https://github.com/temmiland/pxWorlds/releases) page.
+
+- **Linux**: `java -jar pxWorlds-linux.jar`
+- **macOS (Intel)**: `java -jar pxWorlds-macos-amd64.jar`
+- **macOS (Apple Silicon)**: `java -jar pxWorlds-macos-arm64.jar`
+- **Windows**: `java -jar pxWorlds-windows.jar`
+
+Make sure you have Java 21+ installed on your system.
 
 This project is licensed under the MIT License.
 Please see [`LICENSE`](https://github.com/temmiland/pxWorlds/blob/master/LICENSE) for more info.
