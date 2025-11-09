@@ -5,10 +5,16 @@ import com.pxworlds.configuration.Configuration;
 
 public class ScreenConfiguration extends Configuration {
 
+    /** Whether the application is in fullscreen mode. */
     private boolean fullscreen = false;
+    /** The last width of the screen. */
     private int     lastWidth  = ((int) Bootstrap.getInstance().getDimension().getWidth());
+    /** The last height of the screen. */
     private int     lastHeight = ((int) Bootstrap.getInstance().getDimension().getHeight());
-    private int     frameRate = 60;
+    /** The default frame rate. */
+    private static final int DEFAULT_FRAME_RATE = 60;
+    /** The frame rate of the application. */
+    private int     frameRate = DEFAULT_FRAME_RATE;
 
     public ScreenConfiguration() {
     }

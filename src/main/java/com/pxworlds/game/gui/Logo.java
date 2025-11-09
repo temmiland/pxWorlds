@@ -12,6 +12,7 @@ import org.joml.Vector2f;
 
 public class Logo {
 
+    /** The bounding box for the logo. */
     private AABB boundingBox;
 
     private static Matrix4f transform = new Matrix4f();

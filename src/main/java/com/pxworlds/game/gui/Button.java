@@ -16,37 +16,38 @@ public class Button {
 	public static final int STATE_IDLE = 0;
 	public static final int STATE_SELECTED = 1;
 	public static final int STATE_CLICKED = 2;
-	
+
+	/** The bounding box for the button. */
 	private AABB boundingBox;
-	
+
+	/** The current selected state of the button. */
 	private int selectedState;
-	
+
 	private static Matrix4f transform = new Matrix4f();
-	
+
 	public Button(Vector2f position, Vector2f scale) {
 		this.boundingBox = new AABB(position, scale);
 		selectedState = STATE_IDLE;
 	}
-	
+
 	public void update(Input input) {
 		Collision data = boundingBox.getCollision(input.getMousePosition());
-		
+
 		if (data.isIntersecting) {
 			selectedState = STATE_SELECTED;
-			
+
 			if (input.isMouseButtonDown(0)) {
 				selectedState = STATE_CLICKED;
                 PxWorlds.getInstance().gsm.setState(2);
 			}
-		}
-		else selectedState = STATE_IDLE;
+		} else selectedState = STATE_IDLE;
 	}
-	
+
 	public void render(Camera camera, TileSheet sheet, Shader shader) {
 		Vector2f position = boundingBox.getCenter(), scale = boundingBox.getHalfExtent();
-		
+
 		transform.identity().translate(position.x, position.y, 0).scale(scale.x, scale.y, 1); // Middle/Fill
-		
+
 		shader.setUniform("projection", camera.getProjection().mul(transform));
 		switch (selectedState) {
 			case STATE_SELECTED :
@@ -60,14 +61,14 @@ public class Button {
 				break;
 		}
 		Assets.getModel().render();
-		
+
 		renderSides(position, scale, camera, sheet, shader);
 		renderCorners(position, scale, camera, sheet, shader);
 	}
-	
+
 	private void renderSides(Vector2f position, Vector2f scale, Camera camera, TileSheet sheet, Shader shader) {
 		transform.identity().translate(position.x, position.y + scale.y - 16, 0).scale(scale.x, 16, 1); // Top
-		
+
 		shader.setUniform("projection", camera.getProjection().mul(transform));
 		switch (selectedState) {
 			case STATE_SELECTED :
@@ -81,9 +82,9 @@ public class Button {
 				break;
 		}
 		Assets.getModel().render();
-		
+
 		transform.identity().translate(position.x, position.y - scale.y + 16, 0).scale(scale.x, 16, 1); // Bottom
-		
+
 		shader.setUniform("projection", camera.getProjection().mul(transform));
 		switch (selectedState) {
 			case STATE_SELECTED :
@@ -97,9 +98,9 @@ public class Button {
 				break;
 		}
 		Assets.getModel().render();
-		
+
 		transform.identity().translate(position.x - scale.x + 16, position.y, 0).scale(16, scale.y, 1); // Left
-		
+
 		shader.setUniform("projection", camera.getProjection().mul(transform));
 		switch (selectedState) {
 			case STATE_SELECTED :
@@ -113,9 +114,9 @@ public class Button {
 				break;
 		}
 		Assets.getModel().render();
-		
+
 		transform.identity().translate(position.x + scale.x - 16, position.y, 0).scale(16, scale.y, 1); // Right
-		
+
 		shader.setUniform("projection", camera.getProjection().mul(transform));
 		switch (selectedState) {
 			case STATE_SELECTED :
@@ -130,11 +131,11 @@ public class Button {
 		}
 		Assets.getModel().render();
 	}
-	
+
 	private void renderCorners(Vector2f position, Vector2f scale, Camera camera, TileSheet sheet, Shader shader) {
 		transform.identity().translate(position.x - scale.x + 16, position.y + scale.y - 16, 0).scale(16, 16, 1); // Top
 																																					 // Left
-		
+
 		shader.setUniform("projection", camera.getProjection().mul(transform));
 		switch (selectedState) {
 			case STATE_SELECTED :
@@ -148,10 +149,10 @@ public class Button {
 				break;
 		}
 		Assets.getModel().render();
-		
+
 		transform.identity().translate(position.x + scale.x - 16, position.y + scale.y - 16, 0).scale(16, 16, 1); // Top
 																																					 // Right
-		
+
 		shader.setUniform("projection", camera.getProjection().mul(transform));
 		switch (selectedState) {
 			case STATE_SELECTED :
@@ -165,10 +166,10 @@ public class Button {
 				break;
 		}
 		Assets.getModel().render();
-		
+
 		transform.identity().translate(position.x - scale.x + 16, position.y - scale.y + 16, 0).scale(16, 16, 1); // Bottom
 																																					 // Left
-		
+
 		shader.setUniform("projection", camera.getProjection().mul(transform));
 		switch (selectedState) {
 			case STATE_SELECTED :
@@ -182,10 +183,10 @@ public class Button {
 				break;
 		}
 		Assets.getModel().render();
-		
+
 		transform.identity().translate(position.x + scale.x - 16, position.y - scale.y + 16, 0).scale(16, 16, 1); // Bottom
 																																					 // Right
-		
+
 		shader.setUniform("projection", camera.getProjection().mul(transform));
 		switch (selectedState) {
 			case STATE_SELECTED :

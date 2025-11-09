@@ -6,8 +6,11 @@ import java.util.UUID;
 
 public class ProfileConfiguration extends Configuration {
 
+    /** The name of the profile. */
     private String profileName = "";
+    /** The name of the user. */
     private String userName    = "";
+    /** The unique identifier for the profile. */
     private UUID   uuid        = UUID.randomUUID();
 
     public ProfileConfiguration(String profileName, String userName, UUID uuid) {

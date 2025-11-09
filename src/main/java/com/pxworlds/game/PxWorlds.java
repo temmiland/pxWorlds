@@ -13,14 +13,21 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
 public class PxWorlds {
-	private static final Logger logger = LoggerFactory.getLogger(PxWorlds.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PxWorlds.class);
 
+    /** The singleton instance of PxWorlds. */
     private static PxWorlds instance;
+	/** The title of the window. */
 	private String title;
+	/** The width of the window. */
 	private int width;
+	/** The height of the window. */
 	private int height;
+	/** Whether the window is in fullscreen mode. */
 	private boolean fullscreen;
+	/** The target FPS rate. */
 	private int fpsRate;
+	/** The game state manager. */
 	public GameStateManager gsm;
 
 	public PxWorlds(String title, int width, int height, boolean fullscreen, int fpsRate) {
@@ -61,9 +68,9 @@ public class PxWorlds {
 
         gsm.init(window);
 
-		double frame_cap = 1.0 / fpsRate;
+		double frameCap = 1.0 / fpsRate;
 
-		double frame_time = 0;
+		double frameTime = 0;
 		int frames = 0;
 
 		double time = Timer.getTime();
@@ -71,24 +78,24 @@ public class PxWorlds {
 
 		while (!window.shouldClose()) {
 
-		    boolean can_render = false;
+		    boolean canRender = false;
 
-			double time_2 = Timer.getTime();
-			double passed = time_2 - time;
+			double time2 = Timer.getTime();
+			double passed = time2 - time;
 
             unprocessed += passed;
-			frame_time += passed;
-            time = time_2;
+			frameTime += passed;
+            time = time2;
 
-            while (unprocessed >= frame_cap) {
+            while (unprocessed >= frameCap) {
 				if (window.hasResized()) {
 				    gsm.resize();
 					glViewport(0, 0, window.getWidth(), window.getHeight());
 				}
 
-				unprocessed -= frame_cap;
-				can_render = true;
-                gsm.update(frame_cap);
+				unprocessed -= frameCap;
+				canRender = true;
+                gsm.update(frameCap);
 
 				if (window.getInput().isKeyReleased(GLFW_KEY_ESCAPE)) {
 					glfwSetWindowShouldClose(window.getWindow(), true);
@@ -96,14 +103,14 @@ public class PxWorlds {
 
 				window.update();
 
-				if (frame_time >= 1.0) {
-					frame_time = 0;
+				if (frameTime >= 1.0) {
+					frameTime = 0;
 					//TODO System.out.println("FPS: " + frames);
 					frames = 0;
 				}
 			}
 
-			if (can_render) {
+			if (canRender) {
 				glClear(GL_COLOR_BUFFER_BIT);
 
 				gsm.render();

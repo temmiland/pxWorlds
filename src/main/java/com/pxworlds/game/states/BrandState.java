@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class BrandState extends GameState {
 
+    /** The window. */
     private Window window;
 
     public BrandState(GameStateManager gsm) {
@@ -26,7 +27,7 @@ public class BrandState extends GameState {
     }
 
     @Override
-    public void update(double frame_cap)  {
+    public void update(double frameCap)  {
 
     }
 

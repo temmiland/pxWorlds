@@ -10,8 +10,11 @@ public class Tile {
 	public static final Tile GRASS = new Grass();
 	public static final Tile BRICK = new Brick();
 
+	/** The unique ID of the tile. */
 	private byte id;
+	/** Whether the tile is solid. */
 	private boolean solid;
+	/** The texture name of the tile. */
 	private String texture;
 
 	public Tile(String texture, boolean solid) {

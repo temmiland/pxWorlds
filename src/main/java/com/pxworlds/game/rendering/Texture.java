@@ -15,8 +15,11 @@ import javax.imageio.ImageIO;
 import org.lwjgl.BufferUtils;
 
 public class Texture implements AutoCloseable {
+	/** The OpenGL texture object ID. */
 	private int textureObject;
+	/** The width of the texture. */
 	private int width;
+	/** The height of the texture. */
 	private int height;
 
 	public Texture(String filename) {
@@ -27,12 +30,12 @@ public class Texture implements AutoCloseable {
 			width = bufferedImage.getWidth();
 			height = bufferedImage.getHeight();
 
-			int[] pixels_raw = new int[width * height * 4];
-			pixels_raw = bufferedImage.getRGB(0, 0, width, height, null, 0, width);
+			int[] pixelsRaw = new int[width * height * 4];
+			pixelsRaw = bufferedImage.getRGB(0, 0, width, height, null, 0, width);
 			ByteBuffer pixels = BufferUtils.createByteBuffer(width * height * 4);
 			for (int i = 0; i < width; i++) {
 				for (int j = 0; j < height; j++) {
-					int pixel = pixels_raw[i * width + j];
+					int pixel = pixelsRaw[i * width + j];
 					pixels.put((byte) ((pixel >> 16) & 0xFF)); // RED
 					pixels.put((byte) ((pixel >> 8) & 0xFF));  // GREEN
 					pixels.put((byte) (pixel & 0xFF));		  // BLUE
@@ -51,8 +54,7 @@ public class Texture implements AutoCloseable {
 
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
-		}
-		catch (IOException | URISyntaxException e) {
+		} catch (IOException | URISyntaxException e) {
 			e.printStackTrace();
 		}
 	}

@@ -12,11 +12,15 @@ import org.joml.*;
 
 
 public abstract class Entity {
-	protected AABB bounding_box;
+	/** The bounding box for collision detection. */
+	protected AABB boundingBox;
 	// private Texture texture;
+	/** The array of animations. */
 	protected Animation[] animations;
-	private int use_animation;
+	/** The index of the current animation. */
+	private int useAnimation;
 
+	/** The transform of the entity. */
 	protected Transform transform;
 
     private static final int TILE_CHECK_SIZE = 5;
@@ -24,8 +28,8 @@ public abstract class Entity {
     private static final float HALF = 0.5f;
     private static final int DIVIDE_BY_TWO = 2;
 
-	public Entity(int max_animations, Transform transform) {
-		this.animations = new Animation[max_animations];
+	public Entity(int maxAnimations, Transform transform) {
+		this.animations = new Animation[maxAnimations];
 
 		this.transform = transform;
 		this.use_animation = 0;

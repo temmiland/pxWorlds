@@ -5,8 +5,12 @@ import static org.lwjgl.glfw.GLFW.*;
 import org.joml.Vector2f;
 
 public class Input {
+	/** The GLFW key code for space. */
+	private static final int GLFW_KEY_SPACE = 32;
+	/** The GLFW window handle. */
 	private long window;
 
+	/** The array of key states. */
 	private boolean[] keys;
 
 	private static Vector2f mousePos = new Vector2f();
@@ -47,7 +51,7 @@ public class Input {
 	}
 
 	public void update() {
-		for (int i = 32; i < GLFW_KEY_LAST; i++)
+		for (int i = GLFW_KEY_SPACE; i < GLFW_KEY_LAST; i++)
 			keys[i] = isKeyDown(i);
 	}
 }

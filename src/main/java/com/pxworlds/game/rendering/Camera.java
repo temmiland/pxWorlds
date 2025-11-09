@@ -4,18 +4,20 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public class Camera {
+	/** The position of the camera. */
 	private Vector3f position;
+	/** The projection matrix. */
 	private Matrix4f projection;
-	
+
 	public Camera(int width, int height) {
 		position = new Vector3f(0,0,0);
 		setProjection(width, height);
 	}
-	
+
 	public void setProjection(int width, int height) {
 		projection = new Matrix4f().setOrtho2D(-width/2, width/2, -height/2, height/2);
 	}
-	
+
 	public void setPosition(Vector3f position) {
 		this.position.set(position);
 	}
@@ -23,13 +25,14 @@ public class Camera {
 	public void addPosition(Vector3f position) {
 		this.position.add(position);
 	}
-	
-	public Vector3f getPosition() { return position; }
-	
+
+	public Vector3f getPosition()
+	{ return position; }
+
 	public Matrix4f getUntransformedProjection() {
 		return projection;
 	}
-	
+
 	public Matrix4f getProjection() {
 		return projection.translate(position, new Matrix4f());
 	}

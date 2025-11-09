@@ -12,6 +12,10 @@ public enum Hash {
     SHA256("SHA-256"),
     SHA512("SHA-512");
 
+    /** The buffer size for hashing. */
+    private static final int BUFFER_SIZE = 4096;
+
+    /** The name of the hash algorithm. */
     private String name;
 
     Hash(String name) {
@@ -25,7 +29,7 @@ public enum Hash {
     public byte[] checksum(File input) {
         try (InputStream in = new FileInputStream(input)) {
             MessageDigest digest = MessageDigest.getInstance(getName());
-            byte[] block = new byte[4096];
+            byte[] block = new byte[BUFFER_SIZE];
             int length;
             while ((length = in.read(block)) > 0) {
                 digest.update(block, 0, length);

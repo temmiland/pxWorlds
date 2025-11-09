@@ -14,6 +14,7 @@ public class Player extends Entity {
 	public static final int ANIM_WALK = 1;
 	public static final int ANIM_RUN = 2;
     public static final int ANIM_SIZE = 3;
+    /** The movement speed of the player. */
     private int movementSpeed = MovementSpeed.WALKING.getValue();
 
     private static final int IDLE_FRAMES = 4;

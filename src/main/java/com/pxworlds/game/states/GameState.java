@@ -7,10 +7,11 @@ import com.pxworlds.game.io.Window;
  */
 public abstract class GameState {
 
+    /** The game state manager. */
     protected GameStateManager gsm;
     public abstract void init(Window window);
     public abstract void resize();
-    public abstract void update(double frame_cap) ;
+    public abstract void update(double frameCap) ;
     public abstract void render();
 
 }
