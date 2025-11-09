@@ -22,11 +22,11 @@
         <!-- <module name="ParameterName"/> -->
         <module name="StaticVariableName"/>
         <module name="TypeName"/>
-        <!-- <module name="AvoidInlineConditionals"/> -->
-        <module name="EmptyBlock"/>
-        <module name="LeftCurly"/>
+        <!-- <module name="JavadocStyle"/> -->
+        <!-- <module name="EmptyBlock"/> -->
+        <!-- <module name="LeftCurly"/> -->
         <!-- <module name="NeedBraces"/> -->
-        <module name="RightCurly"/>
+        <!-- <module name="RightCurly"/> -->
         <module name="AvoidNestedBlocks"/>
         <module name="EmptyStatement"/>
         <module name="EqualsAvoidNull"/>
@@ -38,8 +38,8 @@
         <module name="SimplifyBooleanExpression"/>
         <module name="SimplifyBooleanReturn"/>
         <!-- <module name="FinalLocalVariable"/> -->
-        <module name="IllegalType"/>
-        <module name="ArrayTypeStyle"/>
+        <!-- <module name="IllegalType"/> -->
+        <!-- <module name="ArrayTypeStyle"/> -->
         <module name="UpperEll"/>
     </module>
 </module>
