@@ -38,39 +38,38 @@ public class PxWorlds {
 	public void run() {
 
 		Window.setCallbacks();
-		
+
 		if (!glfwInit()) {
 			System.err.println("GLFW Failed to initialize!");
 			System.exit(1);
 		}
-		
+
 		Window window = new Window();
 		window.setSize(width, height);
 		window.setFullscreen(fullscreen);
 		window.createWindow(title);
-		
+
 		GL.createCapabilities();
-		
+
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_TEXTURE_2D);
 
         Assets.initAsset();
 
         gsm.init(window);
 
 		double frame_cap = 1.0 / fpsRate;
-		
+
 		double frame_time = 0;
 		int frames = 0;
-		
+
 		double time = Timer.getTime();
 		double unprocessed = 0;
 
 		while (!window.shouldClose()) {
 
 		    boolean can_render = false;
-			
+
 			double time_2 = Timer.getTime();
 			double passed = time_2 - time;
 
@@ -83,7 +82,7 @@ public class PxWorlds {
 				    gsm.resize();
 					glViewport(0, 0, window.getWidth(), window.getHeight());
 				}
-				
+
 				unprocessed -= frame_cap;
 				can_render = true;
                 gsm.update(frame_cap);
@@ -91,21 +90,21 @@ public class PxWorlds {
 				if (window.getInput().isKeyReleased(GLFW_KEY_ESCAPE)) {
 					glfwSetWindowShouldClose(window.getWindow(), true);
 				}
-				
+
 				window.update();
-				
+
 				if (frame_time >= 1.0) {
 					frame_time = 0;
 					//TODO System.out.println("FPS: " + frames);
 					frames = 0;
 				}
 			}
-			
+
 			if (can_render) {
 				glClear(GL_COLOR_BUFFER_BIT);
 
 				gsm.render();
-				
+
 				window.swapBuffers();
 				frames++;
 			}
@@ -115,5 +114,5 @@ public class PxWorlds {
         Bootstrap.getInstance().getConfigurationStorage().saveAllConfigurations();
 		glfwTerminate();
 	}
-	
+
 }
