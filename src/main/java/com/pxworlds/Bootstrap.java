@@ -22,7 +22,7 @@ public class Bootstrap {
     private String               apiKey;
 
     /**
-     * The method which is the entrance point after psvm
+     * The method which is the entrance point after psvm.
      */
     public void onEnable() {
         instance = this;

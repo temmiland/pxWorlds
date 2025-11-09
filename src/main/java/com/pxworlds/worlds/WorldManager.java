@@ -45,7 +45,6 @@ public class WorldManager {
         for(Worlds worlds : Worlds.values()) {
             for(String succeededChecksum : succeededChecksumList) {
                 if(!worlds.getWorldChecksum().equals(succeededChecksum)) {
-
                     // Methode für den Rest-Zugriff auf den Webserver fehlt --> Muss geschrieben werden damit die Datei heruntergeladen werden kann
                     // Download TO DO
                 }
