@@ -6,11 +6,14 @@ import com.pxworlds.game.states.GameStateManager;
 import com.pxworlds.game.io.Timer;
 import com.pxworlds.game.io.Window;
 import org.lwjgl.opengl.GL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
 public class PxWorlds {
+	private static final Logger logger = LoggerFactory.getLogger(PxWorlds.class);
 
     private static PxWorlds instance;
 	private String title;
@@ -40,8 +43,8 @@ public class PxWorlds {
 		Window.setCallbacks();
 
 		if (!glfwInit()) {
-			System.err.println("GLFW Failed to initialize!");
-			System.exit(1);
+			logger.error("GLFW Failed to initialize!");
+			throw new RuntimeException("Failed to initialize GLFW");
 		}
 
 		Window window = new Window();
