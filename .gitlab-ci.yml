@@ -1,0 +1,137 @@
+stages:
+  - lint
+  - build
+  - test
+  - release
+  - sync
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+cache:
+  paths:
+    - .m2/repository
+
+lint:
+  stage: lint
+  image: maven:3.9.6-openjdk-21
+  script:
+    - mvn checkstyle:check
+  only:
+    - merge_requests
+    - main
+    - dev
+
+build:
+  stage: build
+  image: maven:3.9.6-openjdk-21
+  script:
+    - mvn clean package -DskipTests
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 hour
+  only:
+    - merge_requests
+    - main
+    - dev
+
+test:
+  stage: test
+  image: maven:3.9.6-openjdk-21
+  script:
+    - mvn test
+  dependencies:
+    - build
+  only:
+    - merge_requests
+    - main
+    - dev
+
+release_linux:
+  stage: release
+  image: maven:3.9.6-openjdk-21
+  script:
+    - mvn clean package -Plwjgl-natives-linux-amd64
+    - mv target/*-jar-with-dependencies.jar pxWorlds-linux.jar
+  artifacts:
+    paths:
+      - pxWorlds-linux.jar
+    expire_in: 1 week
+  only:
+    - main
+  when: manual
+
+release_macos_amd64:
+  stage: release
+  image: maven:3.9.6-openjdk-21
+  script:
+    - mvn clean package -Plwjgl-natives-macos-amd64
+    - mv target/*-jar-with-dependencies.jar pxWorlds-macos-amd64.jar
+  artifacts:
+    paths:
+      - pxWorlds-macos-amd64.jar
+    expire_in: 1 week
+  only:
+    - main
+  when: manual
+
+release_macos_arm64:
+  stage: release
+  image: maven:3.9.6-openjdk-21
+  script:
+    - mvn clean package -Plwjgl-natives-macos-arm64
+    - mv target/*-jar-with-dependencies.jar pxWorlds-macos-arm64.jar
+  artifacts:
+    paths:
+      - pxWorlds-macos-arm64.jar
+    expire_in: 1 week
+  only:
+    - main
+  when: manual
+
+release_windows:
+  stage: release
+  image: maven:3.9.6-openjdk-21
+  script:
+    - mvn clean package -Plwjgl-natives-windows-amd64
+    - mv target/*-jar-with-dependencies.jar pxWorlds-windows.jar
+  artifacts:
+    paths:
+      - pxWorlds-windows.jar
+    expire_in: 1 week
+  only:
+    - main
+  when: manual
+
+create_release:
+  stage: release
+  image: alpine:latest
+  script:
+    - apk add --no-cache curl
+    - |
+      curl --header 'Content-Type: application/json' --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+        --data '{"name": "Release '$CI_COMMIT_TAG'", "tag_name": "'$CI_COMMIT_TAG'", "description": "Automated release", "draft": true}' \
+        --request POST $CI_API_V4_URL/projects/$CI_PROJECT_ID/releases
+  dependencies:
+    - release_linux
+    - release_macos_amd64
+    - release_macos_arm64
+    - release_windows
+  only:
+    - tags
+  when: manual
+
+sync_github:
+  stage: sync
+  image: alpine:latest
+  script:
+    - apk add --no-cache git
+    - git config --global user.email "ci@gitlab.com"
+    - git config --global user.name "GitLab CI"
+    - git remote add github https://$GITHUB_TOKEN@github.com/YOUR_USERNAME/YOUR_REPO.git
+    - git push github main
+    - git push github dev
+  only:
+    - main
+  when: manual
