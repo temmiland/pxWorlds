@@ -14,7 +14,7 @@ cache:
 
 lint:
   stage: lint
-  image: maven:3.9.6-openjdk-21
+  image: maven:3.9.6-eclipse-temurin-21
   script:
     - mvn checkstyle:check
   only:
@@ -24,7 +24,7 @@ lint:
 
 build:
   stage: build
-  image: maven:3.9.6-openjdk-21
+  image: maven:3.9.6-eclipse-temurin-21
   script:
     - mvn clean package -DskipTests
   artifacts:
@@ -38,7 +38,7 @@ build:
 
 test:
   stage: test
-  image: maven:3.9.6-openjdk-21
+  image: maven:3.9.6-eclipse-temurin-21
   script:
     - mvn test
   dependencies:
@@ -50,7 +50,7 @@ test:
 
 release_linux:
   stage: release
-  image: maven:3.9.6-openjdk-21
+  image: maven:3.9.6-eclipse-temurin-21
   script:
     - mvn clean package -Plwjgl-natives-linux-amd64
     - mv target/*-jar-with-dependencies.jar pxWorlds-linux.jar
@@ -64,7 +64,7 @@ release_linux:
 
 release_macos_amd64:
   stage: release
-  image: maven:3.9.6-openjdk-21
+  image: maven:3.9.6-eclipse-temurin-21
   script:
     - mvn clean package -Plwjgl-natives-macos-amd64
     - mv target/*-jar-with-dependencies.jar pxWorlds-macos-amd64.jar
@@ -78,7 +78,7 @@ release_macos_amd64:
 
 release_macos_arm64:
   stage: release
-  image: maven:3.9.6-openjdk-21
+  image: maven:3.9.6-eclipse-temurin-21
   script:
     - mvn clean package -Plwjgl-natives-macos-arm64
     - mv target/*-jar-with-dependencies.jar pxWorlds-macos-arm64.jar
@@ -92,7 +92,7 @@ release_macos_arm64:
 
 release_windows:
   stage: release
-  image: maven:3.9.6-openjdk-21
+  image: maven:3.9.6-eclipse-temurin-21
   script:
     - mvn clean package -Plwjgl-natives-windows-amd64
     - mv target/*-jar-with-dependencies.jar pxWorlds-windows.jar
