@@ -18,16 +18,17 @@ public class Camera {
 		projection = new Matrix4f().setOrtho2D(-width/2, width/2, -height/2, height/2);
 	}
 
-	public void setPosition(Vector3f position) {
-		this.position.set(position);
+	public void setPosition(Vector3f newPosition) {
+		this.position.set(newPosition);
 	}
 
-	public void addPosition(Vector3f position) {
-		this.position.add(position);
+	public void addPosition(Vector3f newPosition) {
+		this.position.add(newPosition);
 	}
 
-	public Vector3f getPosition()
-	{ return position; }
+	public Vector3f getPosition() {
+		return position;
+	}
 
 	public Matrix4f getUntransformedProjection() {
 		return projection;

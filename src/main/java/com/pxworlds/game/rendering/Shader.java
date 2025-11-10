@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Shader implements AutoCloseable {
+	/** The logger for this class. */
 	private static final Logger LOGGER = LoggerFactory.getLogger(Shader.class);
 	/** The OpenGL program object ID. */
 	private int programObject;
@@ -22,41 +23,54 @@ public class Shader implements AutoCloseable {
 	/** The OpenGL fragment shader object ID. */
 	private int fragmentShaderObject;
 
+	// Shader constants
+	/** The OpenGL success code. */
+	private static final int GL_SUCCESS = 1;
+	/** The attribute location for vertices. */
+	private static final int VERTICES_ATTRIB_LOCATION = 0;
+	/** The attribute location for textures. */
+	private static final int TEXTURES_ATTRIB_LOCATION = 1;
+	/** The invalid uniform location value. */
+	private static final int INVALID_UNIFORM_LOCATION = -1;
+	/** The buffer size for matrices. */
+	private static final int MATRIX_BUFFER_SIZE = 16;
+
 	public Shader(String filename) {
 		programObject = glCreateProgram();
 
 		vertexShaderObject = glCreateShader(GL_VERTEX_SHADER);
 		glShaderSource(vertexShaderObject, readFile(filename + ".vs"));
 		glCompileShader(vertexShaderObject);
-		if (glGetShaderi(vertexShaderObject, GL_COMPILE_STATUS) != 1) {
-			String errorLog = glGetShaderInfoLog(vertexShaderObject);
-			logger.error("Vertex shader compilation failed: {}", errorLog);
+		if (glGetShaderi(vertexShaderObject, GL_COMPILE_STATUS) != GL_SUCCESS) {
+			final String errorLog = glGetShaderInfoLog(vertexShaderObject);
+			LOGGER.error("Vertex shader compilation failed: {}", errorLog);
 			throw new RuntimeException("Failed to compile vertex shader: " + errorLog);
 		}
 
 		fragmentShaderObject = glCreateShader(GL_FRAGMENT_SHADER);
 		glShaderSource(fragmentShaderObject, readFile(filename + ".fs"));
 		glCompileShader(fragmentShaderObject);
-		if (glGetShaderi(fragmentShaderObject, GL_COMPILE_STATUS) != 1) {
-			String errorLog = glGetShaderInfoLog(fragmentShaderObject);
-			logger.error("Fragment shader compilation failed: {}", errorLog);
+		if (glGetShaderi(fragmentShaderObject, GL_COMPILE_STATUS) != GL_SUCCESS) {
+			final String errorLog = glGetShaderInfoLog(fragmentShaderObject);
+			LOGGER.error("Fragment shader compilation failed: {}", errorLog);
 			throw new RuntimeException("Failed to compile fragment shader: " + errorLog);
-		}		glAttachShader(programObject, vertexShaderObject);
+		}
+		glAttachShader(programObject, vertexShaderObject);
 		glAttachShader(programObject, fragmentShaderObject);
 
-		glBindAttribLocation(programObject, 0, "vertices");
-		glBindAttribLocation(programObject, 1, "textures");
+		glBindAttribLocation(programObject, VERTICES_ATTRIB_LOCATION, "vertices");
+		glBindAttribLocation(programObject, TEXTURES_ATTRIB_LOCATION, "textures");
 
 		glLinkProgram(programObject);
-		if (glGetProgrami(programObject, GL_LINK_STATUS) != 1) {
-			String errorLog = glGetProgramInfoLog(programObject);
-			logger.error("Shader program linking failed: {}", errorLog);
+		if (glGetProgrami(programObject, GL_LINK_STATUS) != GL_SUCCESS) {
+			final String errorLog = glGetProgramInfoLog(programObject);
+			LOGGER.error("Shader program linking failed: {}", errorLog);
 			throw new RuntimeException("Failed to link shader program: " + errorLog);
 		}
 		glValidateProgram(programObject);
-		if (glGetProgrami(programObject, GL_VALIDATE_STATUS) != 1) {
-			String errorLog = glGetProgramInfoLog(programObject);
-			logger.error("Shader program validation failed: {}", errorLog);
+		if (glGetProgrami(programObject, GL_VALIDATE_STATUS) != GL_SUCCESS) {
+			final String errorLog = glGetProgramInfoLog(programObject);
+			LOGGER.error("Shader program validation failed: {}", errorLog);
 			throw new RuntimeException("Failed to validate shader program: " + errorLog);
 		}
 	}
@@ -71,20 +85,26 @@ public class Shader implements AutoCloseable {
 	}
 
 	public void setUniform(String uniformName, int value) {
-		int location = glGetUniformLocation(programObject, uniformName);
-		if (location != -1) glUniform1i(location, value);
+		final int location = glGetUniformLocation(programObject, uniformName);
+		if (location != INVALID_UNIFORM_LOCATION) {
+			glUniform1i(location, value);
+		}
 	}
 
 	public void setUniform(String uniformName, Vector4f value) {
-		int location = glGetUniformLocation(programObject, uniformName);
-		if (location != -1) glUniform4f(location, value.x, value.y, value.z, value.w);
+		final int location = glGetUniformLocation(programObject, uniformName);
+		if (location != INVALID_UNIFORM_LOCATION) {
+			glUniform4f(location, value.x, value.y, value.z, value.w);
+		}
 	}
 
 	public void setUniform(String uniformName, Matrix4f value) {
-		int location = glGetUniformLocation(programObject, uniformName);
-		FloatBuffer matrixData = BufferUtils.createFloatBuffer(16);
+		final int location = glGetUniformLocation(programObject, uniformName);
+		final FloatBuffer matrixData = BufferUtils.createFloatBuffer(MATRIX_BUFFER_SIZE);
 		value.get(matrixData);
-		if (location != -1) glUniformMatrix4fv(location, false, matrixData);
+		if (location != INVALID_UNIFORM_LOCATION) {
+			glUniformMatrix4fv(location, false, matrixData);
+		}
 	}
 
 	public void bind() {
@@ -92,11 +112,10 @@ public class Shader implements AutoCloseable {
 	}
 
 	private String readFile(String filename) {
-		StringBuilder outputString = new StringBuilder();
-		BufferedReader bufferedReader;
+		final StringBuilder outputString = new StringBuilder();
 		try {
-			URI filePath = getClass().getResource("/shaders/" + filename).toURI();
-			bufferedReader = new BufferedReader(new FileReader(new File(filePath)));
+			final URI filePath = getClass().getResource("/shaders/" + filename).toURI();
+			final BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(filePath)));
 			String line;
 			while ((line = bufferedReader.readLine()) != null) {
 				outputString.append(line);

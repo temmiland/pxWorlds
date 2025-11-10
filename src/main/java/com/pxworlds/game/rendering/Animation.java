@@ -17,12 +17,12 @@ public class Animation {
 	/** The frames per second. */
 	private double fps;
 
-	public Animation(int amount, int fps, String filename) {
+	public Animation(int amount, int newFps, String filename) {
 		this.texturePointer = 0;
 		this.elapsedTime = 0;
 		this.currentTime = 0;
 		this.lastTime = Timer.getTime();
-		this.fps = 1.0 / fps;
+		this.fps = 1.0 / newFps;
 
 		this.frames = new Texture[amount];
 		for (int i = 0; i < amount; i++) {
@@ -43,7 +43,9 @@ public class Animation {
 			texturePointer++;
 		}
 
-		if (texturePointer >= frames.length) texturePointer = 0;
+		if (texturePointer >= frames.length) {
+			texturePointer = 0;
+		}
 
 		this.lastTime = currentTime;
 

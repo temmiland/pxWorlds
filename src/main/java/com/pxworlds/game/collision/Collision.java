@@ -8,8 +8,8 @@ public class Collision {
 	/** Whether the objects are intersecting. */
 	public boolean isIntersecting;
 
-	public Collision(Vector2f distance, boolean intersects) {
-		this.distance = distance;
+	public Collision(Vector2f newDistance, boolean intersects) {
+		this.distance = newDistance;
 		this.isIntersecting = intersects;
 	}
 }

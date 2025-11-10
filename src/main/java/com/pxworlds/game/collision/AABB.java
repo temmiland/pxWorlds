@@ -8,13 +8,13 @@ public class AABB {
 	/** The half extent of the AABB. */
 	private Vector2f halfExtent;
 
-	public AABB(Vector2f center, Vector2f halfExtent) {
-		this.center = center;
-		this.halfExtent = halfExtent;
+	public AABB(Vector2f newCenter, Vector2f newHalfExtent) {
+		this.center = newCenter;
+		this.halfExtent = newHalfExtent;
 	}
 
 	public Collision getCollision(AABB box2) {
-		Vector2f distance = box2.center.sub(center, new Vector2f());
+		final Vector2f distance = box2.center.sub(center, new Vector2f());
 		distance.x = Math.abs(distance.x);
 		distance.y = Math.abs(distance.y);
 
@@ -24,7 +24,7 @@ public class AABB {
 	}
 
 	public Collision getCollision(Vector2f point) {
-		Vector2f distance = point.sub(center);
+		final Vector2f distance = point.sub(center);
 		distance.x = Math.abs(distance.x);
 		distance.y = Math.abs(distance.y);
 
@@ -34,19 +34,17 @@ public class AABB {
 	}
 
 	public void correctPosition(AABB box2, Collision data) {
-		Vector2f correctionDistance = box2.center.sub(center, new Vector2f());
+		final Vector2f correctionDistance = box2.center.sub(center, new Vector2f());
 		if (data.distance.x > data.distance.y) {
 			if (correctionDistance.x > 0) {
 				center.add(data.distance.x, 0);
-			}
-			else {
+			} else {
 				center.add(-data.distance.x, 0);
 			}
 		} else {
 			if (correctionDistance.y > 0) {
 				center.add(0, data.distance.y);
-			}
-			else {
+			} else {
 				center.add(0, -data.distance.y);
 			}
 		}

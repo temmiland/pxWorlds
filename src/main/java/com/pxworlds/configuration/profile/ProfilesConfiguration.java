@@ -7,6 +7,7 @@ import java.util.List;
 
 public class ProfilesConfiguration extends Configuration {
 
+    /** The list of profile configurations. */
     private List<ProfileConfiguration> profileConfigurations = new ArrayList<>();
 
     public ProfilesConfiguration() {
@@ -16,8 +17,8 @@ public class ProfilesConfiguration extends Configuration {
         return profileConfigurations;
     }
 
-    public ProfilesConfiguration setProfileConfigurations(List<ProfileConfiguration> profileConfigurations) {
-        this.profileConfigurations = profileConfigurations;
+    public ProfilesConfiguration setProfileConfigurations(List<ProfileConfiguration> newProfileConfigurations) {
+        this.profileConfigurations = newProfileConfigurations;
         return this;
     }
 

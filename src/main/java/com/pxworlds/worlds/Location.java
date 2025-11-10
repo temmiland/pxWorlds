@@ -5,18 +5,18 @@ public class Location {
     /** The x coordinate. */
     private int x, y, z;
 
-    public Location(int x, int y, int z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+    public Location(int newX, int newY, int newZ) {
+        this.x = newX;
+        this.y = newY;
+        this.z = newZ;
     }
 
     public int getX() {
         return x;
     }
 
-    public Location setX(int x) {
-        this.x = x;
+    public Location setX(int newX) {
+        this.x = newX;
         return this;
     }
 
@@ -24,8 +24,8 @@ public class Location {
         return y;
     }
 
-    public Location setY(int y) {
-        this.y = y;
+    public Location setY(int newY) {
+        this.y = newY;
         return this;
     }
 
@@ -33,8 +33,8 @@ public class Location {
         return z;
     }
 
-    public Location setZ(int z) {
-        this.z = z;
+    public Location setZ(int newZ) {
+        this.z = newZ;
         return this;
     }
 }

@@ -16,13 +16,13 @@ public class TileSheet {
 	/** The number of tiles in the sheet. */
 	private int amountOfTiles;
 
-	public TileSheet(String texture, int amountOfTiles) {
-		this.texture = new Texture("sheets/" + texture);
+	public TileSheet(String newTexture, int newAmountOfTiles) {
+		this.texture = new Texture("sheets/" + newTexture);
 
-		scale = new Matrix4f().scale(1.0f / (float)amountOfTiles);
+		scale = new Matrix4f().scale(1.0f / (float)newAmountOfTiles);
 		translation = new Matrix4f();
 
-		this.amountOfTiles = amountOfTiles;
+		this.amountOfTiles = newAmountOfTiles;
 	}
 
 	public void bindTile(Shader shader, int x, int y) {
@@ -34,8 +34,8 @@ public class TileSheet {
 	}
 
 	public void bindTile(Shader shader, int tile) {
-		int x = tile % amountOfTiles;
-		int y = tile / amountOfTiles;
+		final int x = tile % amountOfTiles;
+		final int y = tile / amountOfTiles;
 		bindTile(shader, x, y);
 	}
 }

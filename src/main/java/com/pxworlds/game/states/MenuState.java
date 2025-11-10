@@ -12,6 +12,11 @@ import com.pxworlds.game.world.World;
  */
 public class MenuState extends GameState {
 
+    /** The default world scale for menu rendering. */
+    private static final int MENU_WORLD_SCALE = 25;
+    /** The default GUI scale for menu. */
+    private static final int MENU_GUI_SCALE = 21;
+
     /** The menu GUI. */
     private MenuGui gui;
 
@@ -31,20 +36,20 @@ public class MenuState extends GameState {
     }
 
     @Override
-    public void init(Window window) {
-        Camera camera = new Camera(window.getWidth(), window.getHeight());
-        TileRenderer tiles = new TileRenderer();
-        Shader shader = new Shader("shader");
-        World world = new World("demo_level", camera, false, 25);
+    public void init(Window newWindow) {
+        final Camera newCamera = new Camera(newWindow.getWidth(), newWindow.getHeight());
+        final TileRenderer newTiles = new TileRenderer();
+        final Shader newShader = new Shader("shader");
+        final World newWorld = new World("demo_level", newCamera, false, MENU_WORLD_SCALE);
 
-        this.gui = new MenuGui(window, "menustate", 21);
-        this.camera = camera;
-        this.world = world;
-        this.tiles = tiles;
-        this.shader = shader;
-        this.window = window;
+        this.gui = new MenuGui(newWindow, "menustate", MENU_GUI_SCALE);
+        this.camera = newCamera;
+        this.world = newWorld;
+        this.tiles = newTiles;
+        this.shader = newShader;
+        this.window = newWindow;
 
-        world.calculateView(window);
+        world.calculateView(newWindow);
     }
 
     @Override

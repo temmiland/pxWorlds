@@ -25,10 +25,10 @@ public class Gui {
     /** The list of logos. */
     public ArrayList<Logo> logos;
 
-    public Gui(Window window, String tileSheetTexture, int amountOfTiles) {
-        this.window = window;
+    public Gui(Window newWindow, String tileSheetTexture, int amountOfTiles) {
+        this.window = newWindow;
         shader = new Shader("gui");
-        camera = new Camera(window.getWidth(), window.getHeight());
+        camera = new Camera(newWindow.getWidth(), newWindow.getHeight());
         sheet = new TileSheet(tileSheetTexture + ".png", amountOfTiles);
         this.buttons = new ArrayList<>();
         this.logos = new ArrayList<>();
@@ -57,12 +57,12 @@ public class Gui {
         }
     }
 
-    public void registerButtons(Button... buttons) {
-        this.buttons.addAll(Arrays.asList(buttons));
+    public void registerButtons(Button... newButtons) {
+        this.buttons.addAll(Arrays.asList(newButtons));
     }
 
-    public void registerLogos(Logo... logos) {
-        this.logos.addAll(Arrays.asList(logos));
+    public void registerLogos(Logo... newLogos) {
+        this.logos.addAll(Arrays.asList(newLogos));
     }
 
 }

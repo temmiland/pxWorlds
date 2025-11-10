@@ -7,17 +7,17 @@ public class TileLayer {
     /** The tile in this layer. */
     private Tile tile;
 
-    public TileLayer(TileLayerType tileLayerType, Tile tile) {
-        this.tileLayerType = tileLayerType;
-        this.tile = tile;
+    public TileLayer(TileLayerType newTileLayerType, Tile newTile) {
+        this.tileLayerType = newTileLayerType;
+        this.tile = newTile;
     }
 
     public TileLayerType getTileLayerType() {
         return tileLayerType;
     }
 
-    public TileLayer setTileLayerType(TileLayerType tileLayerType) {
-        this.tileLayerType = tileLayerType;
+    public TileLayer setTileLayerType(TileLayerType newTileLayerType) {
+        this.tileLayerType = newTileLayerType;
         return this;
     }
 
@@ -25,8 +25,8 @@ public class TileLayer {
         return tile;
     }
 
-    public TileLayer setTile(Tile tiles) {
-        this.tile = tiles;
+    public TileLayer setTile(Tile newTile) {
+        this.tile = newTile;
         return this;
     }
 }

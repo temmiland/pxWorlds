@@ -13,18 +13,18 @@ public class ProfileConfiguration extends Configuration {
     /** The unique identifier for the profile. */
     private UUID   uuid        = UUID.randomUUID();
 
-    public ProfileConfiguration(String profileName, String userName, UUID uuid) {
-        this.profileName = profileName;
-        this.userName = userName;
-        this.uuid = uuid;
+    public ProfileConfiguration(String newProfileName, String newUserName, UUID newUuid) {
+        this.profileName = newProfileName;
+        this.userName = newUserName;
+        this.uuid = newUuid;
     }
 
     public String getProfileName() {
         return profileName;
     }
 
-    public ProfileConfiguration setProfileName(String profileName) {
-        this.profileName = profileName;
+    public ProfileConfiguration setProfileName(String newProfileName) {
+        this.profileName = newProfileName;
         return this;
     }
 
@@ -32,8 +32,8 @@ public class ProfileConfiguration extends Configuration {
         return userName;
     }
 
-    public ProfileConfiguration setUserName(String userName) {
-        this.userName = userName;
+    public ProfileConfiguration setUserName(String newUserName) {
+        this.userName = newUserName;
         return this;
     }
 
@@ -41,8 +41,8 @@ public class ProfileConfiguration extends Configuration {
         return uuid;
     }
 
-    public ProfileConfiguration setUuid(UUID uuid) {
-        this.uuid = uuid;
+    public ProfileConfiguration setUuid(UUID newUuid) {
+        this.uuid = newUuid;
         return this;
     }
 }

@@ -22,24 +22,41 @@ public class Texture implements AutoCloseable {
 	/** The height of the texture. */
 	private int height;
 
+	// Texture loading constants
+	/** The number of bytes per pixel. */
+	private static final int BYTES_PER_PIXEL = 4;
+	/** The bit shift for the red color component. */
+	private static final int RED_SHIFT = 16;
+	/** The bit shift for the green color component. */
+	private static final int GREEN_SHIFT = 8;
+	/** The bit shift for the blue color component. */
+	private static final int BLUE_SHIFT = 0;
+	/** The bit shift for the alpha color component. */
+	private static final int ALPHA_SHIFT = 24;
+	/** The color mask for extracting color components. */
+	private static final int COLOR_MASK = 0xFF;
+	/** The texture level for OpenGL. */
+	private static final int TEXTURE_LEVEL = 0;
+	/** The maximum number of sampler units. */
+	private static final int MAX_SAMPLER_UNITS = 31;
+
 	public Texture(String filename) {
-		BufferedImage bufferedImage;
+		final BufferedImage bufferedImage;
 		try {
-            URI file = getClass().getResource("/textures/" + filename).toURI();
+            final URI file = getClass().getResource("/textures/" + filename).toURI();
 			bufferedImage = ImageIO.read(new File(file));
 			width = bufferedImage.getWidth();
 			height = bufferedImage.getHeight();
 
-			int[] pixelsRaw = new int[width * height * 4];
-			pixelsRaw = bufferedImage.getRGB(0, 0, width, height, null, 0, width);
-			ByteBuffer pixels = BufferUtils.createByteBuffer(width * height * 4);
+			final int[] pixelsRaw = bufferedImage.getRGB(0, 0, width, height, null, 0, width);
+			final ByteBuffer pixels = BufferUtils.createByteBuffer(width * height * BYTES_PER_PIXEL);
 			for (int i = 0; i < width; i++) {
 				for (int j = 0; j < height; j++) {
-					int pixel = pixelsRaw[i * width + j];
-					pixels.put((byte) ((pixel >> 16) & 0xFF)); // RED
-					pixels.put((byte) ((pixel >> 8) & 0xFF));  // GREEN
-					pixels.put((byte) (pixel & 0xFF));		  // BLUE
-					pixels.put((byte) ((pixel >> 24) & 0xFF)); // ALPHA
+					final int pixel = pixelsRaw[i * width + j];
+					pixels.put((byte) ((pixel >> RED_SHIFT) & COLOR_MASK)); // RED
+					pixels.put((byte) ((pixel >> GREEN_SHIFT) & COLOR_MASK));  // GREEN
+					pixels.put((byte) ((pixel >> BLUE_SHIFT) & COLOR_MASK));		  // BLUE
+					pixels.put((byte) ((pixel >> ALPHA_SHIFT) & COLOR_MASK)); // ALPHA
 				}
 			}
 
@@ -52,7 +69,7 @@ public class Texture implements AutoCloseable {
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+			glTexImage2D(GL_TEXTURE_2D, TEXTURE_LEVEL, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 		} catch (IOException | URISyntaxException e) {
 			e.printStackTrace();
@@ -65,7 +82,7 @@ public class Texture implements AutoCloseable {
 	}
 
 	public void bind(int sampler) {
-		if (sampler >= 0 && sampler <= 31) {
+		if (sampler >= 0 && sampler <= MAX_SAMPLER_UNITS) {
 			glActiveTexture(GL_TEXTURE0 + sampler);
 			glBindTexture(GL_TEXTURE_2D, textureObject);
 		}

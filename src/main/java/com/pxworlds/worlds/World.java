@@ -13,8 +13,8 @@ public class World {
     /** The map of locations to tile layers. */
     private Map<Location, ArrayList<TileLayer>> locationTileLayersHashMap;
 
-    public World(String worldName) {
-        this.worldName = worldName;
+    public World(String name) {
+        this.worldName = name;
         //this.locationTileLayersHashMap = loadWorldFromConfiguration();
     }
 
@@ -30,8 +30,8 @@ public class World {
     //
     //}
 
-    public World setLocationTileLayersHashMap(Map<Location, ArrayList<TileLayer>> locationTileLayersHashMap) {
-        this.locationTileLayersHashMap = locationTileLayersHashMap;
+    public World setLocationTileLayersHashMap(Map<Location, ArrayList<TileLayer>> newLocationTileLayersHashMap) {
+        this.locationTileLayersHashMap = newLocationTileLayersHashMap;
         return this;
     }
 }
