@@ -10,7 +10,9 @@ import java.io.IOException;
 
 public class ConfigurationStorage {
 
+        /** The screen configuration. */
         private ScreenConfiguration screenConfiguration;
+        /** The profiles configuration. */
         private ProfilesConfiguration profilesConfiguration;
 
         public void init() {
@@ -19,7 +21,7 @@ public class ConfigurationStorage {
         }
 
         public void createConfigDirectoryIfNotExists() {
-            File file = new File(Constants.CONFIG_DIRECTORY_PATH);
+            final File file = new File(Constants.CONFIG_DIRECTORY_PATH);
             if (!file.exists()) {
                 file.mkdirs();
             }
@@ -27,12 +29,12 @@ public class ConfigurationStorage {
 
         public void createScreenConfigurationIfNotExists() {
             createConfigDirectoryIfNotExists();
-            File file = new File(Constants.CONFIG_DIRECTORY_PATH, "screen_configuration.json");
+            final File file = new File(Constants.CONFIG_DIRECTORY_PATH, "screen_configuration.json");
             if (!file.exists()) {
                 try {
                     file.createNewFile();
-                    ScreenConfiguration screenConfiguration = new ScreenConfiguration();
-                    Bootstrap.getInstance().getJsonConfig().saveConfig(screenConfiguration, Bootstrap.getInstance().getJsonConfig().generateConfigName("screen_configuration"));
+                    final ScreenConfiguration newScreenConfiguration = new ScreenConfiguration();
+                    Bootstrap.getInstance().getJsonConfig().saveConfig(newScreenConfiguration, Bootstrap.getInstance().getJsonConfig().generateConfigName("screen_configuration"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -42,12 +44,12 @@ public class ConfigurationStorage {
 
         public void createProfilesConfigurationIfNotExists() {
             createConfigDirectoryIfNotExists();
-            File file = new File(Constants.CONFIG_DIRECTORY_PATH, "profiles.json");
+            final File file = new File(Constants.CONFIG_DIRECTORY_PATH, "profiles.json");
             if (!file.exists()) {
                 try {
                     file.createNewFile();
-                    ProfilesConfiguration profilesConfiguration = new ProfilesConfiguration();
-                    Bootstrap.getInstance().getJsonConfig().saveConfig(profilesConfiguration, Bootstrap.getInstance().getJsonConfig().generateConfigName("profiles"));
+                    final ProfilesConfiguration newProfilesConfiguration = new ProfilesConfiguration();
+                    Bootstrap.getInstance().getJsonConfig().saveConfig(newProfilesConfiguration, Bootstrap.getInstance().getJsonConfig().generateConfigName("profiles"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -59,8 +61,8 @@ public class ConfigurationStorage {
             return screenConfiguration;
         }
 
-        public ConfigurationStorage setScreenConfiguration(ScreenConfiguration screenConfiguration) {
-            this.screenConfiguration = screenConfiguration;
+        public ConfigurationStorage setScreenConfiguration(ScreenConfiguration newScreenConfiguration) {
+            this.screenConfiguration = newScreenConfiguration;
             return this;
         }
 
@@ -68,8 +70,8 @@ public class ConfigurationStorage {
             return profilesConfiguration;
         }
 
-        public ConfigurationStorage setProfilesConfiguration(ProfilesConfiguration profilesConfiguration) {
-            this.profilesConfiguration = profilesConfiguration;
+        public ConfigurationStorage setProfilesConfiguration(ProfilesConfiguration newProfilesConfiguration) {
+            this.profilesConfiguration = newProfilesConfiguration;
             return this;
         }
 

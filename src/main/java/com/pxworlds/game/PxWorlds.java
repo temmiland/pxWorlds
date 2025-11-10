@@ -13,6 +13,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
 public class PxWorlds {
+	/** The logger for PxWorlds. */
 	private static final Logger LOGGER = LoggerFactory.getLogger(PxWorlds.class);
 
     /** The singleton instance of PxWorlds. */
@@ -30,14 +31,14 @@ public class PxWorlds {
 	/** The game state manager. */
 	public GameStateManager gsm;
 
-	public PxWorlds(String title, int width, int height, boolean fullscreen, int fpsRate) {
+	public PxWorlds(String newTitle, int newWidth, int newHeight, boolean newFullscreen, int newFpsRate) {
 	    instance = this;
 
-		this.title = title;
-		this.width = width;
-		this.height = height;
-		this.fullscreen = fullscreen;
-        this.fpsRate = fpsRate;
+		this.title = newTitle;
+		this.width = newWidth;
+		this.height = newHeight;
+		this.fullscreen = newFullscreen;
+        this.fpsRate = newFpsRate;
 		this.gsm = new GameStateManager();
 	}
 
@@ -50,11 +51,11 @@ public class PxWorlds {
 		Window.setCallbacks();
 
 		if (!glfwInit()) {
-			logger.error("GLFW Failed to initialize!");
+			LOGGER.error("GLFW Failed to initialize!");
 			throw new RuntimeException("Failed to initialize GLFW");
 		}
 
-		Window window = new Window();
+		final Window window = new Window();
 		window.setSize(width, height);
 		window.setFullscreen(fullscreen);
 		window.createWindow(title);
@@ -68,7 +69,7 @@ public class PxWorlds {
 
         gsm.init(window);
 
-		double frameCap = 1.0 / fpsRate;
+		final double frameCap = 1.0 / fpsRate;
 
 		double frameTime = 0;
 		int frames = 0;
@@ -80,8 +81,8 @@ public class PxWorlds {
 
 		    boolean canRender = false;
 
-			double time2 = Timer.getTime();
-			double passed = time2 - time;
+			final double time2 = Timer.getTime();
+			final double passed = time2 - time;
 
             unprocessed += passed;
 			frameTime += passed;

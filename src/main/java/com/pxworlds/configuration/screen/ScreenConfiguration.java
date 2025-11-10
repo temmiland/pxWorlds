@@ -23,8 +23,8 @@ public class ScreenConfiguration extends Configuration {
         return fullscreen;
     }
 
-    public ScreenConfiguration setFullscreen(boolean fullscreen) {
-        this.fullscreen = fullscreen;
+    public ScreenConfiguration setFullscreen(boolean newFullscreen) {
+        this.fullscreen = newFullscreen;
         return this;
     }
 
@@ -32,8 +32,8 @@ public class ScreenConfiguration extends Configuration {
         return lastWidth;
     }
 
-    public ScreenConfiguration setLastWidth(int lastWidth) {
-        this.lastWidth = lastWidth;
+    public ScreenConfiguration setLastWidth(int newLastWidth) {
+        this.lastWidth = newLastWidth;
         return this;
     }
 
@@ -41,8 +41,8 @@ public class ScreenConfiguration extends Configuration {
         return lastHeight;
     }
 
-    public ScreenConfiguration setLastHeight(int lastHeight) {
-        this.lastHeight = lastHeight;
+    public ScreenConfiguration setLastHeight(int newLastHeight) {
+        this.lastHeight = newLastHeight;
         return this;
     }
 
@@ -50,8 +50,8 @@ public class ScreenConfiguration extends Configuration {
         return frameRate;
     }
 
-    public ScreenConfiguration setFrameRate(int frameRate) {
-        this.frameRate = frameRate;
+    public ScreenConfiguration setFrameRate(int newFrameRate) {
+        this.frameRate = newFrameRate;
         return this;
     }
 

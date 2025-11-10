@@ -33,9 +33,9 @@ public class GameStateManager {
         gameStates.get(currentState).init(window);
     }
 
-    public void init(Window window) {
-        this.window = window;
-        gameStates.get(currentState).init(window);
+    public void init(Window newWindow) {
+        this.window = newWindow;
+        gameStates.get(currentState).init(newWindow);
     }
 
     public void resize() {

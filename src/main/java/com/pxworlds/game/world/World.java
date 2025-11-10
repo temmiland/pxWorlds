@@ -53,32 +53,41 @@ public class World {
 	private static final float BOUNDING_BOX_SIZE = 1.0f;
 	/** The player entity index. */
 	private static final int PLAYER_ENTITY_INDEX = 1;
+	/** The view X position. */
 	private int viewX;
+	/** The view Y position. */
 	private int viewY;
+	/** The tile data. */
 	private byte[] tiles;
+	/** The bounding boxes for collision. */
 	private AABB[] boundingBoxes;
+	/** The list of entities in the world. */
 	private List<Entity> entities;
+	/** The width of the world. */
 	private int width;
+	/** The height of the world. */
 	private int height;
+	/** The scale of the world. */
 	private int scale;
 
+	/** The world transformation matrix. */
 	private Matrix4f world;
 
-	public World(String world, Camera camera, boolean playable, int scale) {
+	public World(String worldName, Camera camera, boolean playable, int newScale) {
 
 		try {
-			BufferedImage tileSheet = ImageIO.read(getClass().getResourceAsStream("/levels/" + world + "/tiles.png"));
-			BufferedImage entitySheet = ImageIO.read(getClass().getResourceAsStream("/levels/" + world + "/entities.png"));
+			final BufferedImage tileSheet = ImageIO.read(getClass().getResourceAsStream("/levels/" + worldName + "/tiles.png"));
+			final BufferedImage entitySheet = ImageIO.read(getClass().getResourceAsStream("/levels/" + worldName + "/entities.png"));
 
 			width = tileSheet.getWidth();
 			height = tileSheet.getHeight();
-            this.scale = scale;
+            this.scale = newScale;
 
 			this.world = new Matrix4f().setTranslation(new Vector3f(0));
 			this.world.scale(scale);
 
-			int[] colorTileSheet = tileSheet.getRGB(0, 0, width, height, null, 0, width);
-			int[] colorEntitySheet = entitySheet.getRGB(0, 0, width, height, null, 0, width);
+			final int[] colorTileSheet = tileSheet.getRGB(0, 0, width, height, null, 0, width);
+			final int[] colorEntitySheet = entitySheet.getRGB(0, 0, width, height, null, 0, width);
 
 			tiles = new byte[width * height];
 			boundingBoxes = new AABB[width * height];
@@ -88,9 +97,9 @@ public class World {
 
 			for (int y = 0; y < height; y++) {
 				for (int x = 0; x < width; x++) {
-					int red = (colorTileSheet[x + y * width] >> RED_SHIFT) & RED_MASK;
-					int entityIndex = (colorEntitySheet[x + y * width] >> RED_SHIFT) & RED_MASK;
-					int entityAlpha = (colorEntitySheet[x + y * width] >> ALPHA_SHIFT) & ALPHA_MASK;
+					final int red = (colorTileSheet[x + y * width] >> RED_SHIFT) & RED_MASK;
+					final int entityIndex = (colorEntitySheet[x + y * width] >> RED_SHIFT) & RED_MASK;
+					final int entityAlpha = (colorEntitySheet[x + y * width] >> ALPHA_SHIFT) & ALPHA_MASK;
 
 					Tile t;
 					try {
@@ -99,7 +108,9 @@ public class World {
 						t = null;
 					}
 
-					if (t != null) setTile(t, x, y);
+					if (t != null) {
+						setTile(t, x, y);
+					}
 
 					if (entityAlpha > 0) {
 						transform = new Transform();
@@ -109,7 +120,7 @@ public class World {
 							case PLAYER_ENTITY_INDEX :
 							    if(playable) {
                                     // Player
-                                    Player player = new Player(transform);
+                                    final Player player = new Player(transform);
                                     entities.add(player);
                                 }
 								camera.getPosition().set(transform.pos.mul(-scale, new Vector3f()));
@@ -148,13 +159,15 @@ public class World {
 	}
 
 	public void render(TileRenderer render, Shader shader, Camera cam) {
-		int posX = (int) cam.getPosition().x / (scale * HALF_DIVISOR);
-		int posY = (int) cam.getPosition().y / (scale * HALF_DIVISOR);
+		final int posX = (int) cam.getPosition().x / (scale * HALF_DIVISOR);
+		final int posY = (int) cam.getPosition().y / (scale * HALF_DIVISOR);
 
 		for (int i = 0; i < viewX; i++) {
 			for (int j = 0; j < viewY; j++) {
-				Tile t = getTile(i - posX - (viewX / HALF_DIVISOR) + RENDER_OFFSET, j + posY - (viewY / HALF_DIVISOR));
-				if (t != null) render.renderTile(t, i - posX - (viewX / HALF_DIVISOR) + RENDER_OFFSET, -j - posY + (viewY / HALF_DIVISOR), shader, world, cam);
+				final Tile t = getTile(i - posX - (viewX / HALF_DIVISOR) + RENDER_OFFSET, j + posY - (viewY / HALF_DIVISOR));
+				if (t != null) {
+					render.renderTile(t, i - posX - (viewX / HALF_DIVISOR) + RENDER_OFFSET, -j - posY + (viewY / HALF_DIVISOR), shader, world, cam);
+				}
 			}
 		}
 
@@ -178,16 +191,24 @@ public class World {
 	}
 
 	public void correctCamera(Camera camera, Window window) {
-		Vector3f pos = camera.getPosition();
+		final Vector3f pos = camera.getPosition();
 
-		int w = -width * scale * HALF_DIVISOR;
-		int h = height * scale * HALF_DIVISOR;
+		final int w = -width * scale * HALF_DIVISOR;
+		final int h = height * scale * HALF_DIVISOR;
 
-		if (pos.x > -(window.getWidth() / HALF_DIVISOR) + scale) pos.x = -(window.getWidth() / HALF_DIVISOR) + scale;
-		if (pos.x < w + (window.getWidth() / HALF_DIVISOR) + scale) pos.x = w + (window.getWidth() / HALF_DIVISOR) + scale;
+		if (pos.x > -(window.getWidth() / HALF_DIVISOR) + scale) {
+			pos.x = -(window.getWidth() / HALF_DIVISOR) + scale;
+		}
+		if (pos.x < w + (window.getWidth() / HALF_DIVISOR) + scale) {
+			pos.x = w + (window.getWidth() / HALF_DIVISOR) + scale;
+		}
 
-		if (pos.y < (window.getHeight() / HALF_DIVISOR) - scale) pos.y = (window.getHeight() / HALF_DIVISOR) - scale;
-		if (pos.y > h - (window.getHeight() / HALF_DIVISOR) - scale) pos.y = h - (window.getHeight() / HALF_DIVISOR) - scale;
+		if (pos.y < (window.getHeight() / HALF_DIVISOR) - scale) {
+			pos.y = (window.getHeight() / HALF_DIVISOR) - scale;
+		}
+		if (pos.y > h - (window.getHeight() / HALF_DIVISOR) - scale) {
+			pos.y = h - (window.getHeight() / HALF_DIVISOR) - scale;
+		}
 	}
 
 	public void setTile(Tile tile, int x, int y) {

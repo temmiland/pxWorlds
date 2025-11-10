@@ -13,15 +13,19 @@ public class Input {
 	/** The array of key states. */
 	private boolean[] keys;
 
+	/** The mouse position. */
 	private static Vector2f mousePos = new Vector2f();
+	/** The x coordinate array. */
 	private static double[] x = new double[1], y = new double[1];
+	/** The window width array. */
 	private static int[] winWidth = new int[1], winHeight = new int[1];
 
-	public Input(long window) {
-		this.window = window;
+	public Input(long newWindow) {
+		this.window = newWindow;
 		this.keys = new boolean[GLFW_KEY_LAST];
-		for (int i = 0; i < GLFW_KEY_LAST; i++)
+		for (int i = 0; i < GLFW_KEY_LAST; i++) {
 			keys[i] = false;
+		}
 	}
 
 	public boolean isKeyDown(int key) {
@@ -51,7 +55,8 @@ public class Input {
 	}
 
 	public void update() {
-		for (int i = GLFW_KEY_SPACE; i < GLFW_KEY_LAST; i++)
+		for (int i = GLFW_KEY_SPACE; i < GLFW_KEY_LAST; i++) {
 			keys[i] = isKeyDown(i);
+		}
 	}
 }

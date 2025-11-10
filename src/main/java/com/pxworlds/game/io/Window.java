@@ -54,14 +54,20 @@ public class Window {
 	}
 
 	public void createWindow(String title) {
-		window = glfwCreateWindow(width, height, title, fullscreen ? glfwGetPrimaryMonitor() : 0, 0);
+		final long monitor;
+		if (fullscreen) {
+			monitor = glfwGetPrimaryMonitor();
+		} else {
+			monitor = 0;
+		}
+		window = glfwCreateWindow(width, height, title, monitor, 0);
 
 		if (window == 0) {
             throw new IllegalStateException("Failed to create window!");
         }
 
 		if (!fullscreen) {
-			GLFWVidMode vid = glfwGetVideoMode(glfwGetPrimaryMonitor());
+			final GLFWVidMode vid = glfwGetVideoMode(glfwGetPrimaryMonitor());
 			glfwSetWindowPos(window, (vid.width() - width) / 2, (vid.height() - height) / 2);
 		}
 
@@ -85,13 +91,13 @@ public class Window {
 		glfwSwapBuffers(window);
 	}
 
-	public void setSize(int width, int height) {
-		this.width = width;
-		this.height = height;
+	public void setSize(int newWidth, int newHeight) {
+		this.width = newWidth;
+		this.height = newHeight;
 	}
 
-	public void setFullscreen(boolean fullscreen) {
-		this.fullscreen = fullscreen;
+	public void setFullscreen(boolean newFullscreen) {
+		this.fullscreen = newFullscreen;
 	}
 
 	public void update() {

@@ -14,7 +14,7 @@ public class JsonConfig {
 
     public void saveConfig(Configuration configuration, String fileName) {
         try {
-            Writer writer = new OutputStreamWriter(new FileOutputStream(fileName));
+            final Writer writer = new OutputStreamWriter(new FileOutputStream(fileName));
             writer.write(configuration.serializeToJson());
             writer.flush();
             writer.close();
@@ -24,11 +24,11 @@ public class JsonConfig {
     }
 
     public <T extends Configuration> T readConfiguration(String fileName, Type type) {
-        StringBuilder stringBuilder = new StringBuilder();
-        File file          = new File(fileName);
+        final StringBuilder stringBuilder = new StringBuilder();
+        final File file          = new File(fileName);
         try {
-            FileReader     fileReader     = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            final FileReader     fileReader     = new FileReader(file);
+            final BufferedReader bufferedReader = new BufferedReader(fileReader);
             String         currentLine    = "";
             while ((currentLine = bufferedReader.readLine()) != null) {
                 stringBuilder.append(currentLine);

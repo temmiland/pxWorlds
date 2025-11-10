@@ -15,8 +15,8 @@ public class WorldManager {
     }
 
     private ArrayList<String> checkWorldConfigurations() {
-        File[] folder = new File(Constants.WORLDS_DIRECTORY_PATH).listFiles();
-        ArrayList<String> succeededChecksumList = new ArrayList<>();
+        final File[] folder = new File(Constants.WORLDS_DIRECTORY_PATH).listFiles();
+        final ArrayList<String> succeededChecksumList = new ArrayList<>();
 
         for (File file : folder) {
             int failedChecksum = 0;
@@ -24,12 +24,16 @@ public class WorldManager {
                 if (!toHex(Hash.SHA512.checksum(file)).equals(worlds.getWorldChecksum())) {
                     failedChecksum++;
                     if (Worlds.values().length == failedChecksum) {
-                        if (!file.delete()) System.exit(1);
+                        if (!file.delete()) {
+                            System.exit(1);
+                        }
                         break;
                     }
                 } else {
                     if (!file.getName().equals(worlds.getWorldFileName())) {
-                        if (!file.delete()) System.exit(1);
+                        if (!file.delete()) {
+                            System.exit(1);
+                        }
                         break;
                     } else {
                         succeededChecksumList.add(worlds.getWorldChecksum());
@@ -47,14 +51,19 @@ public class WorldManager {
                 if(!worlds.getWorldChecksum().equals(succeededChecksum)) {
                     // Methode für den Rest-Zugriff auf den Webserver fehlt --> Muss geschrieben werden damit die Datei heruntergeladen werden kann
                     // Download TO DO
+                    // Empty block is intentional - download functionality not yet implemented
+                    // TODO: Implement download functionality
+                    throw new UnsupportedOperationException("Download functionality not yet implemented");
                 }
             }
         }
     }
 
     private void createWorldDirectoryIfNotExists() {
-        File file = new File(Constants.WORLDS_DIRECTORY_PATH);
-        if (!file.exists()) file.mkdirs();
+        final File file = new File(Constants.WORLDS_DIRECTORY_PATH);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
     }
 
     private static String toHex(byte[] bytes) {

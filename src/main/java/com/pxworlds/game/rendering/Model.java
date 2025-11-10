@@ -21,6 +21,22 @@ public class Model implements AutoCloseable {
 	/** The OpenGL index buffer object. */
 	private int indexObject;
 
+	// OpenGL attribute constants
+	/** The attribute index for vertices. */
+	private static final int VERTICES_ATTRIB_INDEX = 0;
+	/** The attribute index for textures. */
+	private static final int TEXTURES_ATTRIB_INDEX = 1;
+	/** The size of vertex data. */
+	private static final int VERTEX_SIZE = 3;
+	/** The size of texture coordinate data. */
+	private static final int TEXTURE_COORD_SIZE = 2;
+	/** Whether data is normalized. */
+	private static final boolean NORMALIZED = false;
+	/** The stride for vertex data. */
+	private static final int STRIDE = 0;
+	/** The offset for vertex data. */
+	private static final int OFFSET = 0;
+
 	public Model(float[] vertices, float[] textureCoords, int[] indices) {
 		drawCount = indices.length;
 
@@ -30,12 +46,12 @@ public class Model implements AutoCloseable {
 
 		textureCoordObject = glGenBuffers();
 		glBindBuffer(GL_ARRAY_BUFFER, textureCoordObject);
-		glBufferData(GL_ARRAY_BUFFER, createBuffer(tex_coords), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, createBuffer(textureCoords), GL_STATIC_DRAW);
 
 		indexObject = glGenBuffers();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexObject);
 
-		IntBuffer buffer = BufferUtils.createIntBuffer(indices.length);
+		final IntBuffer buffer = BufferUtils.createIntBuffer(indices.length);
 		buffer.put(indices);
 		buffer.flip();
 
@@ -53,28 +69,28 @@ public class Model implements AutoCloseable {
 	}
 
 	public void render() {
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(VERTICES_ATTRIB_INDEX);
+		glEnableVertexAttribArray(TEXTURES_ATTRIB_INDEX);
 
 		glBindBuffer(GL_ARRAY_BUFFER, vertexObject);
-		glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+		glVertexAttribPointer(VERTICES_ATTRIB_INDEX, VERTEX_SIZE, GL_FLOAT, NORMALIZED, STRIDE, OFFSET);
 
 		glBindBuffer(GL_ARRAY_BUFFER, textureCoordObject);
-		glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
+		glVertexAttribPointer(TEXTURES_ATTRIB_INDEX, TEXTURE_COORD_SIZE, GL_FLOAT, NORMALIZED, STRIDE, OFFSET);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexObject);
-		glDrawElements(GL_TRIANGLES, drawCount, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, drawCount, GL_UNSIGNED_INT, OFFSET);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(VERTICES_ATTRIB_INDEX);
+		glDisableVertexAttribArray(TEXTURES_ATTRIB_INDEX);
 
 	}
 
 	private FloatBuffer createBuffer(float[] data) {
-		FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
+		final FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
 		buffer.put(data);
 		buffer.flip();
 		return buffer;

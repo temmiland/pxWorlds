@@ -17,8 +17,8 @@ public class BrandState extends GameState {
     }
 
     @Override
-    public void init(Window window) {
-        this.window = window;
+    public void init(Window newWindow) {
+        this.window = newWindow;
     }
 
     @Override

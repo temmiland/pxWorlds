@@ -22,7 +22,9 @@ public class Bootstrap {
     private JsonConfig           jsonConfig;
     /** The configuration storage. */
     private ConfigurationStorage configurationStorage;
+    /** The world manager. */
     private WorldManager         worldManager;
+    /** The API key. */
     private String               apiKey;
 
     /**
@@ -41,10 +43,10 @@ public class Bootstrap {
         getConfigurationStorage().init();
         getWorldManager().init();
 
-        int width = getConfigurationStorage().getScreenConfiguration().getLastWidth();
-        int height = getConfigurationStorage().getScreenConfiguration().getLastHeight();
-        int frameRate = getConfigurationStorage().getScreenConfiguration().getFrameRate();
-        boolean fullscreen = getConfigurationStorage().getScreenConfiguration().isFullscreen();
+        final int width = getConfigurationStorage().getScreenConfiguration().getLastWidth();
+        final int height = getConfigurationStorage().getScreenConfiguration().getLastHeight();
+        final int frameRate = getConfigurationStorage().getScreenConfiguration().getFrameRate();
+        final boolean fullscreen = getConfigurationStorage().getScreenConfiguration().isFullscreen();
 
         new PxWorlds(TITLE, width, height, fullscreen, frameRate).run();
 

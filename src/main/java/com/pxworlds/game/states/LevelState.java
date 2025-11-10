@@ -11,6 +11,9 @@ import com.pxworlds.game.world.World;
  */
 public class LevelState extends GameState {
 
+    /** The default world scale for level rendering. */
+    private static final int DEFAULT_WORLD_SCALE = 48;
+
     /** The camera for rendering. */
     private Camera camera;
     /** The world being rendered. */
@@ -27,19 +30,19 @@ public class LevelState extends GameState {
     }
 
     @Override
-    public void init(Window window) {
-        Camera camera = new Camera(window.getWidth(), window.getHeight());
-        TileRenderer tiles = new TileRenderer();
-        Shader shader = new Shader("shader");
-        World world = new World("test_level", camera, true, 48);
+    public void init(Window newWindow) {
+        final Camera newCamera = new Camera(newWindow.getWidth(), newWindow.getHeight());
+        final TileRenderer newTiles = new TileRenderer();
+        final Shader newShader = new Shader("shader");
+        final World newWorld = new World("test_level", newCamera, true, DEFAULT_WORLD_SCALE);
 
-        this.camera = camera;
-        this.world = world;
-        this.tiles = tiles;
-        this.shader = shader;
-        this.window = window;
+        this.camera = newCamera;
+        this.world = newWorld;
+        this.tiles = newTiles;
+        this.shader = newShader;
+        this.window = newWindow;
 
-        world.calculateView(window);
+        newWorld.calculateView(newWindow);
     }
 
     @Override
