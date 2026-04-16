@@ -1,0 +1,33 @@
+name: Build Artifacts (Linux/Docker)
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build with Maven
+        run: ./mvnw clean package -DskipTests
+
+      - name: Upload artifact to Gitea
+        uses: actions/upload-artifact@v3
+        with:
+          name: pxworlds-linux
+          path: target/pxWorlds.jar
+          retention-days: 90
