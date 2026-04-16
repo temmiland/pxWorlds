@@ -3,8 +3,6 @@ package com.pxworlds.game.rendering;
 import static org.lwjgl.opengl.GL20.*;
 
 import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.FloatBuffer;
 
 import org.joml.Matrix4f;
@@ -114,15 +112,14 @@ public class Shader implements AutoCloseable {
 	private String readFile(String filename) {
 		final StringBuilder outputString = new StringBuilder();
 		try {
-			final URI filePath = getClass().getResource("/shaders/" + filename).toURI();
-			final BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(filePath)));
+			final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/shaders/" + filename)));
 			String line;
 			while ((line = bufferedReader.readLine()) != null) {
 				outputString.append(line);
 				outputString.append("\n");
 			}
 			bufferedReader.close();
-		} catch (IOException | URISyntaxException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return outputString.toString();

@@ -167,6 +167,8 @@
 							<mainClass>com.pxworlds.Main</mainClass>
 						</manifest>
 					</archive>
+					<appendAssemblyId>false</appendAssemblyId>
+					<finalName>pxWorlds</finalName>
 				</configuration>
 
 				<executions>
@@ -179,6 +181,17 @@
 					</execution>
 				</executions>
         	</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.3.0</version>
+				<executions>
+					<execution>
+						<id>default-jar</id>
+						<phase>none</phase>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>

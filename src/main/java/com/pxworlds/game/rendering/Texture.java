@@ -4,10 +4,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 
 import javax.imageio.ImageIO;
@@ -43,8 +40,7 @@ public class Texture implements AutoCloseable {
 	public Texture(String filename) {
 		final BufferedImage bufferedImage;
 		try {
-            final URI file = getClass().getResource("/textures/" + filename).toURI();
-			bufferedImage = ImageIO.read(new File(file));
+			bufferedImage = ImageIO.read(getClass().getResourceAsStream("/textures/" + filename));
 			width = bufferedImage.getWidth();
 			height = bufferedImage.getHeight();
 
@@ -71,7 +67,7 @@ public class Texture implements AutoCloseable {
 
 			glTexImage2D(GL_TEXTURE_2D, TEXTURE_LEVEL, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
-		} catch (IOException | URISyntaxException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
