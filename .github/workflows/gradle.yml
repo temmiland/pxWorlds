@@ -10,9 +10,7 @@ on:
 
 jobs:
   gradle:
-    runs-on: docker
-    container:
-      image: gradle:8.5-jdk17
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
