@@ -20,4 +20,9 @@ public class Constants {
     public static final String WEB_ROOT = "https://<API_URL>/pxworlds/";
     /** The web API root URL. */
     public static final String WEB_API_ROOT = WEB_ROOT + "api/";
+
+    // --- Game Loop ---
+    /** Maximum number of update ticks processed per frame.
+     *  Caps accumulated time to prevent the spiral-of-death on lag spikes. */
+    public static final int MAX_UPDATES_PER_FRAME = 10;
 }

@@ -1,6 +1,7 @@
 package com.pxworlds.game;
 
 import com.pxworlds.Bootstrap;
+import com.pxworlds.Constants;
 import com.pxworlds.game.assets.Assets;
 import com.pxworlds.game.states.GameStateManager;
 import com.pxworlds.game.io.Timer;
@@ -87,6 +88,11 @@ public class PxWorlds {
             unprocessed += passed;
 			frameTime += passed;
             time = time2;
+
+            // Spiral-of-Death-Schutz: bei Lag-Spikes maximale Nachholzeit begrenzen
+            if (unprocessed > frameCap * Constants.MAX_UPDATES_PER_FRAME) {
+                unprocessed = frameCap * Constants.MAX_UPDATES_PER_FRAME;
+            }
 
             while (unprocessed >= frameCap) {
 				if (window.hasResized()) {
