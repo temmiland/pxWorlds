@@ -52,8 +52,8 @@ public class LevelState extends GameState {
     }
 
     @Override
-    public void update(double frameCap) {
-        world.update((float) frameCap, window, camera);
+    public void update(double delta) {
+        world.update((float) delta, window, camera);
         world.correctCamera(camera, window);
     }
 

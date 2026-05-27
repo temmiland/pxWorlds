@@ -42,8 +42,8 @@ public class GameStateManager {
         gameStates.get(currentState).resize();
     }
 
-    public void update(double frameCap)  {
-        gameStates.get(currentState).update(frameCap);
+    public void update(double delta) {
+        gameStates.get(currentState).update(delta);
     }
 
     public void render() {

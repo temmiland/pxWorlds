@@ -11,7 +11,7 @@ public abstract class GameState {
     protected GameStateManager gsm;
     public abstract void init(Window window);
     public abstract void resize();
-    public abstract void update(double frameCap) ;
+    public abstract void update(double delta);
     public abstract void render();
 
 }

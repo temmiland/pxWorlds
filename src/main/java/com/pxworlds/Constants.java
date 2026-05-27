@@ -22,6 +22,9 @@ public class Constants {
     public static final String WEB_API_ROOT = WEB_ROOT + "api/";
 
     // --- Game Loop ---
+    /** Fixed logic update rate in ticks per second.
+     *  Rendering runs independently at the configured FPS. */
+    public static final int TICK_RATE = 20;
     /** Maximum number of update ticks processed per frame.
      *  Caps accumulated time to prevent the spiral-of-death on lag spikes. */
     public static final int MAX_UPDATES_PER_FRAME = 10;

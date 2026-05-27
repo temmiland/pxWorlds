@@ -30,8 +30,8 @@ public class BrandState extends GameState {
     }
 
     @Override
-    public void update(double frameCap) {
-        elapsed += frameCap;
+    public void update(double delta) {
+        elapsed += delta;
         if (elapsed >= BRAND_DURATION) {
             gsm.setState(1);
         }

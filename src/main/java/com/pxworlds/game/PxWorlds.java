@@ -70,60 +70,63 @@ public class PxWorlds {
 
         gsm.init(window);
 
-		final double frameCap = 1.0 / fpsRate;
+        // Logik läuft fest mit TICK_RATE, Rendering mit fpsRate — entkoppelt
+		final double tickDuration = 1.0 / Constants.TICK_RATE;
+		final double renderCap   = 1.0 / fpsRate;
 
-		double frameTime = 0;
-		int frames = 0;
+		double tickAccumulator   = 0;
+		double renderAccumulator = 0;
+		double frameTime         = 0;
+		int frames               = 0;
 
 		double time = Timer.getTime();
-		double unprocessed = 0;
 
 		while (!window.shouldClose()) {
 
-		    boolean canRender = false;
+			final double now    = Timer.getTime();
+			final double passed = now - time;
+			time = now;
 
-			final double time2 = Timer.getTime();
-			final double passed = time2 - time;
-
-            unprocessed += passed;
-			frameTime += passed;
-            time = time2;
+			tickAccumulator   += passed;
+			renderAccumulator += passed;
+			frameTime         += passed;
 
             // Spiral-of-Death-Schutz: bei Lag-Spikes maximale Nachholzeit begrenzen
-            if (unprocessed > frameCap * Constants.MAX_UPDATES_PER_FRAME) {
-                unprocessed = frameCap * Constants.MAX_UPDATES_PER_FRAME;
+            if (tickAccumulator > tickDuration * Constants.MAX_UPDATES_PER_FRAME) {
+                tickAccumulator = tickDuration * Constants.MAX_UPDATES_PER_FRAME;
             }
 
-            while (unprocessed >= frameCap) {
+            // --- Logik: fixer Zeitschritt (TICK_RATE TPS) ---
+            while (tickAccumulator >= tickDuration) {
+				tickAccumulator -= tickDuration;
+
 				if (window.hasResized()) {
 				    gsm.resize();
 					glViewport(0, 0, window.getWidth(), window.getHeight());
 				}
-
-				unprocessed -= frameCap;
-				canRender = true;
-                gsm.update(frameCap);
 
 				if (window.getInput().isKeyReleased(GLFW_KEY_ESCAPE)) {
 					glfwSetWindowShouldClose(window.getWindow(), true);
 				}
 
 				window.update();
+                gsm.update(tickDuration);
+			}
+
+            // --- Rendering: fpsRate cap ---
+			if (renderAccumulator >= renderCap) {
+				renderAccumulator -= renderCap;
+
+				glClear(GL_COLOR_BUFFER_BIT);
+				gsm.render();
+				window.swapBuffers();
+				frames++;
 
 				if (frameTime >= 1.0) {
 					frameTime = 0;
 					//TODO System.out.println("FPS: " + frames);
 					frames = 0;
 				}
-			}
-
-			if (canRender) {
-				glClear(GL_COLOR_BUFFER_BIT);
-
-				gsm.render();
-
-				window.swapBuffers();
-				frames++;
 			}
 		}
 
