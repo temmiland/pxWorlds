@@ -59,7 +59,6 @@ public class LevelState extends GameState {
 
     @Override
     public void render(float alpha) {
-        // TODO 2.3: alpha an world.render() weitergeben für Entity-Interpolation
-        world.render(tiles, shader, camera);
+        world.render(tiles, shader, camera, alpha);
     }
 }

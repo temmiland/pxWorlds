@@ -22,6 +22,8 @@ public abstract class Entity {
 
 	/** The transform of the entity. */
 	protected Transform transform;
+	/** Position am Ende des letzten Ticks — Ausgangspunkt für Render-Interpolation. */
+	protected Vector3f prevPos;
 
     /** The tile check size. */
     private static final int TILE_CHECK_SIZE = 5;
@@ -37,6 +39,7 @@ public abstract class Entity {
 
 		this.transform = newTransform;
 		this.useAnimation = 0;
+		this.prevPos = new Vector3f(transform.pos);
 
 		boundingBox = new AABB(new Vector2f(transform.pos.x, transform.pos.y), new Vector2f(transform.scale.x, transform.scale.y));
 	}
@@ -110,13 +113,29 @@ public abstract class Entity {
 
 	public abstract void update(float delta, Window window, Camera camera, World world);
 
-	public void render(Shader shader, Camera camera, World world) {
+	/**
+	 * Sichert die aktuelle Position als prevPos und ruft dann update() auf.
+	 * Wird von World.update() statt update() direkt aufgerufen,
+	 * damit prevPos immer den Stand vor dem Tick enthält.
+	 */
+	public final void tick(float delta, Window window, Camera camera, World world) {
+		prevPos.set(transform.pos);
+		update(delta, window, camera, world);
+	}
+
+	public void render(Shader shader, Camera camera, World world, float alpha) {
 		final Matrix4f target = camera.getProjection();
 		target.mul(world.getWorldMatrix());
 
+		// Interpolierte Position zwischen letztem und aktuellem Tick
+		final float renderX = prevPos.x + (transform.pos.x - prevPos.x) * alpha;
+		final float renderY = prevPos.y + (transform.pos.y - prevPos.y) * alpha;
+		target.translate(renderX, renderY, transform.pos.z);
+		target.scale(transform.scale);
+
 		shader.bind();
 		shader.setUniform("sampler", 0);
-		shader.setUniform("projection", transform.getProjection(target));
+		shader.setUniform("projection", target);
 		animations[useAnimation].bind(0);
 		Assets.getModel().render();
 	}

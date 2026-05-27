@@ -158,7 +158,7 @@ public class World {
 		return world;
 	}
 
-	public void render(TileRenderer render, Shader shader, Camera cam) {
+	public void render(TileRenderer render, Shader shader, Camera cam, float alpha) {
 		final int posX = (int) cam.getPosition().x / (scale * HALF_DIVISOR);
 		final int posY = (int) cam.getPosition().y / (scale * HALF_DIVISOR);
 
@@ -172,13 +172,13 @@ public class World {
 		}
 
 		for (Entity entity : entities) {
-			entity.render(shader, cam, this);
+			entity.render(shader, cam, this, alpha);
 		}
 	}
 
 	public void update(float delta, Window window, Camera camera) {
 		for (Entity entity : entities) {
-			entity.update(delta, window, camera, this);
+			entity.tick(delta, window, camera, this);
 		}
 
 		for (int i = 0; i < entities.size(); i++) {
