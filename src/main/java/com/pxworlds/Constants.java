@@ -6,6 +6,8 @@ import java.io.File;
 
 public class Constants {
 
+    /** The current game version — keep in sync with pom.xml. */
+    public static final String VERSION               = "0.2-SNAPSHOT";
     /** The title of the application. */
     public static final String TITLE                 = "pxWorlds - Let's Adventure!";
     /** The name of the program directory. */

@@ -3,6 +3,7 @@ package com.pxworlds.game;
 import com.pxworlds.Bootstrap;
 import com.pxworlds.Constants;
 import com.pxworlds.game.assets.Assets;
+import com.pxworlds.game.debug.DebugOverlay;
 import com.pxworlds.game.states.GameStateManager;
 import com.pxworlds.game.io.Timer;
 import com.pxworlds.game.io.Window;
@@ -70,6 +71,8 @@ public class PxWorlds {
 
         gsm.init(window);
 
+        final DebugOverlay debugOverlay = new DebugOverlay();
+
         // Logik läuft fest mit TICK_RATE, Rendering mit fpsRate — entkoppelt
 		final double tickDuration = 1.0 / Constants.TICK_RATE;
 		final double renderCap   = 1.0 / fpsRate;
@@ -109,6 +112,10 @@ public class PxWorlds {
 					glfwSetWindowShouldClose(window.getWindow(), true);
 				}
 
+				if (window.getInput().isKeyReleased(GLFW_KEY_F3)) {
+					debugOverlay.toggleDetailed();
+				}
+
 				window.update();
                 gsm.update(tickDuration);
 			}
@@ -122,12 +129,13 @@ public class PxWorlds {
 
 				glClear(GL_COLOR_BUFFER_BIT);
 				gsm.render(alpha);
+				debugOverlay.render(window, alpha);
 				window.swapBuffers();
 				frames++;
 
 				if (frameTime >= 1.0) {
 					frameTime = 0;
-					//TODO System.out.println("FPS: " + frames);
+					debugOverlay.updateFps(frames);
 					frames = 0;
 				}
 			}
