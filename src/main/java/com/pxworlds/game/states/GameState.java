@@ -12,6 +12,11 @@ public abstract class GameState {
     public abstract void init(Window window);
     public abstract void resize();
     public abstract void update(double delta);
-    public abstract void render();
+
+    /**
+     * Renders the current state.
+     * @param alpha Interpolationsfaktor 0.0–1.0 zwischen letztem und nächstem Tick.
+     */
+    public abstract void render(float alpha);
 
 }

@@ -38,7 +38,7 @@ public class BrandState extends GameState {
     }
 
     @Override
-    public void render() {
+    public void render(float alpha) {
 
     }
 }

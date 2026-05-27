@@ -58,14 +58,8 @@ public class LevelState extends GameState {
     }
 
     @Override
-    public void render() {
-        /*shader.bind();
-        shader.setUniform("sampler", 0);
-        shader.setUniform("projection",
-        camera.getProjection().mul(target));
-        model.rendering();
-        tex.bind(0);*/
-
+    public void render(float alpha) {
+        // TODO 2.3: alpha an world.render() weitergeben für Entity-Interpolation
         world.render(tiles, shader, camera);
     }
 }

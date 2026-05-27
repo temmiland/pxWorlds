@@ -46,8 +46,8 @@ public class GameStateManager {
         gameStates.get(currentState).update(delta);
     }
 
-    public void render() {
-        gameStates.get(currentState).render();
+    public void render(float alpha) {
+        gameStates.get(currentState).render(alpha);
     }
 
 }

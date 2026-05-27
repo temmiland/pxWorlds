@@ -67,7 +67,8 @@ public class MenuState extends GameState {
     }
 
     @Override
-    public void render() {
+    public void render(float alpha) {
+        // TODO 2.3: alpha an world.render() weitergeben für Entity-Interpolation
         world.render(tiles, shader, camera);
         gui.render();
     }

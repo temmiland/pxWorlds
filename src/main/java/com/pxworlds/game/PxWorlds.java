@@ -117,8 +117,11 @@ public class PxWorlds {
 			if (renderAccumulator >= renderCap) {
 				renderAccumulator -= renderCap;
 
+				// Wie weit sind wir zwischen letztem und nächstem Tick? (0.0 – 1.0)
+				final float alpha = (float) (tickAccumulator / tickDuration);
+
 				glClear(GL_COLOR_BUFFER_BIT);
-				gsm.render();
+				gsm.render(alpha);
 				window.swapBuffers();
 				frames++;
 
