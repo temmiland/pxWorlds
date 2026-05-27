@@ -3,6 +3,7 @@ package com.pxworlds.game.rendering.tiles;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.pxworlds.Constants;
 import com.pxworlds.game.rendering.Camera;
 import com.pxworlds.game.rendering.Model;
 import com.pxworlds.game.rendering.Shader;
@@ -18,8 +19,7 @@ public class TileRenderer {
 	private Model tileModel;
 
 	// Tile rendering constants
-	/** The size of a tile. */
-	private static final float TILE_SIZE = 2.0f;
+	// Tile size: see Constants.TILE_SIZE
 	/** The sampler unit for textures. */
 	private static final int SAMPLER_UNIT = 0;
 	/** The Z depth for tiles. */
@@ -61,7 +61,7 @@ public class TileRenderer {
 			tileTextures.get(tile.getTexture()).bind(SAMPLER_UNIT);
 		}
 
-		final Matrix4f tilePos = new Matrix4f().translate(new Vector3f(x * TILE_SIZE, y * TILE_SIZE, Z_DEPTH));
+		final Matrix4f tilePos = new Matrix4f().translate(new Vector3f(x * Constants.TILE_SIZE, y * Constants.TILE_SIZE, Z_DEPTH));
 		final Matrix4f target = new Matrix4f();
 
 		cam.getProjection().mul(world, target);

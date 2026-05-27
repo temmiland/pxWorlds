@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import com.pxworlds.Constants;
 import com.pxworlds.game.collision.AABB;
 import com.pxworlds.game.entity.Entity;
 import com.pxworlds.game.entity.Player;
@@ -41,8 +42,7 @@ public class World {
 	private static final int BLUE_SHIFT = 0;
 	/** The alpha shift. */
 	private static final int ALPHA_SHIFT = 24;
-	/** The multiplier for tile positioning. */
-	private static final int TILE_POSITION_MULTIPLIER = 2;
+	// Tile size in world-space: Constants.TILE_SIZE
 	/** The view offset. */
 	private static final int VIEW_OFFSET = 4;
 	/** The divisor for half calculations. */
@@ -114,8 +114,8 @@ public class World {
 
 					if (entityAlpha > 0) {
 						transform = new Transform();
-						transform.pos.x = x * TILE_POSITION_MULTIPLIER;
-						transform.pos.y = -y * TILE_POSITION_MULTIPLIER;
+						transform.pos.x = x * Constants.TILE_SIZE;
+						transform.pos.y = -y * Constants.TILE_SIZE;
 						switch (entityIndex) {
 							case PLAYER_ENTITY_INDEX :
 							    if(playable) {
@@ -214,7 +214,7 @@ public class World {
 	public void setTile(Tile tile, int x, int y) {
 		tiles[x + y * width] = tile.getId();
 		if (tile.isSolid()) {
-			boundingBoxes[x + y * width] = new AABB(new Vector2f(x * TILE_POSITION_MULTIPLIER, -y * TILE_POSITION_MULTIPLIER), new Vector2f(BOUNDING_BOX_SIZE, BOUNDING_BOX_SIZE));
+			boundingBoxes[x + y * width] = new AABB(new Vector2f(x * Constants.TILE_SIZE, -y * Constants.TILE_SIZE), new Vector2f(BOUNDING_BOX_SIZE, BOUNDING_BOX_SIZE));
 		} else {
 			boundingBoxes[x + y * width] = null;
 		}

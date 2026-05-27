@@ -25,4 +25,10 @@ public class Constants {
     /** Maximum number of update ticks processed per frame.
      *  Caps accumulated time to prevent the spiral-of-death on lag spikes. */
     public static final int MAX_UPDATES_PER_FRAME = 10;
+
+    // --- World / Tiles ---
+    /** Size of one tile in world-space units.
+     *  Used for tile rendering (TileRenderer) and entity/AABB positioning (World).
+     *  Changing this value scales the entire world consistently. */
+    public static final float TILE_SIZE = 2.0f;
 }
