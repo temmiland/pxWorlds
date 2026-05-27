@@ -166,7 +166,7 @@ public class World {
 			for (int j = 0; j < viewY; j++) {
 				final Tile t = getTile(i - posX - (viewX / HALF_DIVISOR) + RENDER_OFFSET, j + posY - (viewY / HALF_DIVISOR));
 				if (t != null) {
-					render.renderTile(t, i - posX - (viewX / HALF_DIVISOR) + RENDER_OFFSET, -j - posY + (viewY / HALF_DIVISOR), shader, world, cam);
+					render.renderTile(t, i - posX - (viewX / HALF_DIVISOR) + RENDER_OFFSET, -j - posY + (viewY / HALF_DIVISOR), shader, world, cam, alpha);
 				}
 			}
 		}
@@ -177,6 +177,7 @@ public class World {
 	}
 
 	public void update(float delta, Window window, Camera camera) {
+		camera.savePrevPosition();
 		for (Entity entity : entities) {
 			entity.tick(delta, window, camera, this);
 		}

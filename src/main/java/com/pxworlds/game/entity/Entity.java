@@ -124,7 +124,7 @@ public abstract class Entity {
 	}
 
 	public void render(Shader shader, Camera camera, World world, float alpha) {
-		final Matrix4f target = camera.getProjection();
+		final Matrix4f target = camera.getProjection(alpha);
 		target.mul(world.getWorldMatrix());
 
 		// Interpolierte Position zwischen letztem und aktuellem Tick

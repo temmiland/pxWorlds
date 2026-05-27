@@ -55,16 +55,28 @@ public class TileRenderer {
 		}
 	}
 
-	public void renderTile(Tile tile, int x, int y, Shader shader, Matrix4f world, Camera cam) {
+	/**
+	 * Renders a single tile at the given grid position using an interpolated camera.
+	 * @param tile   The tile to render.
+	 * @param x      Tile grid X coordinate.
+	 * @param y      Tile grid Y coordinate.
+	 * @param shader The active shader.
+	 * @param world  The world transformation matrix.
+	 * @param cam    The camera.
+	 * @param alpha  Render-interpolation factor 0.0–1.0.
+	 */
+	public void renderTile(final Tile tile, final int x, final int y, final Shader shader,
+							final Matrix4f world, final Camera cam, final float alpha) {
 		shader.bind();
 		if (tileTextures.containsKey(tile.getTexture())) {
 			tileTextures.get(tile.getTexture()).bind(SAMPLER_UNIT);
 		}
 
-		final Matrix4f tilePos = new Matrix4f().translate(new Vector3f(x * Constants.TILE_SIZE, y * Constants.TILE_SIZE, Z_DEPTH));
+		final Matrix4f tilePos = new Matrix4f().translate(
+				new Vector3f(x * Constants.TILE_SIZE, y * Constants.TILE_SIZE, Z_DEPTH));
 		final Matrix4f target = new Matrix4f();
 
-		cam.getProjection().mul(world, target);
+		cam.getProjection(alpha).mul(world, target);
 		target.mul(tilePos);
 
 		shader.setUniform("sampler", SAMPLER_UNIT);
