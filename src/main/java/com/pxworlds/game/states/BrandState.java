@@ -2,15 +2,18 @@ package com.pxworlds.game.states;
 
 import com.pxworlds.game.io.Window;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * Created by temmiland on 28.09.2017.
  */
 public class BrandState extends GameState {
 
+    /** The duration of the brand screen in seconds. */
+    private static final double BRAND_DURATION = 1.0;
+
     /** The window. */
     private Window window;
+    /** Accumulated time since the state was entered. */
+    private double elapsed = 0.0;
 
     public BrandState(GameStateManager gsm) {
         this.gsm = gsm;
@@ -27,19 +30,15 @@ public class BrandState extends GameState {
     }
 
     @Override
-    public void update(double frameCap)  {
-
+    public void update(double frameCap) {
+        elapsed += frameCap;
+        if (elapsed >= BRAND_DURATION) {
+            gsm.setState(1);
+        }
     }
 
     @Override
     public void render() {
-        try {
-            TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        gsm.setState(1);
-
 
     }
 }
