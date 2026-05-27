@@ -50,4 +50,14 @@ public class GameStateManager {
         gameStates.get(currentState).render(alpha);
     }
 
+    /**
+     * Zeichnet Debug-Visualisierungen für den aktuellen State (delegiert an {@link GameState#renderDebug}).
+     * Nur aufrufen, wenn der erweiterte Debug-Modus (F3) aktiv ist.
+     *
+     * @param alpha Interpolationsfaktor 0.0–1.0
+     */
+    public void renderDebug(final float alpha) {
+        gameStates.get(currentState).renderDebug(alpha);
+    }
+
 }

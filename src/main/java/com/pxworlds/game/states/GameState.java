@@ -19,4 +19,17 @@ public abstract class GameState {
      */
     public abstract void render(float alpha);
 
+    /**
+     * Zeichnet Debug-Visualisierungen (z.B. Kollisions-AABBs) über das Spielbild.
+     * Wird nur aufgerufen, wenn der erweiterte Debug-Modus (F3) aktiv ist.
+     *
+     * <p>Standard-Implementierung ist ein No-op — States die Debug-Rendering
+     * unterstützen, überschreiben diese Methode.</p>
+     *
+     * @param alpha Interpolationsfaktor 0.0–1.0
+     */
+    public void renderDebug(final float alpha) {
+        // no-op by default
+    }
+
 }

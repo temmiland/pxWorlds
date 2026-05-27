@@ -85,6 +85,10 @@ public class InputProcessor {
                     rawMouseX = event.getMouseX();
                     rawMouseY = event.getMouseY();
                     break;
+                case FOCUS_LOST:
+                    heldKeys.clear();
+                    heldMouseButtons.clear();
+                    break;
                 default:
                     break;
             }

@@ -38,7 +38,10 @@ public class Logo {
     };
 
     public Logo(Vector2f position, Vector2f scale) {
-        this.boundingBox = new AABB(position, scale);
+        this.boundingBox = new AABB(
+            position.x - scale.x, position.y - scale.y,
+            position.x + scale.x, position.y + scale.y
+        );
     }
 
     /**

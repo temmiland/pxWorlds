@@ -61,4 +61,15 @@ public class LevelState extends GameState {
     public void render(float alpha) {
         world.render(tiles, shader, camera, alpha);
     }
+
+    /**
+     * Zeichnet Kollisions-AABBs aller Tiles und Entities über das Spielbild.
+     * Wird nur im F3-Debug-Modus aufgerufen.
+     *
+     * @param alpha Interpolationsfaktor 0.0–1.0
+     */
+    @Override
+    public void renderDebug(final float alpha) {
+        world.renderDebugBoxes(camera, alpha);
+    }
 }

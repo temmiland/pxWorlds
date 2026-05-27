@@ -31,12 +31,20 @@ public class Player extends Entity {
     private static final float DIAGONAL_SPEED_MULTIPLIER = 1.5f;
     /** Lerp factor for camera smoothing. */
     private static final float CAMERA_LERP_FACTOR = 0.05f;
+    /**
+     * Halbe Breite der Spieler-Hitbox in Tile-Einheiten (65 % der Texturbreite).
+     * Die Textur belegt 2 × transform.scale.x = 2.0 Einheiten; 65 % davon ergibt
+     * eine Gesamtbreite von 1.3 Einheiten (±0.65), zentriert auf der Textur.
+     */
+    private static final float HITBOX_HALF_WIDTH = 0.65f;
 
     public Player(Transform transform) {
 		super(ANIM_SIZE, transform);
 		setAnimation(ANIM_IDLE, new Animation(IDLE_FRAMES, IDLE_FPS, "player/idle"));
 		setAnimation(ANIM_WALK, new Animation(WALK_RUN_FRAMES, MovementSpeed.WALKING.getValue(), "player/walking"));
 		setAnimation(ANIM_RUN, new Animation(WALK_RUN_FRAMES, MovementSpeed.RUNNING.getValue(), "player/walking"));
+		// Hitbox schmaler als Render-Sprite: 65 % der Texturbreite, volle Höhe
+		setBoundingBoxSize(HITBOX_HALF_WIDTH, transform.scale.y);
 	}
 
 	public void setMovementSpeed(MovementSpeed newMovementSpeed) {
@@ -90,7 +98,7 @@ public class Player extends Entity {
             setMovementSpeed(MovementSpeed.WALKING);
         }
 
-		move(movement);
+        moveClipped(movement.x, movement.y, world);
         if (movement.x != 0 || movement.y != 0) {
             if (movementSpeed == MovementSpeed.WALKING.getValue()) {
                 useAnimation(ANIM_WALK);

@@ -90,7 +90,10 @@ public class Button {
 	private static Matrix4f transform = new Matrix4f();
 
 	public Button(Vector2f position, Vector2f scale) {
-		this.boundingBox = new AABB(position, scale);
+		this.boundingBox = new AABB(
+			position.x - scale.x, position.y - scale.y,
+			position.x + scale.x, position.y + scale.y
+		);
 		selectedState = STATE_IDLE;
 	}
 

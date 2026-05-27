@@ -20,7 +20,13 @@ public final class InputEvent {
         /** Eine Maustaste wurde losgelassen. */
         MOUSE_RELEASE,
         /** Der Mauszeiger wurde bewegt. */
-        MOUSE_MOVE
+        MOUSE_MOVE,
+        /**
+         * Das Fenster hat den Fokus verloren.
+         * {@link com.pxworlds.game.io.InputProcessor} löscht beim Empfang alle
+         * gedrückt-gehaltenen Tasten und Maustasten, damit keine Keys „stecken" bleiben.
+         */
+        FOCUS_LOST
     }
 
     /** Typ dieses Events. */
@@ -103,6 +109,16 @@ public final class InputEvent {
      */
     public static InputEvent mouseMove(final double eventMouseX, final double eventMouseY) {
         return new InputEvent(Type.MOUSE_MOVE, GLFW_KEY_UNKNOWN, -1, eventMouseX, eventMouseY);
+    }
+
+    /**
+     * Erzeugt ein FOCUS_LOST-Event.
+     * Wird von {@link InputHandler} ausgelöst wenn das Fenster den Fokus verliert,
+     * damit der {@link InputProcessor} alle gedrückten Tasten zurücksetzen kann.
+     * @return neues {@code InputEvent}
+     */
+    public static InputEvent focusLost() {
+        return new InputEvent(Type.FOCUS_LOST, GLFW_KEY_UNKNOWN, -1, 0, 0);
     }
 
     // --- Getter ---

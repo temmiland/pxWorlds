@@ -103,6 +103,8 @@ public class PxWorlds {
             while (tickAccumulator >= tickDuration) {
 				tickAccumulator -= tickDuration;
 
+				window.update();
+
 				if (window.hasResized()) {
 				    gsm.resize();
 					glViewport(0, 0, window.getWidth(), window.getHeight());
@@ -116,7 +118,6 @@ public class PxWorlds {
 					debugOverlay.toggleDetailed();
 				}
 
-				window.update();
                 gsm.update(tickDuration);
 			}
 
@@ -129,6 +130,9 @@ public class PxWorlds {
 
 				glClear(GL_COLOR_BUFFER_BIT);
 				gsm.render(alpha);
+				if (debugOverlay.isShowDetailed()) {
+					gsm.renderDebug(alpha);
+				}
 				debugOverlay.render(window, alpha);
 				window.swapBuffers();
 				frames++;

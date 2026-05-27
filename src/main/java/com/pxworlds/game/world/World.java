@@ -2,6 +2,7 @@ package com.pxworlds.game.world;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,24 @@ import com.pxworlds.game.rendering.Camera;
 import com.pxworlds.game.rendering.Shader;
 import com.pxworlds.game.rendering.tiles.Tile;
 import com.pxworlds.game.rendering.tiles.TileRenderer;
-import org.joml.*;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.lwjgl.BufferUtils;
+
+import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glColor3f;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glLoadMatrixf;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glLineWidth;
+import static org.lwjgl.opengl.GL11.glVertex2f;
+import static org.lwjgl.opengl.GL20.glUseProgram;
 
 public class World {
 	/** The default world width. */
@@ -42,7 +60,6 @@ public class World {
 	private static final int BLUE_SHIFT = 0;
 	/** The alpha shift. */
 	private static final int ALPHA_SHIFT = 24;
-	// Tile size in world-space: Constants.TILE_SIZE
 	/** The view offset. */
 	private static final int VIEW_OFFSET = 4;
 	/** The divisor for half calculations. */
@@ -53,6 +70,18 @@ public class World {
 	private static final float BOUNDING_BOX_SIZE = 1.0f;
 	/** The player entity index. */
 	private static final int PLAYER_ENTITY_INDEX = 1;
+	/** Größe eines 4×4-Matrizen-FloatBuffer (16 Einträge). */
+	private static final int MATRIX_FLOAT_COUNT = 16;
+	/** OpenGL-Programm-ID 0 — deaktiviert jeden aktiven Shader. */
+	private static final int NO_SHADER = 0;
+	/** Debug-Farbe Grün: volle Intensität (für Tile-AABBs). */
+	private static final float COLOR_FULL = 1.0f;
+	/** Debug-Farbe: keine Intensität (Kanal ausgeschaltet). */
+	private static final float COLOR_NONE = 0.0f;
+	/** Linienbreite der Debug-AABB-Rahmen in Pixeln. */
+	private static final float DEBUG_LINE_WIDTH = 2.0f;
+	/** Standard-Linienbreite — wird nach dem Debug-Rendering wiederhergestellt. */
+	private static final float DEFAULT_LINE_WIDTH = 1.0f;
 	/** The view X position. */
 	private int viewX;
 	/** The view Y position. */
@@ -69,6 +98,18 @@ public class World {
 	private int height;
 	/** The scale of the world. */
 	private int scale;
+
+	/**
+	 * Wiederverwendbare Scratch-AABB für {@link #renderDebugBoxes} — vermeidet
+	 * eine Heap-Allokation pro Entity pro Frame im Debug-Modus.
+	 */
+	private final AABB scratchEntityDebugBox = new AABB(0, 0, 0, 0);
+
+	/**
+	 * Wiederverwendbare Ergebnisliste für {@link #getCollidingBoxes(AABB)}.
+	 * Vermeidet eine {@code new ArrayList<>()} pro Tick pro Entity.
+	 */
+	private final List<AABB> scratchColliders = new ArrayList<>();
 
 	/** The world transformation matrix. */
 	private Matrix4f world;
@@ -119,7 +160,6 @@ public class World {
 						switch (entityIndex) {
 							case PLAYER_ENTITY_INDEX :
 							    if(playable) {
-                                    // Player
                                     final Player player = new Player(transform);
                                     entities.add(player);
                                 }
@@ -182,13 +222,39 @@ public class World {
 			entity.tick(delta, window, camera, this);
 		}
 
+		// Entity-Entity Push-out erfolgt nach den Tick-Updates
 		for (int i = 0; i < entities.size(); i++) {
-			entities.get(i).collideWithTiles(this);
 			for (int j = i + 1; j < entities.size(); j++) {
 				entities.get(i).collideWithEntity(entities.get(j));
 			}
-			entities.get(i).collideWithTiles(this);
 		}
+	}
+
+	/**
+	 * Liefert alle Tile-Bounding-Boxes, die die gegebene AABB überschneiden.
+	 *
+	 * @param area  die zu prüfende AABB
+	 * @return Liste aller schneidenden Tile-Bounding-Boxes (nie null)
+	 */
+	public List<AABB> getCollidingBoxes(AABB area) {
+		scratchColliders.clear();
+
+		// Y-Achse ist im Welt-Koordinatensystem negiert (Tile y=0 liegt oben),
+		// daher minY → y1 und maxY → y0. Puffer ±1 verhindert Rand-Lücken.
+		final int x0 = (int) Math.floor( area.minX / Constants.TILE_SIZE) - 1;
+		final int x1 = (int) Math.ceil(  area.maxX / Constants.TILE_SIZE) + 1;
+		final int y0 = (int) Math.floor(-area.maxY / Constants.TILE_SIZE) - 1;
+		final int y1 = (int) Math.ceil( -area.minY / Constants.TILE_SIZE) + 1;
+
+		for (int y = Math.max(0, y0); y <= Math.min(height - 1, y1); y++) {
+			for (int x = Math.max(0, x0); x <= Math.min(width - 1, x1); x++) {
+				final AABB bb = getTileBoundingBox(x, y);
+				if (bb != null && bb.intersects(area)) {
+					scratchColliders.add(bb);
+				}
+			}
+		}
+		return scratchColliders;
 	}
 
 	public void correctCamera(Camera camera, Window window) {
@@ -215,7 +281,12 @@ public class World {
 	public void setTile(Tile tile, int x, int y) {
 		tiles[x + y * width] = tile.getId();
 		if (tile.isSolid()) {
-			boundingBoxes[x + y * width] = new AABB(new Vector2f(x * Constants.TILE_SIZE, -y * Constants.TILE_SIZE), new Vector2f(BOUNDING_BOX_SIZE, BOUNDING_BOX_SIZE));
+			final float cx = x * Constants.TILE_SIZE;
+			final float cy = -y * Constants.TILE_SIZE;
+			boundingBoxes[x + y * width] = new AABB(
+				cx - BOUNDING_BOX_SIZE, cy - BOUNDING_BOX_SIZE,
+				cx + BOUNDING_BOX_SIZE, cy + BOUNDING_BOX_SIZE
+			);
 		} else {
 			boundingBoxes[x + y * width] = null;
 		}
@@ -235,6 +306,64 @@ public class World {
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return null;
 		}
+	}
+
+	/**
+	 * Zeichnet Kollisions-AABBs als Linienrahmen: Tile-AABBs grün, Entity-AABBs rot.
+	 * Nutzt dieselbe kombinierte Kamera-Welt-Matrix wie das normale Rendering.
+	 *
+	 * @param camera die aktive Kamera
+	 * @param alpha  Interpolationsfaktor 0.0–1.0
+	 */
+	public void renderDebugBoxes(final Camera camera, final float alpha) {
+		final Matrix4f combined = camera.getProjection(alpha).mul(world);
+		final FloatBuffer matBuf = BufferUtils.createFloatBuffer(MATRIX_FLOAT_COUNT);
+		combined.get(matBuf);
+
+		glUseProgram(NO_SHADER);
+		glLineWidth(DEBUG_LINE_WIDTH);
+
+		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+		glLoadMatrixf(matBuf);
+
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+		glLoadIdentity();
+
+		glColor3f(COLOR_NONE, COLOR_FULL, COLOR_NONE);
+		for (final AABB bb : boundingBoxes) {
+			if (bb != null) {
+				drawDebugBox(bb);
+			}
+		}
+
+		glColor3f(COLOR_FULL, COLOR_NONE, COLOR_NONE);
+		for (final Entity entity : entities) {
+			entity.getInterpolatedBoundingBox(alpha, scratchEntityDebugBox);
+			drawDebugBox(scratchEntityDebugBox);
+		}
+
+		glMatrixMode(GL_PROJECTION);
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
+		glPopMatrix();
+
+		glLineWidth(DEFAULT_LINE_WIDTH);
+	}
+
+	/**
+	 * Zeichnet eine einzelne AABB als Linienrahmen (GL_LINE_LOOP mit 4 Ecken).
+	 *
+	 * @param bb die zu zeichnende AABB (Koordinaten in Tile-Einheiten)
+	 */
+	private static void drawDebugBox(final AABB bb) {
+		glBegin(GL_LINE_LOOP);
+		glVertex2f(bb.minX, bb.minY);
+		glVertex2f(bb.maxX, bb.minY);
+		glVertex2f(bb.maxX, bb.maxY);
+		glVertex2f(bb.minX, bb.maxY);
+		glEnd();
 	}
 
 	public int getScale() {

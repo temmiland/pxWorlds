@@ -50,6 +50,13 @@ public class DebugOverlay {
     }
 
     /**
+     * @return {@code true} wenn die erweiterte Debug-Ansicht (F3) aktiv ist
+     */
+    public boolean isShowDetailed() {
+        return showDetailed;
+    }
+
+    /**
      * Updates the displayed FPS value. Call this once per second when the frame counter resets.
      * @param fps The measured frames per second.
      */

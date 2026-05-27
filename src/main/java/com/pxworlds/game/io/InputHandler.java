@@ -3,6 +3,7 @@ package com.pxworlds.game.io;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
+import org.lwjgl.glfw.GLFWWindowFocusCallback;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -13,6 +14,7 @@ import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
 import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowFocusCallback;
 
 /**
  * Registriert GLFW-Callbacks und schreibt {@link InputEvent}-Objekte in eine Queue.
@@ -42,6 +44,11 @@ public class InputHandler {
      * Cursor-Callback — Referenz muss gehalten werden, damit der GC sie nicht freigibt.
      */
     private GLFWCursorPosCallback cursorPosCallback;
+    /**
+     * Fenster-Fokus-Callback — feuert FOCUS_LOST wenn das Fenster den Fokus verliert,
+     * damit der InputProcessor stuck keys zurücksetzen kann.
+     */
+    private GLFWWindowFocusCallback windowFocusCallback;
 
     /**
      * Registriert die GLFW-Callbacks für das angegebene Fenster-Handle.
@@ -77,9 +84,18 @@ public class InputHandler {
             eventQueue.add(InputEvent.mouseMove(x, y))
         );
 
+        // Fix: Bei Fokusverlust FOCUS_LOST in die Queue schreiben, damit
+        // der InputProcessor heldKeys/heldMouseButtons leert → keine stuck keys.
+        windowFocusCallback = GLFWWindowFocusCallback.create((win, focused) -> {
+            if (!focused) {
+                eventQueue.add(InputEvent.focusLost());
+            }
+        });
+
         glfwSetKeyCallback(handle, keyCallback);
         glfwSetMouseButtonCallback(handle, mouseButtonCallback);
         glfwSetCursorPosCallback(handle, cursorPosCallback);
+        glfwSetWindowFocusCallback(handle, windowFocusCallback);
     }
 
     /**
@@ -104,6 +120,7 @@ public class InputHandler {
         glfwSetKeyCallback(windowHandle, null);
         glfwSetMouseButtonCallback(windowHandle, null);
         glfwSetCursorPosCallback(windowHandle, null);
+        glfwSetWindowFocusCallback(windowHandle, null);
 
         // Dann die LWJGL-Wrapper-Objekte freigeben
         if (keyCallback != null) {
@@ -117,6 +134,10 @@ public class InputHandler {
         if (cursorPosCallback != null) {
             cursorPosCallback.free();
             cursorPosCallback = null;
+        }
+        if (windowFocusCallback != null) {
+            windowFocusCallback.free();
+            windowFocusCallback = null;
         }
     }
 }
