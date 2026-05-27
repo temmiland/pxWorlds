@@ -3,11 +3,14 @@ package com.pxworlds;
 import com.pxworlds.util.OSHelperUtil;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 public class Constants {
 
-    /** The current game version — keep in sync with pom.xml. */
-    public static final String VERSION               = "0.2-SNAPSHOT";
+    /** The current game version resolved from pom.xml via filtered resources. */
+    public static final String VERSION               = loadVersion();
     /** The title of the application. */
     public static final String TITLE                 = "pxWorlds - Let's Adventure!";
     /** The name of the program directory. */
@@ -36,4 +39,18 @@ public class Constants {
      *  Used for tile rendering (TileRenderer) and entity/AABB positioning (World).
      *  Changing this value scales the entire world consistently. */
     public static final float TILE_SIZE = 2.0f;
+
+    private static String loadVersion() {
+        final Properties properties = new Properties();
+        try (InputStream input = Constants.class.getResourceAsStream("/build.properties")) {
+            if (input == null) {
+                return "dev";
+            }
+            properties.load(input);
+            return properties.getProperty("app.version", "dev");
+        }
+        catch (IOException e) {
+            return "dev";
+        }
+    }
 }

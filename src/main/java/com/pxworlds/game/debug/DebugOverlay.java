@@ -88,7 +88,7 @@ public class DebugOverlay {
         glColor3f(WHITE, WHITE, WHITE);
 
         // --- Always-visible line: version + FPS ---
-        DebugRenderer.drawString("v" + Constants.VERSION + "  " + currentFps + " fps", MARGIN, MARGIN);
+        DebugRenderer.drawString("pxWorlds v" + Constants.VERSION + "  " + currentFps + " fps", MARGIN, MARGIN);
 
         // --- Second line: hint or detailed header ---
         float lineY = MARGIN + LINE_HEIGHT;
