@@ -4,7 +4,7 @@ import com.pxworlds.game.assets.Assets;
 import com.pxworlds.game.collision.AABB;
 import com.pxworlds.game.collision.Collision;
 import com.pxworlds.game.PxWorlds;
-import com.pxworlds.game.io.Input;
+import com.pxworlds.game.io.InputProcessor;
 import com.pxworlds.game.rendering.Camera;
 import com.pxworlds.game.rendering.Shader;
 import com.pxworlds.game.rendering.tiles.TileSheet;
@@ -94,8 +94,14 @@ public class Button {
 		selectedState = STATE_IDLE;
 	}
 
-	public void update(Input input) {
-		final Collision data = boundingBox.getCollision(input.getMousePosition());
+	/**
+	 * Aktualisiert den Button-Zustand basierend auf der Mausposition und Mausbuttons.
+	 *
+	 * @param input    der aktuelle {@link InputProcessor}
+	 * @param mousePos transformierte Mausposition (Fenstermitte = Ursprung, Y oben)
+	 */
+	public void update(final InputProcessor input, final Vector2f mousePos) {
+		final Collision data = boundingBox.getCollision(mousePos);
 
 		if (data.isIntersecting) {
 			selectedState = STATE_SELECTED;

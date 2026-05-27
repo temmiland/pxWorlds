@@ -108,11 +108,11 @@ public class PxWorlds {
 					glViewport(0, 0, window.getWidth(), window.getHeight());
 				}
 
-				if (window.getInput().isKeyReleased(GLFW_KEY_ESCAPE)) {
+				if (window.getInputProcessor().wasPressed(GLFW_KEY_ESCAPE)) {
 					glfwSetWindowShouldClose(window.getWindow(), true);
 				}
 
-				if (window.getInput().isKeyReleased(GLFW_KEY_F3)) {
+				if (window.getInputProcessor().wasPressed(GLFW_KEY_F3)) {
 					debugOverlay.toggleDetailed();
 				}
 
@@ -143,6 +143,7 @@ public class PxWorlds {
 
 		Assets.deleteAsset();
         Bootstrap.getInstance().getConfigurationStorage().saveAllConfigurations();
+		window.cleanUp();
 		glfwTerminate();
 	}
 

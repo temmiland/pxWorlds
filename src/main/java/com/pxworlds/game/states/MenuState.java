@@ -63,7 +63,7 @@ public class MenuState extends GameState {
     public void update(double delta) {
         world.update((float) delta, window, camera);
         world.correctCamera(camera, window);
-        gui.update(window.getInput());
+        gui.update(window.getInputProcessor(), window.getMousePosition());
     }
 
     @Override

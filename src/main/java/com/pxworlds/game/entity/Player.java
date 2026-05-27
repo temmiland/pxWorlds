@@ -2,8 +2,8 @@ package com.pxworlds.game.entity;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.lwjgl.glfw.GLFW;
 
+import com.pxworlds.game.io.InputProcessor;
 import com.pxworlds.game.io.Window;
 import com.pxworlds.game.rendering.Animation;
 import com.pxworlds.game.rendering.Camera;
@@ -45,51 +45,51 @@ public class Player extends Entity {
 
 	@Override
 	public void update(float delta, Window window, Camera camera, World world) {
+		final InputProcessor input = window.getInputProcessor();
 		final Vector2f movement = new Vector2f();
         final float movementP = movementSpeed * delta;
         final float movementN = -movementSpeed * delta;
-        final boolean isADown = window.getInput().isKeyDown(GLFW.GLFW_KEY_A);
-        final boolean isDDown = window.getInput().isKeyDown(GLFW.GLFW_KEY_D);
-        final boolean isWDown = window.getInput().isKeyDown(GLFW.GLFW_KEY_W);
-        final boolean isSDown = window.getInput().isKeyDown(GLFW.GLFW_KEY_S);
 
-        if (isADown) {
-            if (isWDown || isSDown) {
+        final boolean isLeft  = input.isMoveLeft();
+        final boolean isRight = input.isMoveRight();
+        final boolean isUp    = input.isMoveUp();
+        final boolean isDown  = input.isMoveDown();
+
+        if (isLeft) {
+            if (isUp || isDown) {
                 movement.add(movementN / DIAGONAL_SPEED_MULTIPLIER, 0);
             } else {
                 movement.add(movementN, 0);
             }
         }
-
-		if (isDDown) {
-            if (isWDown || isSDown) {
+        if (isRight) {
+            if (isUp || isDown) {
                 movement.add(movementP / DIAGONAL_SPEED_MULTIPLIER, 0);
             } else {
                 movement.add(movementP, 0);
             }
         }
-
-		if (isWDown) {
-            if (isADown || isDDown) {
+        if (isUp) {
+            if (isLeft || isRight) {
                 movement.add(0, movementP / DIAGONAL_SPEED_MULTIPLIER);
             } else {
                 movement.add(0, movementP);
             }
         }
-
-		if (isSDown) {
-            if (isADown || isDDown) {
+        if (isDown) {
+            if (isLeft || isRight) {
                 movement.add(0, movementN / DIAGONAL_SPEED_MULTIPLIER);
             } else {
                 movement.add(0, movementN);
             }
         }
 
-        if (window.getInput().isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) {
+        if (input.isSprinting()) {
             setMovementSpeed(MovementSpeed.RUNNING);
         } else {
             setMovementSpeed(MovementSpeed.WALKING);
         }
+
 		move(movement);
         if (movement.x != 0 || movement.y != 0) {
             if (movementSpeed == MovementSpeed.WALKING.getValue()) {

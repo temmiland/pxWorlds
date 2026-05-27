@@ -117,6 +117,10 @@ public abstract class Entity {
 	 * Sichert die aktuelle Position als prevPos und ruft dann update() auf.
 	 * Wird von World.update() statt update() direkt aufgerufen,
 	 * damit prevPos immer den Stand vor dem Tick enthält.
+	 * @param delta    Zeit seit dem letzten Tick in Sekunden
+	 * @param window   das Fenster (für Input-Zugriff)
+	 * @param camera   die aktive Kamera
+	 * @param world    die Spielwelt
 	 */
 	public final void tick(float delta, Window window, Camera camera, World world) {
 		prevPos.set(transform.pos);

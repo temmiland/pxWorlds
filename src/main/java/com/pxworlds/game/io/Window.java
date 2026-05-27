@@ -3,6 +3,7 @@ package com.pxworlds.game.io;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 
+import org.joml.Vector2f;
 import org.lwjgl.glfw.*;
 
 public class Window {
@@ -22,8 +23,10 @@ public class Window {
 	/** The callback for window size changes. */
 	private GLFWWindowSizeCallback windowSizeCallback;
 
-	/** The input handler. */
-	private Input input;
+	/** Event-Produzent: GLFW-Callbacks → InputEvent-Queue. */
+	private InputHandler inputHandler;
+	/** Event-Konsument: übersetzt InputEvents in GLFW-freie Spielaktionen. */
+	private InputProcessor inputProcessor;
 
 	public static void setCallbacks() {
 		glfwSetErrorCallback(new GLFWErrorCallbackI() {
@@ -72,14 +75,23 @@ public class Window {
 		}
 
 		glfwShowWindow(window);
-
 		glfwMakeContextCurrent(window);
 
-		input = new Input(window);
+		inputHandler = new InputHandler();
+		inputHandler.registerCallbacks(window);
+		inputProcessor = new InputProcessor();
+
 		setLocalCallbacks();
 	}
 
+	/**
+	 * Gibt alle Callbacks und Fenster-Ressourcen frei.
+	 * Muss vor {@code glfwTerminate()} aufgerufen werden.
+	 */
 	public void cleanUp() {
+		// InputHandler-Callbacks zuerst detachen und freigeben,
+		// damit glfwFreeCallbacks() sie nicht nochmals freed (Double-Free)
+		inputHandler.free();
 		glfwFreeCallbacks(window);
 	}
 
@@ -102,8 +114,8 @@ public class Window {
 
 	public void update() {
 		hasResized = false;
-		input.update();
-		glfwPollEvents();
+		glfwPollEvents();                        // Callbacks feuern → Events in die Queue schreiben
+		inputProcessor.processEvents(inputHandler.getEventQueue()); // Queue leeren & Aktionen ableiten
 	}
 
 	public int getWidth() {
@@ -126,7 +138,20 @@ public class Window {
 		return window;
 	}
 
-	public Input getInput() {
-		return input;
+	/**
+	 * Convenience-Methode: gibt die Mausposition im GUI-Koordinatensystem zurück
+	 * (Fenstermitte = Ursprung, Y-Achse nach oben).
+	 *
+	 * @return transformierte Mausposition
+	 */
+	public Vector2f getMousePosition() {
+		return inputProcessor.getMousePosition(width, height);
+	}
+
+	/**
+	 * @return den {@link InputProcessor} für GLFW-freie Spielaktionen
+	 */
+	public InputProcessor getInputProcessor() {
+		return inputProcessor;
 	}
 }

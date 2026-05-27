@@ -3,7 +3,7 @@ package com.pxworlds.game.gui;
 import com.pxworlds.game.assets.Assets;
 import com.pxworlds.game.collision.AABB;
 import com.pxworlds.game.collision.Collision;
-import com.pxworlds.game.io.Input;
+import com.pxworlds.game.io.InputProcessor;
 import com.pxworlds.game.rendering.Camera;
 import com.pxworlds.game.rendering.Shader;
 import com.pxworlds.game.rendering.tiles.TileSheet;
@@ -41,7 +41,13 @@ public class Logo {
         this.boundingBox = new AABB(position, scale);
     }
 
-    public void update(Input input) {
+    /**
+     * Aktualisiert das Logo (aktuell keine Interaktion).
+     *
+     * @param input    der aktuelle {@link InputProcessor}
+     * @param mousePos transformierte Mausposition (Fenstermitte = Ursprung, Y oben)
+     */
+    public void update(final InputProcessor input, final Vector2f mousePos) {
 
     }
 

@@ -1,7 +1,8 @@
 package com.pxworlds.game.gui;
 
-import com.pxworlds.game.io.Input;
+import com.pxworlds.game.io.InputProcessor;
 import com.pxworlds.game.io.Window;
+import org.joml.Vector2f;
 import com.pxworlds.game.rendering.Camera;
 import com.pxworlds.game.rendering.Shader;
 import com.pxworlds.game.rendering.tiles.TileSheet;
@@ -38,12 +39,18 @@ public class Gui {
         camera.setProjection(window.getWidth(), window.getHeight());
     }
 
-    public void update(Input input) {
-        for(Button button : buttons) {
-            button.update(input);
+    /**
+     * Aktualisiert alle GUI-Elemente.
+     *
+     * @param input     der aktuelle {@link InputProcessor}
+     * @param mousePos  die transformierte Mausposition (Fenstermitte = Ursprung, Y oben)
+     */
+    public void update(final InputProcessor input, final Vector2f mousePos) {
+        for (Button button : buttons) {
+            button.update(input, mousePos);
         }
-        for(Logo logo : logos) {
-            logo.update(input);
+        for (Logo logo : logos) {
+            logo.update(input, mousePos);
         }
     }
 
