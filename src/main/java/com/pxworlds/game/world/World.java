@@ -1,12 +1,8 @@
 package com.pxworlds.game.world;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.imageio.ImageIO;
 
 import com.pxworlds.Constants;
 import com.pxworlds.game.collision.AABB;
@@ -16,357 +12,694 @@ import com.pxworlds.game.entity.Transform;
 import com.pxworlds.game.io.Window;
 import com.pxworlds.game.rendering.Camera;
 import com.pxworlds.game.rendering.Shader;
+import com.pxworlds.game.rendering.TextureAtlas;
 import com.pxworlds.game.rendering.tiles.Tile;
 import com.pxworlds.game.rendering.tiles.TileRenderer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 
-import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glColor3f;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glLoadMatrixf;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glLineWidth;
-import static org.lwjgl.opengl.GL11.glVertex2f;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 
+/**
+ * Spielwelt — verwaltet Tiles (Chunk-Grid), Kollisions-AABBs und Entities.
+ *
+ * <h3>Tile-Speicherung</h3>
+ * Tiles liegen in einem {@code Chunk[][]}-Grid. Jeder Chunk ist
+ * {@value Constants#CHUNK_SIZE}×{@value Constants#CHUNK_SIZE} Tiles groß
+ * und besitzt einen eigenen OpenGL-VBO. {@link #setTile} markiert den
+ * betroffenen Chunk als dirty und benachrichtigt alle {@link WorldListener}.
+ *
+ * <h3>Kollision</h3>
+ * Für Kollisionsabfragen existiert weiterhin ein flaches {@code AABB[]}-Array
+ * (global indexiert als {@code x + y * width}). Das Array liegt parallel
+ * zum Chunk-Grid und wird bei {@link #setTile} synchron aktualisiert.
+ *
+ * <h3>Rendering</h3>
+ * {@link #render} iteriert nur die sichtbaren Chunks (Viewport-Culling),
+ * baut bei Bedarf ihren VBO neu und rendert sie in einem einzigen
+ * {@code glDrawArrays}-Call pro Chunk.
+ */
 public class World {
-	/** The default world width. */
-	private static final int DEFAULT_WORLD_WIDTH = 64;
-	/** The default world height. */
-	private static final int DEFAULT_WORLD_HEIGHT = 64;
-	/** The default world scale. */
-	private static final int DEFAULT_WORLD_SCALE = 16;
-	/** The alpha mask. */
-	private static final int ALPHA_MASK = 0xFF;
-	/** The red mask. */
-	private static final int RED_MASK = 0xFF;
-	/** The green mask. */
-	private static final int GREEN_MASK = 0xFF;
-	/** The blue mask. */
-	private static final int BLUE_MASK = 0xFF;
-	/** The red shift. */
-	private static final int RED_SHIFT = 16;
-	/** The green shift. */
-	private static final int GREEN_SHIFT = 8;
-	/** The blue shift. */
-	private static final int BLUE_SHIFT = 0;
-	/** The alpha shift. */
-	private static final int ALPHA_SHIFT = 24;
-	/** The view offset. */
-	private static final int VIEW_OFFSET = 4;
-	/** The divisor for half calculations. */
-	private static final int HALF_DIVISOR = 2;
-	/** The render offset. */
-	private static final int RENDER_OFFSET = 1;
-	/** The bounding box size. */
-	private static final float BOUNDING_BOX_SIZE = 1.0f;
-	/** The player entity index. */
-	private static final int PLAYER_ENTITY_INDEX = 1;
-	/** Größe eines 4×4-Matrizen-FloatBuffer (16 Einträge). */
-	private static final int MATRIX_FLOAT_COUNT = 16;
-	/** OpenGL-Programm-ID 0 — deaktiviert jeden aktiven Shader. */
-	private static final int NO_SHADER = 0;
-	/** Debug-Farbe Grün: volle Intensität (für Tile-AABBs). */
-	private static final float COLOR_FULL = 1.0f;
-	/** Debug-Farbe: keine Intensität (Kanal ausgeschaltet). */
-	private static final float COLOR_NONE = 0.0f;
-	/** Linienbreite der Debug-AABB-Rahmen in Pixeln. */
-	private static final float DEBUG_LINE_WIDTH = 2.0f;
-	/** Standard-Linienbreite — wird nach dem Debug-Rendering wiederhergestellt. */
-	private static final float DEFAULT_LINE_WIDTH = 1.0f;
-	/** The view X position. */
-	private int viewX;
-	/** The view Y position. */
-	private int viewY;
-	/** The tile data. */
-	private byte[] tiles;
-	/** The bounding boxes for collision. */
-	private AABB[] boundingBoxes;
-	/** The list of entities in the world. */
-	private List<Entity> entities;
-	/** The width of the world. */
-	private int width;
-	/** The height of the world. */
-	private int height;
-	/** The scale of the world. */
-	private int scale;
 
-	/**
-	 * Wiederverwendbare Scratch-AABB für {@link #renderDebugBoxes} — vermeidet
-	 * eine Heap-Allokation pro Entity pro Frame im Debug-Modus.
-	 */
-	private final AABB scratchEntityDebugBox = new AABB(0, 0, 0, 0);
+    // -------------------------------------------------------------------------
+    // Konstanten
 
-	/**
-	 * Wiederverwendbare Ergebnisliste für {@link #getCollidingBoxes(AABB)}.
-	 * Vermeidet eine {@code new ArrayList<>()} pro Tick pro Entity.
-	 */
-	private final List<AABB> scratchColliders = new ArrayList<>();
+    /** Tile-Kacheln links/rechts/oben/unten außerhalb des berechneten Viewports rendern. */
+    private static final int VIEW_OFFSET   = 4;
+    private static final int HALF_DIVISOR  = 2;
+    private static final int RENDER_OFFSET = 1;
 
-	/** The world transformation matrix. */
-	private Matrix4f world;
+    /** AABB-Halb-Ausdehnung für solid Tiles (= TILE_SIZE / 2). */
+    private static final float BOUNDING_BOX_SIZE = 1.0f;
+    /** Dicke der unsichtbaren Grenz-Wände an den Welträndern (in World-Space-Einheiten). */
+    private static final float BOUNDARY_THICKNESS = 8.0f;
 
-	public World(String worldName, Camera camera, boolean playable, int newScale) {
+    /** Sentinel-Wert für „kein Spawn gesetzt" in {@link #spawnTileX}/{@link #spawnTileY}. */
+    public static final int NO_SPAWN = -1;
 
-		try {
-			final BufferedImage tileSheet = ImageIO.read(getClass().getResourceAsStream("/levels/" + worldName + "/tiles.png"));
-			final BufferedImage entitySheet = ImageIO.read(getClass().getResourceAsStream("/levels/" + worldName + "/entities.png"));
+    // Debug-Rendering
+    private static final int   MATRIX_FLOAT_COUNT = 16;
+    private static final int   NO_SHADER          = 0;
+    private static final float COLOR_FULL         = 1.0f;
+    private static final float COLOR_NONE         = 0.0f;
+    private static final float DEBUG_LINE_WIDTH   = 2.0f;
+    private static final float DEFAULT_LINE_WIDTH  = 1.0f;
 
-			width = tileSheet.getWidth();
-			height = tileSheet.getHeight();
-            this.scale = newScale;
+    // -------------------------------------------------------------------------
+    // Felder
 
-			this.world = new Matrix4f().setTranslation(new Vector3f(0));
-			this.world.scale(scale);
+    /** Breite/Höhe der Welt in Tiles. */
+    private int width;
+    private int height;
+    /** World-Scale (Pixel-Multiplikator). */
+    private int scale;
 
-			final int[] colorTileSheet = tileSheet.getRGB(0, 0, width, height, null, 0, width);
-			final int[] colorEntitySheet = entitySheet.getRGB(0, 0, width, height, null, 0, width);
+    /** Chunk-Grid [chunkX][chunkY]. */
+    private Chunk[][] chunks;
+    /** Anzahl Chunks horizontal / vertikal. */
+    private int chunkCountX;
+    private int chunkCountY;
 
-			tiles = new byte[width * height];
-			boundingBoxes = new AABB[width * height];
-			entities = new ArrayList<>();
+    // kein boundingBoxes-Array mehr — AABBs werden in getCollidingBoxes on-the-fly erzeugt
 
-			Transform transform;
+    /** Alle Entities in der Welt. */
+    private List<Entity> entities;
 
-			for (int y = 0; y < height; y++) {
-				for (int x = 0; x < width; x++) {
-					final int red = (colorTileSheet[x + y * width] >> RED_SHIFT) & RED_MASK;
-					final int entityIndex = (colorEntitySheet[x + y * width] >> RED_SHIFT) & RED_MASK;
-					final int entityAlpha = (colorEntitySheet[x + y * width] >> ALPHA_SHIFT) & ALPHA_MASK;
+    /** Listener die bei Tile-Änderungen benachrichtigt werden. */
+    private final List<WorldListener> listeners = new ArrayList<>();
 
-					Tile t;
-					try {
-						t = Tile.tiles[red];
-					} catch (ArrayIndexOutOfBoundsException e) {
-						t = null;
-					}
+    /** Viewportgröße in Tiles — berechnet in {@link #calculateView}. */
+    private int viewX;
+    private int viewY;
 
-					if (t != null) {
-						setTile(t, x, y);
-					}
+    /** World-Transform-Matrix (Skalierung um {@link #scale}). */
+    private Matrix4f world;
 
-					if (entityAlpha > 0) {
-						transform = new Transform();
-						transform.pos.x = x * Constants.TILE_SIZE;
-						transform.pos.y = -y * Constants.TILE_SIZE;
-						switch (entityIndex) {
-							case PLAYER_ENTITY_INDEX :
-							    if(playable) {
-                                    final Player player = new Player(transform);
-                                    entities.add(player);
-                                }
-								camera.getPosition().set(transform.pos.mul(-scale, new Vector3f()));
-								break;
-							default :
-								break;
-						}
-					}
-				}
-			}
+    // Scratch-Objekte — vermeiden Heap-Allokationen im Hot-Path
+    private final AABB         scratchEntityDebugBox = new AABB(0, 0, 0, 0);
+    private final List<AABB>   scratchColliders      = new ArrayList<>();
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    /**
+     * Unsichtbare Grenz-Wände an den vier Welträndern —
+     * verhindern, dass Entities die Welt verlassen.
+     * Werden einmalig in {@link #initBoundaries()} erzeugt.
+     */
+    private AABB boundaryLeft;
+    private AABB boundaryRight;
+    private AABB boundaryTop;
+    private AABB boundaryBottom;
 
-	public World() {
-		width = DEFAULT_WORLD_WIDTH;
-		height = DEFAULT_WORLD_HEIGHT;
-		scale = DEFAULT_WORLD_SCALE;
+    /**
+     * Spawn-Position des Spielers in Tile-Koordinaten.
+     * {@value #NO_SPAWN} = kein Spawn gesetzt (Standard nach {@link World#World(int,int,int)}).
+     */
+    private int spawnTileX = NO_SPAWN;
+    private int spawnTileY = NO_SPAWN;
 
-		tiles = new byte[width * height];
-		boundingBoxes = new AABB[width * height];
+    /**
+     * Letzte gespeicherte Spieler-Position in Entity-World-Space-Koordinaten.
+     * {@link Float#NaN} = keine Letztposition gespeichert.
+     * Wird beim Speichern durch {@link #capturePlayerPosition()} befüllt
+     * und beim Laden über {@link #setLastPos(float, float)} gesetzt.
+     */
+    private float lastSavedPosX = Float.NaN;
+    private float lastSavedPosY = Float.NaN;
 
-		world = new Matrix4f().setTranslation(new Vector3f(0));
-		world.scale(scale);
-	}
+    // Debug-Statistiken — aktualisiert in render()
+    private int lastRenderedChunks = 0;
+    private int lastRebuiltChunks  = 0;
 
-	public void calculateView(Window window) {
-		viewX = (window.getWidth() / (scale * HALF_DIVISOR)) + VIEW_OFFSET;
-		viewY = (window.getHeight() / (scale * HALF_DIVISOR)) + VIEW_OFFSET;
-	}
+    // -------------------------------------------------------------------------
+    // Konstruktoren
 
-	public Matrix4f getWorldMatrix() {
-		return world;
-	}
+    /**
+     * Erzeugt eine leere Welt mit den angegebenen Dimensionen.
+     * Intern verwendet von {@link WorldIO} zum Aufbau einer geladenen Welt.
+     *
+     * @param newWidth   Weltbreite in Tiles
+     * @param newHeight  Welthöhe in Tiles
+     * @param newScale   World-Scale (Pixel-Multiplikator)
+     */
+    World(final int newWidth, final int newHeight, final int newScale) {
+        this.width  = newWidth;
+        this.height = newHeight;
+        this.scale  = newScale;
+        initChunks();
+        initWorld();
+    }
 
-	public void render(TileRenderer render, Shader shader, Camera cam, float alpha) {
-		final int posX = (int) cam.getPosition().x / (scale * HALF_DIVISOR);
-		final int posY = (int) cam.getPosition().y / (scale * HALF_DIVISOR);
+    // -------------------------------------------------------------------------
+    // Initialisierung
 
-		for (int i = 0; i < viewX; i++) {
-			for (int j = 0; j < viewY; j++) {
-				final Tile t = getTile(i - posX - (viewX / HALF_DIVISOR) + RENDER_OFFSET, j + posY - (viewY / HALF_DIVISOR));
-				if (t != null) {
-					render.renderTile(t, i - posX - (viewX / HALF_DIVISOR) + RENDER_OFFSET, -j - posY + (viewY / HALF_DIVISOR), shader, world, cam, alpha);
-				}
-			}
-		}
+    private void initChunks() {
+        chunkCountX = (width  + Chunk.SIZE - 1) / Chunk.SIZE;
+        chunkCountY = (height + Chunk.SIZE - 1) / Chunk.SIZE;
+        chunks      = new Chunk[chunkCountX][chunkCountY];
+        for (int cy = 0; cy < chunkCountY; cy++) {
+            for (int cx = 0; cx < chunkCountX; cx++) {
+                chunks[cx][cy] = new Chunk(cx, cy);
+            }
+        }
+    }
 
-		for (Entity entity : entities) {
-			entity.render(shader, cam, this, alpha);
-		}
-	}
+    private void initWorld() {
+        entities = new ArrayList<>();
+        world         = new Matrix4f().setTranslation(new Vector3f(0));
+        world.scale(scale);
+        initBoundaries();
+    }
 
-	public void update(float delta, Window window, Camera camera) {
-		camera.savePrevPosition();
-		for (Entity entity : entities) {
-			entity.tick(delta, window, camera, this);
-		}
+    /**
+     * Baut die vier unsichtbaren Grenz-Wände auf, die Entities am Verlassen
+     * der Welt hindern. Die Ränder entsprechen den äußeren Kanten der
+     * Randtiles (d.h. dem Übergang Tile-AABB → Luft).
+     *
+     * <p>Koordinaten im Entity-World-Space (vor dem Scale-Matrix):
+     * <ul>
+     *   <li>linker  Rand: x = −{@value #BOUNDING_BOX_SIZE} (linke Kante von Tile 0)</li>
+     *   <li>rechter Rand: x = width×{@value com.pxworlds.Constants#TILE_SIZE} − {@value #BOUNDING_BOX_SIZE}</li>
+     *   <li>oberer  Rand: y = +{@value #BOUNDING_BOX_SIZE} (obere Kante von Tile 0)</li>
+     *   <li>unterer Rand: y = −height×{@value com.pxworlds.Constants#TILE_SIZE} + {@value #BOUNDING_BOX_SIZE}</li>
+     * </ul></p>
+     */
+    private void initBoundaries() {
+        // Äußere Kanten des Welt-Rechtecks im Entity-Space
+        final float left   = -BOUNDING_BOX_SIZE;
+        final float right  =  width  * Constants.TILE_SIZE - BOUNDING_BOX_SIZE;
+        final float top    =  BOUNDING_BOX_SIZE;
+        final float bottom = -height * Constants.TILE_SIZE + BOUNDING_BOX_SIZE;
 
-		// Entity-Entity Push-out erfolgt nach den Tick-Updates
-		for (int i = 0; i < entities.size(); i++) {
-			for (int j = i + 1; j < entities.size(); j++) {
-				entities.get(i).collideWithEntity(entities.get(j));
-			}
-		}
-	}
+        boundaryLeft   = new AABB(left - BOUNDARY_THICKNESS, bottom, left,   top);
+        boundaryRight  = new AABB(right, bottom, right + BOUNDARY_THICKNESS, top);
+        boundaryTop    = new AABB(left, top,    right, top    + BOUNDARY_THICKNESS);
+        boundaryBottom = new AABB(left, bottom  - BOUNDARY_THICKNESS, right, bottom);
+    }
 
-	/**
-	 * Liefert alle Tile-Bounding-Boxes, die die gegebene AABB überschneiden.
-	 *
-	 * @param area  die zu prüfende AABB
-	 * @return Liste aller schneidenden Tile-Bounding-Boxes (nie null)
-	 */
-	public List<AABB> getCollidingBoxes(AABB area) {
-		scratchColliders.clear();
+    // -------------------------------------------------------------------------
+    // Listener
 
-		// Y-Achse ist im Welt-Koordinatensystem negiert (Tile y=0 liegt oben),
-		// daher minY → y1 und maxY → y0. Puffer ±1 verhindert Rand-Lücken.
-		final int x0 = (int) Math.floor( area.minX / Constants.TILE_SIZE) - 1;
-		final int x1 = (int) Math.ceil(  area.maxX / Constants.TILE_SIZE) + 1;
-		final int y0 = (int) Math.floor(-area.maxY / Constants.TILE_SIZE) - 1;
-		final int y1 = (int) Math.ceil( -area.minY / Constants.TILE_SIZE) + 1;
+    public void addListener(final WorldListener listener) {
+        listeners.add(listener);
+    }
 
-		for (int y = Math.max(0, y0); y <= Math.min(height - 1, y1); y++) {
-			for (int x = Math.max(0, x0); x <= Math.min(width - 1, x1); x++) {
-				final AABB bb = getTileBoundingBox(x, y);
-				if (bb != null && bb.intersects(area)) {
-					scratchColliders.add(bb);
-				}
-			}
-		}
-		return scratchColliders;
-	}
+    public void removeListener(final WorldListener listener) {
+        listeners.remove(listener);
+    }
 
-	public void correctCamera(Camera camera, Window window) {
-		final Vector3f pos = camera.getPosition();
+    // -------------------------------------------------------------------------
+    // Update
 
-		final int w = -width * scale * HALF_DIVISOR;
-		final int h = height * scale * HALF_DIVISOR;
+    public void calculateView(final Camera camera) {
+        viewX = (camera.getVirtualWidth()  / (scale * HALF_DIVISOR)) + VIEW_OFFSET;
+        viewY = (camera.getVirtualHeight() / (scale * HALF_DIVISOR)) + VIEW_OFFSET;
+    }
 
-		if (pos.x > -(window.getWidth() / HALF_DIVISOR) + scale) {
-			pos.x = -(window.getWidth() / HALF_DIVISOR) + scale;
-		}
-		if (pos.x < w + (window.getWidth() / HALF_DIVISOR) + scale) {
-			pos.x = w + (window.getWidth() / HALF_DIVISOR) + scale;
-		}
+    public void update(final float delta, final Window window, final Camera camera) {
+        camera.savePrevPosition();
+        for (final Entity entity : entities) {
+            entity.tick(delta, window, camera, this);
+        }
+        // Entity-Entity Push-out nach allen Ticks
+        for (int i = 0; i < entities.size(); i++) {
+            for (int j = i + 1; j < entities.size(); j++) {
+                entities.get(i).collideWithEntity(entities.get(j));
+            }
+        }
+        // Tile-Recheck nach dem Push-out: eine in eine Wand geschobene Entity
+        // wird hier herauskorrigiert (clipX/clipY allein genügen nicht, weil
+        // sie nur verhindernde, keine korrigierende Geometrie anwenden).
+        for (final Entity entity : entities) {
+            entity.resolveAgainstTiles(this);
+        }
+    }
 
-		if (pos.y < (window.getHeight() / HALF_DIVISOR) - scale) {
-			pos.y = (window.getHeight() / HALF_DIVISOR) - scale;
-		}
-		if (pos.y > h - (window.getHeight() / HALF_DIVISOR) - scale) {
-			pos.y = h - (window.getHeight() / HALF_DIVISOR) - scale;
-		}
-	}
+    // -------------------------------------------------------------------------
+    // Rendering
 
-	public void setTile(Tile tile, int x, int y) {
-		tiles[x + y * width] = tile.getId();
-		if (tile.isSolid()) {
-			final float cx = x * Constants.TILE_SIZE;
-			final float cy = -y * Constants.TILE_SIZE;
-			boundingBoxes[x + y * width] = new AABB(
-				cx - BOUNDING_BOX_SIZE, cy - BOUNDING_BOX_SIZE,
-				cx + BOUNDING_BOX_SIZE, cy + BOUNDING_BOX_SIZE
-			);
-		} else {
-			boundingBoxes[x + y * width] = null;
-		}
-	}
+    /**
+     * Rendert alle sichtbaren Chunks und anschließend alle Entities.
+     *
+     * @param tileRenderer  stellt Atlas und Batch-Shader bereit
+     * @param entityShader  Shader für Entities (bestehender "shader")
+     * @param cam           aktive Kamera
+     * @param alpha         Interpolationsfaktor 0.0–1.0
+     */
+    public void render(final TileRenderer tileRenderer, final Shader entityShader,
+                       final Camera cam, final float alpha) {
 
-	public Tile getTile(int x, int y) {
-		try {
-			return Tile.tiles[tiles[x + y * width]];
-		} catch (ArrayIndexOutOfBoundsException e) {
-			return null;
-		}
-	}
+        final TextureAtlas atlas       = tileRenderer.getAtlas();
+        final Shader       batchShader = tileRenderer.getBatchShader();
 
-	public AABB getTileBoundingBox(int x, int y) {
-		try {
-			return boundingBoxes[x + y * width];
-		} catch (ArrayIndexOutOfBoundsException e) {
-			return null;
-		}
-	}
+        // --- Sichtbaren Chunk-Bereich berechnen ---
+        // posX/posY: Kamera-Offset in Tile-Koordinaten
+        final int posX = (int) cam.getPosition().x / (scale * HALF_DIVISOR);
+        final int posY = (int) cam.getPosition().y / (scale * HALF_DIVISOR);
 
-	/**
-	 * Zeichnet Kollisions-AABBs als Linienrahmen: Tile-AABBs grün, Entity-AABBs rot.
-	 * Nutzt dieselbe kombinierte Kamera-Welt-Matrix wie das normale Rendering.
-	 *
-	 * @param camera die aktive Kamera
-	 * @param alpha  Interpolationsfaktor 0.0–1.0
-	 */
-	public void renderDebugBoxes(final Camera camera, final float alpha) {
-		final Matrix4f combined = camera.getProjection(alpha).mul(world);
-		final FloatBuffer matBuf = BufferUtils.createFloatBuffer(MATRIX_FLOAT_COUNT);
-		combined.get(matBuf);
+        final int halfX = viewX / HALF_DIVISOR;
+        final int halfY = viewY / HALF_DIVISOR;
 
-		glUseProgram(NO_SHADER);
-		glLineWidth(DEBUG_LINE_WIDTH);
+        // Sichtbare Tile-Range (mit VIEW_OFFSET-Puffer)
+        final int minTileX = -posX - halfX - 1;
+        final int maxTileX = -posX + halfX + 1;
+        final int minTileY =  posY - halfY - 1;
+        final int maxTileY =  posY + halfY + 1;
 
-		glMatrixMode(GL_PROJECTION);
-		glPushMatrix();
-		glLoadMatrixf(matBuf);
+        // In Chunk-Koordinaten umrechnen und auf Welt-Bounds klemmen
+        final int minCX = Math.max(0,              Math.floorDiv(minTileX, Chunk.SIZE));
+        final int maxCX = Math.min(chunkCountX - 1, Math.floorDiv(maxTileX, Chunk.SIZE));
+        final int minCY = Math.max(0,              Math.floorDiv(minTileY, Chunk.SIZE));
+        final int maxCY = Math.min(chunkCountY - 1, Math.floorDiv(maxTileY, Chunk.SIZE));
 
-		glMatrixMode(GL_MODELVIEW);
-		glPushMatrix();
-		glLoadIdentity();
+        // --- Dirty Chunks neu bauen und Statistik führen ---
+        int rebuilt  = 0;
+        int rendered = 0;
+        for (int cy = minCY; cy <= maxCY; cy++) {
+            for (int cx = minCX; cx <= maxCX; cx++) {
+                if (chunks[cx][cy].rebuildIfDirty(atlas)) {
+                    rebuilt++;
+                }
+            }
+        }
 
-		glColor3f(COLOR_NONE, COLOR_FULL, COLOR_NONE);
-		for (final AABB bb : boundingBoxes) {
-			if (bb != null) {
-				drawDebugBox(bb);
-			}
-		}
+        // --- Chunks rendern (ein Draw-Call pro Chunk) ---
+        final Matrix4f viewProj = cam.getProjection(alpha).mul(world);
 
-		glColor3f(COLOR_FULL, COLOR_NONE, COLOR_NONE);
-		for (final Entity entity : entities) {
-			entity.getInterpolatedBoundingBox(alpha, scratchEntityDebugBox);
-			drawDebugBox(scratchEntityDebugBox);
-		}
+        batchShader.bind();
+        batchShader.setUniform("sampler", 0);
+        batchShader.setUniform("projection", viewProj);
+        atlas.bind(0);
 
-		glMatrixMode(GL_PROJECTION);
-		glPopMatrix();
-		glMatrixMode(GL_MODELVIEW);
-		glPopMatrix();
+        for (int cy = minCY; cy <= maxCY; cy++) {
+            for (int cx = minCX; cx <= maxCX; cx++) {
+                chunks[cx][cy].render();
+                rendered++;
+            }
+        }
 
-		glLineWidth(DEFAULT_LINE_WIDTH);
-	}
+        lastRenderedChunks = rendered;
+        lastRebuiltChunks  = rebuilt;
 
-	/**
-	 * Zeichnet eine einzelne AABB als Linienrahmen (GL_LINE_LOOP mit 4 Ecken).
-	 *
-	 * @param bb die zu zeichnende AABB (Koordinaten in Tile-Einheiten)
-	 */
-	private static void drawDebugBox(final AABB bb) {
-		glBegin(GL_LINE_LOOP);
-		glVertex2f(bb.minX, bb.minY);
-		glVertex2f(bb.maxX, bb.minY);
-		glVertex2f(bb.maxX, bb.maxY);
-		glVertex2f(bb.minX, bb.maxY);
-		glEnd();
-	}
+        // --- Entities rendern (bestehende Per-Entity-Methode) ---
+        for (final Entity entity : entities) {
+            entity.render(entityShader, cam, this, alpha);
+        }
+    }
 
-	public int getScale() {
-		return scale;
-	}
+    public void correctCamera(final Camera camera) {
+        final Vector3f pos = camera.getPosition();
+        final int w = -width  * scale * HALF_DIVISOR;
+        final int h =  height * scale * HALF_DIVISOR;
+
+        final int halfVW = camera.getVirtualWidth()  / HALF_DIVISOR;
+        final int halfVH = camera.getVirtualHeight() / HALF_DIVISOR;
+
+        if (pos.x > -halfVW + scale) {
+            pos.x = -halfVW + scale;
+        }
+        if (pos.x < w + halfVW + scale) {
+            pos.x =  w + halfVW + scale;
+        }
+        if (pos.y < halfVH - scale) {
+            pos.y = halfVH - scale;
+        }
+        if (pos.y > h - halfVH - scale) {
+            pos.y = h - halfVH - scale;
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Tile-Zugriff
+
+    /**
+     * Setzt ein Tile an der globalen Position und markiert den betroffenen Chunk als dirty.
+     *
+     * @param tile  das neue Tile oder {@code null} für Luft
+     * @param x     globale X-Tile-Koordinate
+     * @param y     globale Y-Tile-Koordinate
+     */
+    public void setTile(final Tile tile, final int x, final int y) {
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+            return;
+        }
+
+        // Chunk aktualisieren — AABB wird on-the-fly in getCollidingBoxes berechnet
+        final int cx = x / Chunk.SIZE;
+        final int cy = y / Chunk.SIZE;
+        chunks[cx][cy].setTile(x % Chunk.SIZE, y % Chunk.SIZE, tile);
+
+        // Listener benachrichtigen
+        for (final WorldListener listener : listeners) {
+            listener.tileChanged(x, y);
+        }
+    }
+
+    /**
+     * Gibt das Tile an der globalen Position zurück oder {@code null} für Luft
+     * bzw. außerhalb der Welt.
+     */
+    public Tile getTile(final int x, final int y) {
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+            return null;
+        }
+        final int cx = x / Chunk.SIZE;
+        final int cy = y / Chunk.SIZE;
+        final int lx = x % Chunk.SIZE;
+        final int ly = y % Chunk.SIZE;
+        return chunks[cx][cy].getTile(lx, ly);
+    }
+
+    /**
+     * Berechnet die AABB eines soliden Tiles on-the-fly.
+     *
+     * @param x  globale X-Tile-Koordinate
+     * @param y  globale Y-Tile-Koordinate
+     * @return   berechnete AABB oder {@code null} wenn Luft / außerhalb der Welt
+     */
+    public AABB getTileBoundingBox(final int x, final int y) {
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+            return null;
+        }
+        final Tile tile = getTile(x, y);
+        if (tile == null || !tile.isSolid()) {
+            return null;
+        }
+        final float bx = x * Constants.TILE_SIZE;
+        final float by = -y * Constants.TILE_SIZE;
+        return new AABB(bx - BOUNDING_BOX_SIZE, by - BOUNDING_BOX_SIZE,
+                        bx + BOUNDING_BOX_SIZE, by + BOUNDING_BOX_SIZE);
+    }
+
+    /**
+     * Liefert alle AABB von soliden Tiles die {@code area} überschneiden.
+     *
+     * <p>Die AABBs werden on-the-fly berechnet — kein paralleles AABB-Array nötig.
+     * Das zurückgegebene Scratch-Objekt darf nicht gecacht werden und ist nach
+     * dem nächsten Aufruf ungültig.</p>
+     *
+     * @param area  Suchbereich
+     * @return      Referenz auf {@code scratchColliders} (nie null, nicht cachen!)
+     */
+    public List<AABB> getCollidingBoxes(final AABB area) {
+        scratchColliders.clear();
+
+        // Weltgrenz-Wände — verhindern, dass Entities den Welt-Bereich verlassen
+        if (area.minX < boundaryLeft.maxX)   { scratchColliders.add(boundaryLeft);   }
+        if (area.maxX > boundaryRight.minX)  { scratchColliders.add(boundaryRight);  }
+        if (area.maxY > boundaryTop.minY)    { scratchColliders.add(boundaryTop);    }
+        if (area.minY < boundaryBottom.maxY) { scratchColliders.add(boundaryBottom); }
+
+        final int x0 = (int) Math.floor( area.minX / Constants.TILE_SIZE) - 1;
+        final int x1 = (int) Math.ceil(  area.maxX / Constants.TILE_SIZE) + 1;
+        final int y0 = (int) Math.floor(-area.maxY / Constants.TILE_SIZE) - 1;
+        final int y1 = (int) Math.ceil( -area.minY / Constants.TILE_SIZE) + 1;
+
+        for (int y = Math.max(0, y0); y <= Math.min(height - 1, y1); y++) {
+            for (int x = Math.max(0, x0); x <= Math.min(width - 1, x1); x++) {
+                final Tile tile = getTile(x, y);
+                if (tile == null || !tile.isSolid()) {
+                    continue;
+                }
+                final float bx  = x * Constants.TILE_SIZE;
+                final float by  = -y * Constants.TILE_SIZE;
+                final float mnX = bx - BOUNDING_BOX_SIZE;
+                final float mnY = by - BOUNDING_BOX_SIZE;
+                final float mxX = bx + BOUNDING_BOX_SIZE;
+                final float mxY = by + BOUNDING_BOX_SIZE;
+                // Inline-Intersection-Check verhindert AABB-Allokation für Nicht-Treffer
+                if (mxX > area.minX && mnX < area.maxX && mxY > area.minY && mnY < area.maxY) {
+                    scratchColliders.add(new AABB(mnX, mnY, mxX, mxY));
+                }
+            }
+        }
+        return scratchColliders;
+    }
+
+    // -------------------------------------------------------------------------
+    // Debug
+
+    /**
+     * Zeichnet Tile-AABBs (grün) und Entity-AABBs (rot) als Linienrahmen.
+     * Wird nur im F3-Debug-Modus aufgerufen.
+     */
+    public void renderDebugBoxes(final Camera camera, final float alpha) {
+        final Matrix4f combined = camera.getProjection(alpha).mul(world);
+        final FloatBuffer matBuf = BufferUtils.createFloatBuffer(MATRIX_FLOAT_COUNT);
+        combined.get(matBuf);
+
+        glUseProgram(NO_SHADER);
+        glLineWidth(DEBUG_LINE_WIDTH);
+
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadMatrixf(matBuf);
+
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+
+        // Sichtbarer Tile-Bereich — identische Logik wie in render()
+        final int posX  = (int) camera.getPosition().x / (scale * HALF_DIVISOR);
+        final int posY  = (int) camera.getPosition().y / (scale * HALF_DIVISOR);
+        final int halfX = viewX / HALF_DIVISOR;
+        final int halfY = viewY / HALF_DIVISOR;
+        final int minTX = Math.max(0,          -posX - halfX - RENDER_OFFSET);
+        final int maxTX = Math.min(width  - 1, -posX + halfX + RENDER_OFFSET);
+        final int minTY = Math.max(0,           posY - halfY - RENDER_OFFSET);
+        final int maxTY = Math.min(height - 1,  posY + halfY + RENDER_OFFSET);
+
+        glColor3f(COLOR_NONE, COLOR_FULL, COLOR_NONE);
+        for (int ty = minTY; ty <= maxTY; ty++) {
+            for (int tx = minTX; tx <= maxTX; tx++) {
+                final Tile tile = getTile(tx, ty);
+                if (tile != null && tile.isSolid()) {
+                    final float bx = tx * Constants.TILE_SIZE;
+                    final float by = -ty * Constants.TILE_SIZE;
+                    drawDebugBox(bx - BOUNDING_BOX_SIZE, by - BOUNDING_BOX_SIZE,
+                                 bx + BOUNDING_BOX_SIZE, by + BOUNDING_BOX_SIZE);
+                }
+            }
+        }
+
+        glColor3f(COLOR_FULL, COLOR_NONE, COLOR_NONE);
+        for (final Entity entity : entities) {
+            entity.getInterpolatedBoundingBox(alpha, scratchEntityDebugBox);
+            drawDebugBox(scratchEntityDebugBox.minX, scratchEntityDebugBox.minY,
+                         scratchEntityDebugBox.maxX, scratchEntityDebugBox.maxY);
+        }
+
+        // --- Chunk-Grenzen (blau) ---
+        // half = halbe Tile-Breite; Tile (0,0) hat Mittelpunkt bei (0,0),
+        // daher liegt die linke/obere Weltkante bei (-half, +half).
+        final float half       = Constants.TILE_SIZE * 0.5f;
+        final float worldLeft  = -half;
+        final float worldRight =  width  * Constants.TILE_SIZE - half;
+        final float worldTop   =  half;
+        final float worldBot   = -height * Constants.TILE_SIZE + half;
+
+        glColor3f(COLOR_NONE, COLOR_NONE, COLOR_FULL);
+
+        // Vertikale Trennlinien zwischen Chunk-Spalten
+        for (int cx = 1; cx < chunkCountX; cx++) {
+            final float x = cx * Chunk.SIZE * Constants.TILE_SIZE - half;
+            glBegin(GL_LINES);
+            glVertex2f(x, worldTop);
+            glVertex2f(x, worldBot);
+            glEnd();
+        }
+
+        // Horizontale Trennlinien zwischen Chunk-Zeilen
+        for (int cy = 1; cy < chunkCountY; cy++) {
+            final float y = -cy * Chunk.SIZE * Constants.TILE_SIZE + half;
+            glBegin(GL_LINES);
+            glVertex2f(worldLeft,  y);
+            glVertex2f(worldRight, y);
+            glEnd();
+        }
+
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+        glPopMatrix();
+
+        glLineWidth(DEFAULT_LINE_WIDTH);
+    }
+
+    private static void drawDebugBox(final float minX, final float minY,
+                                      final float maxX, final float maxY) {
+        glBegin(GL_LINE_LOOP);
+        glVertex2f(minX, minY);
+        glVertex2f(maxX, minY);
+        glVertex2f(maxX, maxY);
+        glVertex2f(minX, maxY);
+        glEnd();
+    }
+
+    // -------------------------------------------------------------------------
+    // Getter
+
+    public Matrix4f getWorldMatrix() {
+        return world;
+    }
+
+    /** @return Weltbreite in Tiles */
+    public int getWidth()  { return width;  }
+    /** @return Welthöhe in Tiles */
+    public int getHeight() { return height; }
+    /** @return World-Scale (Pixel-Multiplikator) */
+    public int getScale()  { return scale;  }
+
+    /**
+     * Liefert Debug-Zeilen über den aktuellen Welt-Zustand:
+     * Spieler-Tile-Position, Chunk-Position, Chunk-Statistiken.
+     *
+     * <p>Die Tile-Position wird direkt aus der World-Space-Position des ersten
+     * {@link Player}-Entity berechnet, nicht aus der Kamera, um Rundungs-Artefakte
+     * durch den Kamera-Umweg zu vermeiden.
+     * Ist kein Player vorhanden, wird {@code cam} als Fallback genutzt.</p>
+     *
+     * @param cam aktive Kamera (Fallback wenn kein Player-Entity gefunden)
+     * @return Debug-Zeilen zur Anzeige im F3-Panel
+     */
+    public String[] getDebugLines(final Camera cam) {
+        // Direkt aus der Entity-Position berechnen — kein Kamera-Umweg
+        Entity playerEntity = null;
+        for (final Entity e : entities) {
+            if (e instanceof Player) {
+                playerEntity = e;
+                break;
+            }
+        }
+
+        final int tileX;
+        final int tileY;
+        if (playerEntity != null) {
+            final float wx = playerEntity.getPosition().x;
+            final float wy = playerEntity.getPosition().y;
+            tileX = (int) Math.floor( wx / Constants.TILE_SIZE);
+            tileY = (int) Math.floor(-wy / Constants.TILE_SIZE);
+        } else {
+            // Fallback: Kamera-Mittelpunkt → Tile (identisch zur Render-Logik)
+            tileX =  -(int) cam.getPosition().x / (scale * HALF_DIVISOR);
+            tileY =   (int) cam.getPosition().y / (scale * HALF_DIVISOR);
+        }
+
+        final int chunkX = Math.floorDiv(tileX, Chunk.SIZE);
+        final int chunkY = Math.floorDiv(tileY, Chunk.SIZE);
+
+        return new String[] {
+            "Tile:    " + tileX  + ", " + tileY,
+            "Chunk:   " + chunkX + ", " + chunkY
+                + "  (" + chunkCountX + "x" + chunkCountY + " total)",
+            "Chunks:  " + lastRenderedChunks + " rendered, "
+                + lastRebuiltChunks + " rebuilt"
+        };
+    }
+
+    /**
+     * Markiert alle Chunks als dirty, sodass ihre VBOs beim nächsten Render-Aufruf
+     * vollständig neu gebaut werden.
+     *
+     * <p>Muss aufgerufen werden, wenn der {@link com.pxworlds.game.rendering.TextureAtlas}
+     * ausgetauscht wird (z.B. Ressourcen-Reload), da sich die UV-Koordinaten aller Tiles
+     * ändern. Off-screen-Chunks haben {@code dirty=false} und würden sonst beim
+     * Hereinrollen veraltete UVs rendern.</p>
+     */
+    public void markAllChunksDirty() {
+        for (int cy = 0; cy < chunkCountY; cy++) {
+            for (int cx = 0; cx < chunkCountX; cx++) {
+                chunks[cx][cy].markDirty();
+            }
+        }
+    }
+
+    /** @return Spawn-Tile-X oder {@value #NO_SPAWN} wenn kein Spawn gesetzt. */
+    public int getSpawnTileX() { return spawnTileX; }
+    /** @return Spawn-Tile-Y oder {@value #NO_SPAWN} wenn kein Spawn gesetzt. */
+    public int getSpawnTileY() { return spawnTileY; }
+
+    /**
+     * Setzt den Spawn-Punkt direkt (in Tile-Koordinaten).
+     * Wird von {@link WorldIO} nach dem Laden einer Version-2/3-Datei aufgerufen.
+     */
+    public void setSpawn(final int tileX, final int tileY) {
+        this.spawnTileX = tileX;
+        this.spawnTileY = tileY;
+    }
+
+    /** @return letzte gespeicherte X-Position oder {@link Float#NaN} wenn nicht gesetzt. */
+    public float getLastSavedPosX() { return lastSavedPosX; }
+    /** @return letzte gespeicherte Y-Position oder {@link Float#NaN} wenn nicht gesetzt. */
+    public float getLastSavedPosY() { return lastSavedPosY; }
+    /** @return {@code true} wenn eine Letztposition gespeichert wurde. */
+    public boolean hasLastPos() { return !Float.isNaN(lastSavedPosX); }
+
+    /**
+     * Setzt die Letztposition direkt (in Entity-World-Space-Koordinaten).
+     * Wird von {@link WorldIO} nach dem Laden einer Version-3-Datei aufgerufen.
+     */
+    public void setLastPos(final float x, final float y) {
+        this.lastSavedPosX = x;
+        this.lastSavedPosY = y;
+    }
+
+    /**
+     * Liest die aktuelle Position des ersten {@link Player}-Entity und
+     * speichert sie als Letztposition. Muss vor {@link WorldIO#save} aufgerufen werden.
+     *
+     * <p>Hat keinen Effekt wenn kein Player-Entity gefunden wird.</p>
+     */
+    public void capturePlayerPosition() {
+        for (final Entity e : entities) {
+            if (e instanceof Player) {
+                lastSavedPosX = e.getPosition().x;
+                lastSavedPosY = e.getPosition().y;
+                return;
+            }
+        }
+    }
+
+    /**
+     * Erzeugt den Spieler und setzt die Kamera.
+     *
+     * <p>Priorität der Startposition:
+     * <ol>
+     *   <li>Letztposition ({@link #lastSavedPosX}/{@link #lastSavedPosY}) — wenn gesetzt</li>
+     *   <li>Spawn-Tile ({@link #spawnTileX}/{@link #spawnTileY}) — als Fallback</li>
+     * </ol>
+     * Hat keinen Effekt wenn weder Letztposition noch Spawn-Tile bekannt sind.</p>
+     *
+     * @param camera    wird auf die Startposition gesetzt
+     * @param playable  ob ein spielbarer Player erzeugt werden soll
+     */
+    public void spawnPlayer(final Camera camera, final boolean playable) {
+        final float posX;
+        final float posY;
+        if (hasLastPos()) {
+            posX = lastSavedPosX;
+            posY = lastSavedPosY;
+        } else if (spawnTileX != NO_SPAWN && spawnTileY != NO_SPAWN) {
+            posX =  spawnTileX * Constants.TILE_SIZE;
+            posY = -spawnTileY * Constants.TILE_SIZE;
+        } else {
+            return; // keine Position bekannt
+        }
+        final Transform transform = new Transform();
+        transform.pos.x = posX;
+        transform.pos.y = posY;
+        if (playable) {
+            entities.add(new Player(transform));
+        }
+        camera.getPosition().set(transform.pos.mul(-scale, new Vector3f()));
+    }
+
+    /** Gibt alle OpenGL-Ressourcen der Chunks frei. Muss im GL-Thread aufgerufen werden. */
+    public void close() {
+        for (int cy = 0; cy < chunkCountY; cy++) {
+            for (int cx = 0; cx < chunkCountX; cx++) {
+                chunks[cx][cy].close();
+            }
+        }
+    }
 }

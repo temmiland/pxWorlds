@@ -11,6 +11,13 @@ public class Camera {
 	/** The projection matrix. */
 	private Matrix4f projection;
 
+	/** Reference height used to keep proportional scaling on resize. */
+	private final int referenceHeight;
+	/** Virtual viewport width (derived from referenceHeight + aspect ratio). */
+	private int virtualWidth;
+	/** Virtual viewport height (= referenceHeight). */
+	private int virtualHeight;
+
 	/**
 	 * Creates a new Camera with the given viewport size.
 	 * @param width  Viewport width in pixels.
@@ -19,12 +26,23 @@ public class Camera {
 	public Camera(int width, int height) {
 		position = new Vector3f(0, 0, 0);
 		prevPosition = new Vector3f(0, 0, 0);
+		referenceHeight = height;
 		setProjection(width, height);
 	}
 
 	public void setProjection(int width, int height) {
-		projection = new Matrix4f().setOrtho2D(-width/2, width/2, -height/2, height/2);
+		float aspect = (float) width / height;
+		virtualHeight = referenceHeight;
+		virtualWidth  = (int) (referenceHeight * aspect);
+		projection = new Matrix4f().setOrtho2D(
+				-virtualWidth / 2f, virtualWidth / 2f,
+				-virtualHeight / 2f, virtualHeight / 2f);
 	}
+
+	/** @return virtual viewport width (in world-pixel units) */
+	public int getVirtualWidth() { return virtualWidth; }
+	/** @return virtual viewport height (in world-pixel units) */
+	public int getVirtualHeight() { return virtualHeight; }
 
 	public void setPosition(Vector3f newPosition) {
 		this.position.set(newPosition);

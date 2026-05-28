@@ -30,7 +30,7 @@ public class Player extends Entity {
     /** Multiplier for diagonal movement speed. */
     private static final float DIAGONAL_SPEED_MULTIPLIER = 1.5f;
     /** Lerp factor for camera smoothing. */
-    private static final float CAMERA_LERP_FACTOR = 0.05f;
+    private static final float CAMERA_LERP_FACTOR = 0.09f;
     /**
      * Halbe Breite der Spieler-Hitbox in Tile-Einheiten (65 % der Texturbreite).
      * Die Textur belegt 2 × transform.scale.x = 2.0 Einheiten; 65 % davon ergibt

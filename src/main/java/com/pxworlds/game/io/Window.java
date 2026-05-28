@@ -63,6 +63,8 @@ public class Window {
 		} else {
 			monitor = 0;
 		}
+
+		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 		window = glfwCreateWindow(width, height, title, monitor, 0);
 
 		if (window == 0) {
@@ -74,14 +76,23 @@ public class Window {
 			glfwSetWindowPos(window, (vid.width() - width) / 2, (vid.height() - height) / 2);
 		}
 
-		glfwShowWindow(window);
-		glfwMakeContextCurrent(window);
-
+		// Callbacks VOR glfwShowWindow registrieren, damit initiale Resize-Events
+		// (z.B. durch macOS Window-Server) nicht verloren gehen.
 		inputHandler = new InputHandler();
 		inputHandler.registerCallbacks(window);
 		inputProcessor = new InputProcessor();
-
 		setLocalCallbacks();
+
+		glfwShowWindow(window);
+		glfwMakeContextCurrent(window);
+
+		// Tatsächliche Fenstergröße von GLFW abfragen — kann auf macOS von der
+		// angeforderten Größe abweichen (z.B. durch System-Constraints).
+		final int[] w = new int[1];
+		final int[] h = new int[1];
+		glfwGetWindowSize(window, w, h);
+		this.width  = w[0];
+		this.height = h[0];
 	}
 
 	/**
@@ -114,7 +125,7 @@ public class Window {
 
 	public void update() {
 		hasResized = false;
-		glfwPollEvents();                        // Callbacks feuern → Events in die Queue schreiben
+		glfwPollEvents(); // Callbacks feuern → Events in die Queue schreiben
 		inputProcessor.processEvents(inputHandler.getEventQueue()); // Queue leeren & Aktionen ableiten
 	}
 
@@ -136,6 +147,20 @@ public class Window {
 
 	public long getWindow() {
 		return window;
+	}
+
+	/** @return Framebuffer-Breite in Pixeln (auf Retina-Displays ≠ Fensterbreite). */
+	public int getFramebufferWidth() {
+		final int[] w = new int[1];
+		glfwGetFramebufferSize(window, w, null);
+		return w[0];
+	}
+
+	/** @return Framebuffer-Höhe in Pixeln (auf Retina-Displays ≠ Fensterhöhe). */
+	public int getFramebufferHeight() {
+		final int[] h = new int[1];
+		glfwGetFramebufferSize(window, null, h);
+		return h[0];
 	}
 
 	/**

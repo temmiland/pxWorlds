@@ -60,4 +60,22 @@ public class GameStateManager {
         gameStates.get(currentState).renderDebug(alpha);
     }
 
+    /**
+     * Liefert state-spezifische Debug-Zeilen für das F3-Panel.
+     * @return Zeilen die unter dem Separator im Debug-Panel erscheinen
+     */
+    public String[] getDebugLines() {
+        return gameStates.get(currentState).getDebugLines();
+    }
+
+    /**
+     * Ruft {@link GameState#save()} auf allen registrierten States auf.
+     * Wird beim geordneten Beenden des Spiels aufgerufen.
+     */
+    public void save() {
+        for (final GameState state : gameStates) {
+            state.save();
+        }
+    }
+
 }

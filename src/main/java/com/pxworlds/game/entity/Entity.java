@@ -35,6 +35,14 @@ public abstract class Entity {
      */
     private final AABB sweptBounds = new AABB(0, 0, 0, 0);
 
+    /**
+     * Gibt die aktuelle World-Space-Position der Entity zurück (live reference).
+     * @return {@code transform.pos} — kein Defensive-Copy, nicht cachen
+     */
+    public Vector3f getPosition() {
+        return transform.pos;
+    }
+
     public Entity(int maxAnimations, Transform newTransform) {
         this.animations = new Animation[maxAnimations];
 
@@ -119,6 +127,34 @@ public abstract class Entity {
         transform.pos.y = boundingBox.getCenterY();
     }
 
+    /**
+     * Schiebt diese Entity aus allen Tile-AABBs heraus, mit denen sie aktuell überlappt.
+     *
+     * <p>Wird nach dem Entity-Entity-Push-out in {@link World#update} aufgerufen,
+     * damit eine durch eine andere Entity in eine Wand gedrückte Entity korrekt
+     * herauskorrigiert wird. Der Push-out wird nicht interpoliert (prevPos wird
+     * mitgesetzt), weil er eine physikalische Korrektur, keine Bewegung ist.</p>
+     *
+     * @param world Spielwelt — Quelle der Tile-AABBs
+     */
+    public void resolveAgainstTiles(final World world) {
+        final List<AABB> overlapping = world.getCollidingBoxes(boundingBox);
+        boolean moved = false;
+        for (final AABB tile : overlapping) {
+            final Collision col = boundingBox.getCollision(tile);
+            if (col.isIntersecting) {
+                boundingBox.correctPosition(tile, col);
+                moved = true;
+            }
+        }
+        if (moved) {
+            transform.pos.x = boundingBox.getCenterX();
+            transform.pos.y = boundingBox.getCenterY();
+            // Keine Interpolation über die Korrektur — prevPos nachziehen
+            prevPos.set(transform.pos);
+        }
+    }
+
     public abstract void update(float delta, Window window, Camera camera, World world);
 
     /**
@@ -192,7 +228,13 @@ public abstract class Entity {
             }
 
             transform.pos.set(boundingBox.getCenterX(), boundingBox.getCenterY(), 0);
+            // prevPos mitsynchronisieren — sonst interpoliert der Renderer
+            // über den gesamten Push-out-Delta und erzeugt einen sichtbaren
+            // Positions-Pop in der nächsten Render-Frame.
+            prevPos.set(transform.pos);
+
             entity.transform.pos.set(entity.boundingBox.getCenterX(), entity.boundingBox.getCenterY(), 0);
+            entity.prevPos.set(entity.transform.pos);
         }
     }
 }

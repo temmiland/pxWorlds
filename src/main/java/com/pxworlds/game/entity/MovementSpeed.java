@@ -5,7 +5,7 @@ public enum MovementSpeed {
     /** Walking movement speed. */
     WALKING(5),
     /** Running movement speed. */
-    RUNNING(10);
+    RUNNING(8);
 
     /** The value of the movement speed. */
     private final int movementSpeed;

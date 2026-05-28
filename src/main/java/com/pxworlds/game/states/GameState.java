@@ -32,4 +32,27 @@ public abstract class GameState {
         // no-op by default
     }
 
+    /**
+     * Liefert state-spezifische Zeilen für das F3-Debug-Panel.
+     *
+     * <p>Standard-Implementierung gibt ein leeres Array zurück.
+     * States mit eigenen Debug-Infos überschreiben diese Methode.</p>
+     *
+     * @return Zeilen die unter dem Separator im Debug-Panel erscheinen
+     */
+    public String[] getDebugLines() {
+        return new String[0];
+    }
+
+    /**
+     * Persistiert den State-Zustand auf Festplatte (z.B. Welt-Daten).
+     * Wird beim geordneten Beenden des Spiels aufgerufen.
+     *
+     * <p>Standard-Implementierung ist ein No-op — States mit speicherbaren
+     * Daten überschreiben diese Methode.</p>
+     */
+    public void save() {
+        // no-op by default
+    }
+
 }

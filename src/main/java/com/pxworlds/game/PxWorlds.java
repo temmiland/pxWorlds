@@ -11,6 +11,8 @@ import org.lwjgl.opengl.GL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
@@ -32,6 +34,9 @@ public class PxWorlds {
 	private int fpsRate;
 	/** The game state manager. */
 	public GameStateManager gsm;
+
+    /** Wiederverwendbares leeres Array — vermeidet Heap-Allokation pro Render-Frame. */
+    private static final String[] NO_DEBUG_LINES = new String[0];
 
 	public PxWorlds(String newTitle, int newWidth, int newHeight, boolean newFullscreen, int newFpsRate) {
 	    instance = this;
@@ -66,10 +71,21 @@ public class PxWorlds {
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glViewport(0, 0, window.getFramebufferWidth(), window.getFramebufferHeight());
 
         Assets.initAsset();
 
         gsm.init(window);
+
+        // Shutdown-Hook: sichert Spielstand auch bei IDE-Stop (SIGTERM).
+        // AtomicBoolean verhindert Doppel-Save wenn der Loop normal endet.
+        final AtomicBoolean saveGuard = new AtomicBoolean(false);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (saveGuard.compareAndSet(false, true)) {
+                LOGGER.info("Shutdown-Hook: Spielstand wird gesichert...");
+                gsm.save();
+            }
+        }, "pxworlds-save-hook"));
 
         final DebugOverlay debugOverlay = new DebugOverlay();
 
@@ -84,71 +100,81 @@ public class PxWorlds {
 
 		double time = Timer.getTime();
 
-		while (!window.shouldClose()) {
+        try {
+            while (!window.shouldClose()) {
 
-			final double now    = Timer.getTime();
-			final double passed = now - time;
-			time = now;
+                final double now    = Timer.getTime();
+                final double passed = now - time;
+                time = now;
 
-			tickAccumulator   += passed;
-			renderAccumulator += passed;
-			frameTime         += passed;
+                tickAccumulator   += passed;
+                renderAccumulator += passed;
+                frameTime         += passed;
 
-            // Spiral-of-Death-Schutz: bei Lag-Spikes maximale Nachholzeit begrenzen
-            if (tickAccumulator > tickDuration * Constants.MAX_UPDATES_PER_FRAME) {
-                tickAccumulator = tickDuration * Constants.MAX_UPDATES_PER_FRAME;
+                // Spiral-of-Death-Schutz: bei Lag-Spikes maximale Nachholzeit begrenzen
+                if (tickAccumulator > tickDuration * Constants.MAX_UPDATES_PER_FRAME) {
+                    tickAccumulator = tickDuration * Constants.MAX_UPDATES_PER_FRAME;
+                }
+
+                // --- Logik: fixer Zeitschritt (TICK_RATE TPS) ---
+                while (tickAccumulator >= tickDuration) {
+                    tickAccumulator -= tickDuration;
+
+                    window.update();
+
+                    if (window.hasResized()) {
+                        gsm.resize();
+                        glViewport(0, 0, window.getFramebufferWidth(), window.getFramebufferHeight());
+                    }
+
+                    if (window.getInputProcessor().wasPressed(GLFW_KEY_ESCAPE)) {
+                        glfwSetWindowShouldClose(window.getWindow(), true);
+                    }
+
+                    if (window.getInputProcessor().wasPressed(GLFW_KEY_F3)) {
+                        debugOverlay.toggleDetailed();
+                    }
+
+                    gsm.update(tickDuration);
+                }
+
+                // --- Rendering: fpsRate cap ---
+                if (renderAccumulator >= renderCap) {
+                    renderAccumulator -= renderCap;
+
+                    // Wie weit sind wir zwischen letztem und nächstem Tick? (0.0 – 1.0)
+                    final float alpha = (float) (tickAccumulator / tickDuration);
+
+                    glClear(GL_COLOR_BUFFER_BIT);
+                    gsm.render(alpha);
+                    final String[] debugLines;
+                    if (debugOverlay.isShowDetailed()) {
+                        gsm.renderDebug(alpha);
+                        debugLines = gsm.getDebugLines(); // nur wenn F3-Panel sichtbar
+                    } else {
+                        debugLines = NO_DEBUG_LINES;
+                    }
+                    debugOverlay.render(window, alpha, debugLines);
+                    window.swapBuffers();
+                    frames++;
+
+                    if (frameTime >= 1.0) {
+                        frameTime = 0;
+                        debugOverlay.updateFps(frames);
+                        frames = 0;
+                    }
+                }
             }
-
-            // --- Logik: fixer Zeitschritt (TICK_RATE TPS) ---
-            while (tickAccumulator >= tickDuration) {
-				tickAccumulator -= tickDuration;
-
-				window.update();
-
-				if (window.hasResized()) {
-				    gsm.resize();
-					glViewport(0, 0, window.getWidth(), window.getHeight());
-				}
-
-				if (window.getInputProcessor().wasPressed(GLFW_KEY_ESCAPE)) {
-					glfwSetWindowShouldClose(window.getWindow(), true);
-				}
-
-				if (window.getInputProcessor().wasPressed(GLFW_KEY_F3)) {
-					debugOverlay.toggleDetailed();
-				}
-
-                gsm.update(tickDuration);
-			}
-
-            // --- Rendering: fpsRate cap ---
-			if (renderAccumulator >= renderCap) {
-				renderAccumulator -= renderCap;
-
-				// Wie weit sind wir zwischen letztem und nächstem Tick? (0.0 – 1.0)
-				final float alpha = (float) (tickAccumulator / tickDuration);
-
-				glClear(GL_COLOR_BUFFER_BIT);
-				gsm.render(alpha);
-				if (debugOverlay.isShowDetailed()) {
-					gsm.renderDebug(alpha);
-				}
-				debugOverlay.render(window, alpha);
-				window.swapBuffers();
-				frames++;
-
-				if (frameTime >= 1.0) {
-					frameTime = 0;
-					debugOverlay.updateFps(frames);
-					frames = 0;
-				}
-			}
-		}
-
-		Assets.deleteAsset();
-        Bootstrap.getInstance().getConfigurationStorage().saveAllConfigurations();
-		window.cleanUp();
-		glfwTerminate();
+        } finally {
+            // Normaler Exit-Pfad: saveGuard verhindert Doppel-Save mit dem Shutdown-Hook
+            if (saveGuard.compareAndSet(false, true)) {
+                gsm.save();
+            }
+            Assets.deleteAsset();
+            Bootstrap.getInstance().getConfigurationStorage().saveAllConfigurations();
+            window.cleanUp();
+            glfwTerminate();
+        }
 	}
 
 }

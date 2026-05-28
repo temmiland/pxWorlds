@@ -40,6 +40,10 @@ public class Constants {
      *  Changing this value scales the entire world consistently. */
     public static final float TILE_SIZE = 2.0f;
 
+    /** Number of tiles per chunk side (chunks are CHUNK_SIZE × CHUNK_SIZE tiles).
+     *  Used by the Chunk system and procedural world generation. */
+    public static final int CHUNK_SIZE = 16;
+
     private static String loadVersion() {
         final Properties properties = new Properties();
         try (InputStream input = Constants.class.getResourceAsStream("/build.properties")) {

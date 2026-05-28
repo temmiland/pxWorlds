@@ -44,13 +44,21 @@ public class Gui {
      *
      * @param input     der aktuelle {@link InputProcessor}
      * @param mousePos  die transformierte Mausposition (Fenstermitte = Ursprung, Y oben)
+     * @param windowWidth  aktuelle Fensterbreite in Pixeln
+     * @param windowHeight aktuelle Fensterhöhe in Pixeln
      */
-    public void update(final InputProcessor input, final Vector2f mousePos) {
+    public void update(final InputProcessor input, final Vector2f mousePos,
+                       final int windowWidth, final int windowHeight) {
+        // Mausposition von Fenster-Pixeln in virtuelle Projektionskoordinaten umrechnen
+        final float scaleX = (float) camera.getVirtualWidth()  / windowWidth;
+        final float scaleY = (float) camera.getVirtualHeight() / windowHeight;
+        final Vector2f virtualMouse = new Vector2f(mousePos.x * scaleX, mousePos.y * scaleY);
+
         for (Button button : buttons) {
-            button.update(input, mousePos);
+            button.update(input, virtualMouse);
         }
         for (Logo logo : logos) {
-            logo.update(input, mousePos);
+            logo.update(input, virtualMouse);
         }
     }
 
