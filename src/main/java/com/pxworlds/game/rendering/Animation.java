@@ -16,6 +16,8 @@ public class Animation {
 	private double lastTime;
 	/** The frames per second. */
 	private double fps;
+	/** Whether this animation is paused. */
+	private boolean paused;
 
 	public Animation(int amount, int newFps, String filename) {
 		this.texturePointer = 0;
@@ -30,24 +32,35 @@ public class Animation {
 		}
 	}
 
+	public void pause() {
+		this.paused = true;
+	}
+
+	public void resume() {
+		this.paused = false;
+		this.lastTime = Timer.getTime();
+	}
+
 	public void bind() {
 		bind(0);
 	}
 
 	public void bind(int sampler) {
-		this.currentTime = Timer.getTime();
-		this.elapsedTime += currentTime - lastTime;
+		if (!paused) {
+			this.currentTime = Timer.getTime();
+			this.elapsedTime += currentTime - lastTime;
 
-		if (elapsedTime >= fps) {
-			elapsedTime = 0;
-			texturePointer++;
+			if (elapsedTime >= fps) {
+				elapsedTime = 0;
+				texturePointer++;
+			}
+
+			if (texturePointer >= frames.length) {
+				texturePointer = 0;
+			}
+
+			this.lastTime = currentTime;
 		}
-
-		if (texturePointer >= frames.length) {
-			texturePointer = 0;
-		}
-
-		this.lastTime = currentTime;
 
 		frames[texturePointer].bind(sampler);
 	}

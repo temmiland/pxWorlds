@@ -3,13 +3,17 @@ package com.pxworlds.game.gui;
 import com.pxworlds.game.assets.Assets;
 import com.pxworlds.game.collision.AABB;
 import com.pxworlds.game.collision.Collision;
-import com.pxworlds.game.PxWorlds;
+import com.pxworlds.game.debug.DebugRenderer;
 import com.pxworlds.game.io.InputProcessor;
 import com.pxworlds.game.rendering.Camera;
 import com.pxworlds.game.rendering.Shader;
 import com.pxworlds.game.rendering.tiles.TileSheet;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
+import org.lwjgl.stb.STBEasyFont;
+
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL20.glUseProgram;
 
 
 public class Button {
@@ -80,21 +84,42 @@ public class Button {
 	/** Border size. */
 	private static final int BUTTON_BORDER_SIZE = 16;
 
+	/** STBEasyFont font height in coordinate units. */
+	private static final float FONT_HEIGHT = 7.0f;
+	/** Scale applied to the font for readable button text. */
+	private static final float FONT_SCALE = 2.5f;
+
 	/** The bounding box for the button. */
 	private AABB boundingBox;
 
 	/** The current selected state of the button. */
 	private int selectedState;
 
+	/** The label text displayed on the button (may be null for no text). */
+	private String label;
+
+	/** Action executed when the button is clicked (may be null). */
+	private Runnable onClick;
+
 	/** The transform matrix for the button. */
 	private static Matrix4f transform = new Matrix4f();
 
-	public Button(Vector2f position, Vector2f scale) {
+	public Button(Vector2f position, Vector2f scale, String label, Runnable onClick) {
 		this.boundingBox = new AABB(
 			position.x - scale.x, position.y - scale.y,
 			position.x + scale.x, position.y + scale.y
 		);
+		this.label = label;
+		this.onClick = onClick;
 		selectedState = STATE_IDLE;
+	}
+
+	public Button(Vector2f position, Vector2f scale, String label) {
+		this(position, scale, label, null);
+	}
+
+	public Button(Vector2f position, Vector2f scale) {
+		this(position, scale, null, null);
 	}
 
 	/**
@@ -111,7 +136,9 @@ public class Button {
 
 			if (input.isMouseButtonDown(0)) {
 				selectedState = STATE_CLICKED;
-                PxWorlds.getInstance().gsm.setState(2);
+				if (onClick != null) {
+					onClick.run();
+				}
 			}
 		} else {
 			selectedState = STATE_IDLE;
@@ -139,6 +166,8 @@ public class Button {
 
 		renderSides(position, scale, camera, sheet, shader);
 		renderCorners(position, scale, camera, sheet, shader);
+		renderLabel(camera);
+		shader.bind();
 	}
 
 	private void renderSides(Vector2f position, Vector2f scale, Camera camera, TileSheet sheet, Shader shader) {
@@ -271,5 +300,54 @@ public class Button {
 				break;
 		}
 		Assets.getModel().render();
+	}
+
+	/**
+	 * Rendert den Button-Label-Text zentriert über dem Button.
+	 * Nutzt STBEasyFont (gleicher Font wie das Debug-Overlay).
+	 */
+	private void renderLabel(final Camera camera) {
+		if (label == null || label.isEmpty()) {
+			return;
+		}
+
+		final Vector2f center = boundingBox.getCenter();
+		final int vw = camera.getVirtualWidth();
+		final int vh = camera.getVirtualHeight();
+
+		// Textbreite in STBEasyFont-Einheiten messen
+		final float textWidth = STBEasyFont.stb_easy_font_width(label);
+		final float scaledTextWidth  = textWidth * FONT_SCALE;
+		final float scaledTextHeight = FONT_HEIGHT * FONT_SCALE;
+
+		// Koordinaten: GUI-Kamera ist zentriert (-vw/2..+vw/2, -vh/2..+vh/2)
+		// glOrtho setzt origin oben-links, also Y invertiert gegenüber dem GUI-System
+		final float drawX = (center.x - scaledTextWidth / 2.0f) + vw / 2.0f;
+		final float drawY = (-center.y - scaledTextHeight / 2.0f) + vh / 2.0f;
+
+		// Trailing Space verhindert, dass STBEasyFont den letzten schmalen Glyph
+		// (t, e, l etc.) unvollständig in den Vertex-Buffer schreibt.
+		final String renderLabel = label + " ";
+
+		glUseProgram(0);
+		glDisable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+		glLoadIdentity();
+		glOrtho(0, vw, vh, 0, -1, 1);
+
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+		glLoadIdentity();
+		glScalef(FONT_SCALE, FONT_SCALE, 1.0f);
+
+		DebugRenderer.drawStringShadowed(renderLabel, drawX / FONT_SCALE, drawY / FONT_SCALE);
+
+		glMatrixMode(GL_PROJECTION);
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
+		glPopMatrix();
+		glEnable(GL_TEXTURE_2D);
 	}
 }

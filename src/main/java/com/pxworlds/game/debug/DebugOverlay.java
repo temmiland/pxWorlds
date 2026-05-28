@@ -5,6 +5,9 @@ import com.pxworlds.game.io.Window;
 
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glOrtho;
@@ -71,6 +74,7 @@ public class DebugOverlay {
      */
     public void render(final Window window, final float alpha, final String[] extraLines) {
         glUseProgram(NO_SHADER);
+        glDisable(GL_TEXTURE_2D);
 
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
@@ -113,5 +117,6 @@ public class DebugOverlay {
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
         glPopMatrix();
+        glEnable(GL_TEXTURE_2D);
     }
 }

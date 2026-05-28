@@ -1,9 +1,10 @@
 package com.pxworlds.game.gui;
 
+import com.pxworlds.game.PxWorlds;
 import com.pxworlds.game.io.Window;
 import org.joml.Vector2f;
 
-import java.util.ArrayList;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
 
 public class MenuGui extends Gui {
 
@@ -27,9 +28,14 @@ public class MenuGui extends Gui {
         super(window, tileSheetTexture, amountOfTiles);
 
         final Logo logo = new Logo(new Vector2f(0, LOGO_Y_POSITION), new Vector2f(LOGO_SCALE, LOGO_SCALE));
-        final Button playButton = new Button(new Vector2f(0, PLAY_BUTTON_Y_POSITION), new Vector2f(BUTTON_WIDTH, BUTTON_HEIGHT));
-        final Button optionButton = new Button(new Vector2f(0, OPTION_BUTTON_Y_POSITION), new Vector2f(BUTTON_WIDTH, BUTTON_HEIGHT));
-        final Button exitButton = new Button(new Vector2f(0, EXIT_BUTTON_Y_POSITION), new Vector2f(BUTTON_WIDTH, BUTTON_HEIGHT));
+        final Button playButton = new Button(new Vector2f(0, PLAY_BUTTON_Y_POSITION),
+                new Vector2f(BUTTON_WIDTH, BUTTON_HEIGHT), "Play",
+                () -> PxWorlds.getInstance().gsm.setState(2));
+        final Button optionButton = new Button(new Vector2f(0, OPTION_BUTTON_Y_POSITION),
+                new Vector2f(BUTTON_WIDTH, BUTTON_HEIGHT), "Options");
+        final Button exitButton = new Button(new Vector2f(0, EXIT_BUTTON_Y_POSITION),
+                new Vector2f(BUTTON_WIDTH, BUTTON_HEIGHT), "Exit",
+                () -> glfwSetWindowShouldClose(window.getWindow(), true));
 
         registerLogos(logo);
         registerButtons(playButton, optionButton, exitButton);

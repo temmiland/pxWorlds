@@ -449,6 +449,7 @@ public class World {
         combined.get(matBuf);
 
         glUseProgram(NO_SHADER);
+        glDisable(GL_TEXTURE_2D);
         glLineWidth(DEBUG_LINE_WIDTH);
 
         glMatrixMode(GL_PROJECTION);
@@ -524,6 +525,7 @@ public class World {
         glPopMatrix();
 
         glLineWidth(DEFAULT_LINE_WIDTH);
+        glEnable(GL_TEXTURE_2D);
     }
 
     private static void drawDebugBox(final float minX, final float minY,
@@ -611,6 +613,27 @@ public class World {
             for (int cx = 0; cx < chunkCountX; cx++) {
                 chunks[cx][cy].markDirty();
             }
+        }
+    }
+
+    /** Stoppt die Render-Interpolation aller Entities (prevPos = pos). */
+    public void snapAllEntities() {
+        for (final Entity entity : entities) {
+            entity.snapPrevPosition();
+        }
+    }
+
+    /** Pausiert die Animationen aller Entities. */
+    public void pauseAllAnimations() {
+        for (final Entity entity : entities) {
+            entity.pauseAnimations();
+        }
+    }
+
+    /** Setzt die Animationen aller Entities fort. */
+    public void resumeAllAnimations() {
+        for (final Entity entity : entities) {
+            entity.resumeAnimations();
         }
     }
 

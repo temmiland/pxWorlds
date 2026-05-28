@@ -1,6 +1,7 @@
 package com.pxworlds.game.states;
 
 import com.pxworlds.Constants;
+import com.pxworlds.game.gui.PauseGui;
 import com.pxworlds.game.io.Window;
 import com.pxworlds.game.rendering.Camera;
 import com.pxworlds.game.rendering.Shader;
@@ -25,6 +26,9 @@ public class LevelState extends GameState {
     /** Name des aktuellen Levels (Unterordner unter {@code /levels/} und Dateiname ohne Endung). */
     private static final String WORLD_NAME = "test_level";
 
+    /** Pause-Menu GUI scale (gleich wie MenuGui). */
+    private static final int PAUSE_GUI_SCALE = 21;
+
     /** The camera for rendering. */
     private Camera camera;
     /** The world being rendered. */
@@ -35,6 +39,10 @@ public class LevelState extends GameState {
     private Shader shader;
     /** The window. */
     private Window window;
+    /** Pause-Menü GUI. */
+    private PauseGui pauseGui;
+    /** Ob das Spiel pausiert ist. */
+    private boolean paused;
 
     public LevelState(GameStateManager gsm) {
         this.gsm = gsm;
@@ -77,6 +85,8 @@ public class LevelState extends GameState {
         this.shader = newShader;
         this.world  = newWorld;
         this.window = newWindow;
+        this.paused = false;
+        this.pauseGui = new PauseGui(newWindow, "menustate", PAUSE_GUI_SCALE, () -> paused = false);
 
         newWorld.calculateView(newCamera);
     }
@@ -85,10 +95,29 @@ public class LevelState extends GameState {
     public void resize() {
         camera.setProjection(window.getWidth(), window.getHeight());
         world.calculateView(camera);
+        pauseGui.resizeCamera();
     }
 
     @Override
     public void update(double delta) {
+        if (window.getInputProcessor().wasPressed(org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE)) {
+            paused = !paused;
+            if (paused) {
+                camera.savePrevPosition();
+                world.snapAllEntities();
+                world.pauseAllAnimations();
+            } else {
+                world.resumeAllAnimations();
+            }
+            return;
+        }
+
+        if (paused) {
+            pauseGui.update(window.getInputProcessor(), window.getMousePosition(),
+                    window.getWidth(), window.getHeight());
+            return;
+        }
+
         world.update((float) delta, window, camera);
         world.correctCamera(camera);
     }
@@ -96,6 +125,9 @@ public class LevelState extends GameState {
     @Override
     public void render(float alpha) {
         world.render(tiles, shader, camera, alpha);
+        if (paused) {
+            pauseGui.render();
+        }
     }
 
     /**

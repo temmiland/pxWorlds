@@ -127,10 +127,6 @@ public class PxWorlds {
                         glViewport(0, 0, window.getFramebufferWidth(), window.getFramebufferHeight());
                     }
 
-                    if (window.getInputProcessor().wasPressed(GLFW_KEY_ESCAPE)) {
-                        glfwSetWindowShouldClose(window.getWindow(), true);
-                    }
-
                     if (window.getInputProcessor().wasPressed(GLFW_KEY_F3)) {
                         debugOverlay.toggleDetailed();
                     }

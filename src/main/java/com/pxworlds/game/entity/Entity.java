@@ -100,6 +100,24 @@ public abstract class Entity {
         this.useAnimation = index;
     }
 
+    /** Pausiert alle Animationen dieser Entity. */
+    public void pauseAnimations() {
+        for (final Animation anim : animations) {
+            if (anim != null) {
+                anim.pause();
+            }
+        }
+    }
+
+    /** Setzt alle Animationen dieser Entity fort. */
+    public void resumeAnimations() {
+        for (final Animation anim : animations) {
+            if (anim != null) {
+                anim.resume();
+            }
+        }
+    }
+
     /**
      * Bewegt die Entity achsenweise mit Collision-Clipping gegen Welt-Tiles.
      * Y wird vor X geclippt, um Ecken-Bugs zu vermeiden.
@@ -156,6 +174,11 @@ public abstract class Entity {
     }
 
     public abstract void update(float delta, Window window, Camera camera, World world);
+
+    /** Synchronisiert prevPos auf die aktuelle Position — stoppt Render-Interpolation. */
+    public void snapPrevPosition() {
+        prevPos.set(transform.pos);
+    }
 
     /**
      * Sichert die aktuelle Position als prevPos und ruft dann update() auf.
