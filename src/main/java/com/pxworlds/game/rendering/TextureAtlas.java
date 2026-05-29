@@ -53,7 +53,7 @@ public class TextureAtlas implements AutoCloseable {
     public TextureAtlas() {
         // 1. Alle eindeutigen Tile-Texturen einsammeln
         final LinkedHashMap<String, int[]> images = new LinkedHashMap<>(); // name → ARGB pixels (TILE_PX × TILE_PX)
-        for (final Tile tile : Tile.tiles) {
+        for (final Tile tile : Tile.getTiles()) {
             if (tile == null) {
                 continue;
             }

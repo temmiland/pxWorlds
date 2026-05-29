@@ -14,22 +14,22 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
 public class PxWorlds {
-	/** The logger for PxWorlds. */
+	/** Logger dieser Klasse. */
 	private static final Logger LOGGER = LoggerFactory.getLogger(PxWorlds.class);
 
-	/** The title of the window. */
+	/** Fenstertitel. */
 	private String title;
-	/** The width of the window. */
+	/** Fensterbreite in Pixeln. */
 	private int width;
-	/** The height of the window. */
+	/** Fensterhöhe in Pixeln. */
 	private int height;
-	/** Whether the window is in fullscreen mode. */
+	/** Ob das Fenster im Vollbildmodus ist. */
 	private boolean fullscreen;
-	/** The target FPS rate. */
+	/** Ziel-FPS. */
 	private int fpsRate;
-	/** The game state manager. */
+	/** Game-State-Manager. */
 	private GameStateManager gsm;
-	/** The configuration storage for saving on exit. */
+	/** Konfigurations-Storage für Speichern beim Beenden. */
 	private ConfigurationStorage configurationStorage;
 
 	public PxWorlds(String newTitle, int newWidth, int newHeight, boolean newFullscreen, int newFpsRate, ConfigurationStorage newConfigurationStorage) {

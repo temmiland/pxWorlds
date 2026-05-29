@@ -1,14 +1,14 @@
 package com.pxworlds.game.world;
 
 /**
- * Holds the spawn point and last-saved position of the player within a world.
+ * Speichert den Spawn-Punkt und die zuletzt gespeicherte Position des Spielers in einer Welt.
  *
- * <p>Both pieces of data are written by {@link WorldIO} after loading and read by
- * {@link World#spawnPlayer} and {@link World#capturePlayerPosition}.</p>
+ * <p>Beide Werte werden von {@link WorldIO} nach dem Laden geschrieben und von
+ * {@link World#spawnPlayer} und {@link World#capturePlayerPosition} gelesen.</p>
  */
 public final class PlayerSpawnState {
 
-    /** Sentinel value meaning "no spawn set". */
+    /** Sentinel-Wert für „kein Spawn gesetzt“. */
     public static final int NO_SPAWN = -1;
 
     private int   spawnTileX    = NO_SPAWN;
@@ -16,28 +16,28 @@ public final class PlayerSpawnState {
     private float lastSavedPosX = Float.NaN;
     private float lastSavedPosY = Float.NaN;
 
-    /** @return spawn tile X or {@value #NO_SPAWN} if not set */
+    /** @return Spawn-Tile-X oder {@value #NO_SPAWN} wenn nicht gesetzt */
     public int getSpawnTileX() { return spawnTileX; }
 
-    /** @return spawn tile Y or {@value #NO_SPAWN} if not set */
+    /** @return Spawn-Tile-Y oder {@value #NO_SPAWN} wenn nicht gesetzt */
     public int getSpawnTileY() { return spawnTileY; }
 
-    /** Sets the spawn tile coordinates. */
+    /** Setzt die Spawn-Tile-Koordinaten. */
     public void setSpawn(final int tileX, final int tileY) {
         this.spawnTileX = tileX;
         this.spawnTileY = tileY;
     }
 
-    /** @return last saved X position in world space, or {@link Float#NaN} if not set */
+    /** @return zuletzt gespeicherte X-Position im World-Space, oder {@link Float#NaN} wenn nicht gesetzt */
     public float getLastSavedPosX() { return lastSavedPosX; }
 
-    /** @return last saved Y position in world space, or {@link Float#NaN} if not set */
+    /** @return zuletzt gespeicherte Y-Position im World-Space, oder {@link Float#NaN} wenn nicht gesetzt */
     public float getLastSavedPosY() { return lastSavedPosY; }
 
-    /** @return {@code true} if a last-saved position has been stored */
+    /** @return {@code true} wenn eine zuletzt gespeicherte Position vorhanden ist */
     public boolean hasLastPos() { return !Float.isNaN(lastSavedPosX); }
 
-    /** Sets the last-saved player position in world space. */
+    /** Setzt die zuletzt gespeicherte Spielerposition im World-Space. */
     public void setLastPos(final float x, final float y) {
         this.lastSavedPosX = x;
         this.lastSavedPosY = y;

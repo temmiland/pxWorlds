@@ -62,13 +62,13 @@ public final class WorldLoadingService {
     }
 
     /**
-     * Saves the world to {@link Constants#WORLDS_DIRECTORY_PATH} as {@code <worldName>.pxwl},
-     * capturing the current player position beforehand.
+     * Speichert die Welt nach {@link Constants#WORLDS_DIRECTORY_PATH} als {@code <worldName>.pxwl},
+     * dabei wird zuerst die aktuelle Spielerposition gespeichert.
      *
-     * <p>Does nothing if {@code world} is {@code null}.</p>
+     * <p>Hat keinen Effekt wenn {@code world} {@code null} ist.</p>
      *
-     * @param world     the world to save; may be {@code null}
-     * @param worldName level name without extension
+     * @param world     die zu speichernde Welt; kann {@code null} sein
+     * @param worldName Level-Name ohne Dateiendung
      */
     public static void save(final World world, final String worldName) {
         if (world == null) {

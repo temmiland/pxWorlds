@@ -10,31 +10,31 @@ import java.nio.IntBuffer;
 import org.lwjgl.BufferUtils;
 
 public class Model implements AutoCloseable {
-	/** The number of elements to draw. */
+	/** Anzahl der zu zeichnenden Elemente. */
 	private int drawCount;
 
-	/** The OpenGL vertex buffer object. */
+	/** OpenGL Vertex-Buffer-Objekt. */
 	private int vertexObject;
-	/** The OpenGL texture coordinate buffer object. */
+	/** OpenGL Texturkoordinaten-Buffer-Objekt. */
 	private int textureCoordObject;
 
-	/** The OpenGL index buffer object. */
+	/** OpenGL Index-Buffer-Objekt. */
 	private int indexObject;
 
-	// OpenGL attribute constants
-	/** The attribute index for vertices. */
+	// OpenGL-Attribut-Konstanten
+	/** Attribut-Index für Vertices. */
 	private static final int VERTICES_ATTRIB_INDEX = 0;
-	/** The attribute index for textures. */
+	/** Attribut-Index für Texturkoordinaten. */
 	private static final int TEXTURES_ATTRIB_INDEX = 1;
-	/** The size of vertex data. */
+	/** Größe der Vertex-Daten (x, y, z). */
 	private static final int VERTEX_SIZE = 3;
-	/** The size of texture coordinate data. */
+	/** Größe der Texturkoordinaten-Daten (u, v). */
 	private static final int TEXTURE_COORD_SIZE = 2;
-	/** Whether data is normalized. */
+	/** Ob die Daten normalisiert werden sollen. */
 	private static final boolean NORMALIZED = false;
-	/** The stride for vertex data. */
+	/** Stride zwischen zwei aufeinanderfolgenden Vertex-Einträgen. */
 	private static final int STRIDE = 0;
-	/** The offset for vertex data. */
+	/** Offset zum ersten Vertex-Eintrag. */
 	private static final int OFFSET = 0;
 
 	public Model(float[] vertices, float[] textureCoords, int[] indices) {

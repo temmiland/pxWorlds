@@ -8,7 +8,7 @@ import java.lang.reflect.Type;
 
 public class JsonConfig {
 
-    /** The Gson instance used for serialization/deserialization. */
+    /** Gson-Instanz für Serialisierung/Deserialisierung. */
     private final Gson gson;
 
     public JsonConfig(Gson gson) {

@@ -29,9 +29,14 @@ public enum InputAction {
     DEBUG_TOGGLE(GLFW_KEY_F3);
 
     /** Standard-GLFW-Keycode für diese Aktion. */
-    public final int defaultKey;
+    private final int defaultKey;
 
     InputAction(final int defaultKey) {
         this.defaultKey = defaultKey;
+    }
+
+    /** @return Standard-GLFW-Keycode für diese Aktion */
+    public int getDefaultKey() {
+        return defaultKey;
     }
 }

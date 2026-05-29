@@ -3,21 +3,21 @@ package com.pxworlds.game.assets;
 import com.pxworlds.game.rendering.Model;
 
 public class Assets {
-	/** The shared model asset. */
+	/** Gemeinsames Quad-Modell. */
 	private static Model model;
 
-	// Quad geometry constants
-	/** The Z depth for the quad. */
+	// Quad-Geometrie-Konstanten
+	/** Z-Tiefe des Quads. */
 	private static final float Z_DEPTH = 0.0f;
-	/** The vertices for the quad. */
+	/** Vertices des Quads. */
 	private static final float[] VERTICES = new float[] {
-		-1f, 1f, Z_DEPTH, //TOP LEFT     0
-		1f, 1f, Z_DEPTH,  //TOP RIGHT    1
-		1f, -1f, Z_DEPTH, //BOTTOM RIGHT 2
-		-1f, -1f, Z_DEPTH,//BOTTOM LEFT  3
+		-1f, 1f, Z_DEPTH, //OBEN LINKS   0
+		1f, 1f, Z_DEPTH,  //OBEN RECHTS  1
+		1f, -1f, Z_DEPTH, //UNTEN RECHTS 2
+		-1f, -1f, Z_DEPTH,//UNTEN LINKS  3
 	};
 
-	/** The texture coordinates for the quad. */
+	/** Texturkoordinaten des Quads. */
 	private static final float[] TEXTURE_COORDS = new float[] {
 		0,0,
 		1,0,
@@ -25,7 +25,7 @@ public class Assets {
 		0,1,
 	};
 
-	/** The indices for the quad. */
+	/** Indizes des Quads. */
 	private static final int[] INDICES = new int[] {
 		0,1,2,
 		2,3,0

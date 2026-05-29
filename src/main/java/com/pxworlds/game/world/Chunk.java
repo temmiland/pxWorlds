@@ -60,9 +60,9 @@ public class Chunk {
     // -------------------------------------------------------------------------
 
     /** Position im Chunk-Grid. */
-    public final int chunkX;
+    private final int chunkX;
     /** Position im Chunk-Grid. */
-    public final int chunkY;
+    private final int chunkY;
 
     /** Tile-IDs für diesen Chunk; EMPTY (-1) = kein Tile (Luft). */
     private final byte[] tiles;
@@ -114,10 +114,10 @@ public class Chunk {
             return null;
         }
         final int idx = Byte.toUnsignedInt(id);
-        if (idx >= Tile.tiles.length) {
+        if (idx >= Tile.getTiles().length) {
             return null;
         }
-        return Tile.tiles[idx];
+        return Tile.getTiles()[idx];
     }
 
     // -------------------------------------------------------------------------

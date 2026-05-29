@@ -100,7 +100,7 @@ public class DebugOverlay {
             DebugRenderer.drawStringShadowed("TPS:   " + Constants.TICK_RATE + " (fixed)", MARGIN, lineY); lineY += LINE_HEIGHT;
             DebugRenderer.drawStringShadowed("Alpha: " + String.format("%.3f", alpha),     MARGIN, lineY); lineY += LINE_HEIGHT;
 
-            // State-specific extra lines (e.g. chunk stats from LevelState)
+            // State-spezifische Extra-Zeilen (z.B. Chunk-Statistiken aus LevelState)
             if (extraLines.length > 0) {
                 DebugRenderer.drawStringShadowed(SEPARATOR, MARGIN, lineY);
                 lineY += LINE_HEIGHT;

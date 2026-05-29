@@ -12,18 +12,18 @@ import java.util.Arrays;
 
 public class Gui {
 
-    /** The window. */
+    /** Das Spielfenster. */
     private Window window;
-    /** The shader for rendering. */
+    /** Shader für das Rendering. */
     private Shader shader;
-    /** The camera for rendering. */
+    /** Kamera für das Rendering. */
     private Camera camera;
-    /** The tile sheet for GUI elements. */
+    /** TileSheet für GUI-Elemente. */
     private TileSheet sheet;
 
-    /** The list of buttons. */
+    /** Liste der Buttons. */
     private ArrayList<Button> buttons;
-    /** The list of logos. */
+    /** Liste der Logos. */
     private ArrayList<Logo> logos;
 
     public Gui(Window newWindow, String tileSheetTexture, int amountOfTiles) {

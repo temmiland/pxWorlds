@@ -9,11 +9,11 @@ import java.util.ArrayList;
  */
 public class GameStateManager {
 
-    /** The list of game states. */
+    /** Liste aller registrierten Game-States. */
     private ArrayList<GameState> gameStates;
-    /** The index of the current state. */
+    /** Index des aktuell aktiven States. */
     private int currentState;
-    /** The window. */
+    /** Das Spielfenster. */
     private Window window;
 
     public GameStateManager() {

@@ -22,15 +22,15 @@ public class LevelState extends GameState {
     /** Name des aktuellen Levels (Unterordner unter {@code /levels/} und Dateiname ohne Endung). */
     private final String worldName;
 
-    /** The camera for rendering. */
+    /** Kamera für das Rendering. */
     private Camera camera;
-    /** The world being rendered. */
+    /** Die aktive Welt. */
     private World world;
-    /** The tile renderer. */
+    /** Tile-Renderer. */
     private TileRenderer tiles;
-    /** The shader for rendering. */
+    /** Shader für das Rendering. */
     private Shader shader;
-    /** The window. */
+    /** Das Spielfenster. */
     private Window window;
     /** Pause-Menü GUI. */
     private PauseGui pauseGui;

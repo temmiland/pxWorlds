@@ -2,7 +2,7 @@ package com.pxworlds.worlds;
 
 public class Location {
 
-    /** The x coordinate. */
+    /** X-Koordinate der Location. */
     private int x, y, z;
 
     public Location(int newX, int newY, int newZ) {

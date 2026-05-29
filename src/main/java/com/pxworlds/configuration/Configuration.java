@@ -9,14 +9,14 @@ import java.lang.reflect.Type;
 public class Configuration {
 
     public enum ConfigurationType {
-        /** Screen configuration type. */
+        /** Konfigurationstyp für die Bildschirm-Einstellungen. */
         SCREEN_CONFIGURATION(new TypeToken<ScreenConfiguration>() {
         }.getType()),
-        /** Profiles configuration type. */
+        /** Konfigurationstyp für die Profile. */
         PROFILES_CONFIGURATION(new TypeToken<ProfilesConfiguration>() {
         }.getType());
 
-        /** The type of configuration. */
+        /** Typ-Token für Gson-Deserialisierung. */
         private Type type;
 
         ConfigurationType(Type newType) {

@@ -46,29 +46,29 @@ public class Button {
 		}
 	}
 
-	/** Corner size in pixels. */
+	/** Eckengröße des Buttons in Pixeln. */
 	private static final int BUTTON_CORNER_SIZE = 16;
-	/** Border size in pixels. */
+	/** Randgröße des Buttons in Pixeln. */
 	private static final int BUTTON_BORDER_SIZE = 16;
 
-	/** STBEasyFont font height in coordinate units. */
+	/** STBEasyFont Schriftzeilenhöhe in Koordinateneinheiten. */
 	private static final float FONT_HEIGHT = 7.0f;
-	/** Scale applied to the font for readable button text. */
+	/** Skalierung für lesbare Button-Beschriftung. */
 	private static final float FONT_SCALE = 2.5f;
 
-	/** The bounding box for the button. */
+	/** Kollisions-AABB des Buttons. */
 	private AABB boundingBox;
 
-	/** The current selected state of the button. */
+	/** Aktueller Auswahlzustand des Buttons. */
 	private ButtonState selectedState;
 
-	/** The label text displayed on the button (may be null for no text). */
+	/** Anzeigetext des Buttons (null = kein Text). */
 	private String label;
 
-	/** Action executed when the button is clicked (may be null). */
+	/** Aktion beim Klick auf den Button (null = keine Aktion). */
 	private Runnable onClick;
 
-	/** The transform matrix for the button. */
+	/** Transformationsmatrix für das Button-Rendering. */
 	private static Matrix4f transform = new Matrix4f();
 
 	public Button(Vector2f position, Vector2f scale, String label, Runnable onClick) {

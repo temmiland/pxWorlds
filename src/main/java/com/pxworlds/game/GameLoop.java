@@ -27,13 +27,13 @@ public final class GameLoop {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GameLoop.class);
 
-    /** Reusable empty debug-lines array — avoids allocation when F3 is off. */
+    /** Wiederverwendbares leeres Debug-Zeilen-Array — vermeidet Allokation wenn F3 inaktiv. */
     private static final String[] NO_DEBUG_LINES = new String[0];
 
     private final GameStateManager gsm;
     private final DebugOverlay     debugOverlay;
     private final int              fpsRate;
-    /** Called when the loop exits normally or via shutdown hook to persist state. */
+    /** Wird beim normalen Ende der Schleife oder über den Shutdown-Hook aufgerufen, um den Zustand zu persistieren. */
     private final Consumer<Boolean> onShutdown;
 
     /**

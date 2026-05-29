@@ -5,15 +5,15 @@ import com.pxworlds.game.rendering.Texture;
 import org.joml.Matrix4f;
 
 public class TileSheet {
-	/** The texture of the tile sheet. */
+	/** Textur des TileSheets. */
 	private Texture texture;
 
-	/** The scale matrix. */
+	/** Skalierungsmatrix. */
 	private Matrix4f scale;
-	/** The translation matrix. */
+	/** Translationsmatrix. */
 	private Matrix4f translation;
 
-	/** The number of tiles in the sheet. */
+	/** Anzahl der Tiles im Sheet. */
 	private int amountOfTiles;
 
 	public TileSheet(String newTexture, int newAmountOfTiles) {

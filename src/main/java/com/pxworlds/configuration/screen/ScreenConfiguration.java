@@ -4,23 +4,23 @@ import com.pxworlds.configuration.Configuration;
 
 public class ScreenConfiguration extends Configuration {
 
-    /** Default window width used on first start. */
+    /** Standard-Fensterbreite beim ersten Start. */
     private static final int DEFAULT_WIDTH = 1280;
-    /** Default window height used on first start. */
+    /** Standard-Fensterhöhe beim ersten Start. */
     private static final int DEFAULT_HEIGHT = 720;
-    /** The default frame rate. */
+    /** Standard-Bildwiederholrate. */
     private static final int DEFAULT_FRAME_RATE = 60;
 
-    /** Whether the application is in fullscreen mode. */
+    /** Ob die Anwendung im Vollbildmodus läuft. */
     private boolean fullscreen = false;
-    /** The last width of the screen. */
+    /** Letzte gespeicherte Fensterbreite. */
     private int     lastWidth  = DEFAULT_WIDTH;
-    /** The last height of the screen. */
+    /** Letzte gespeicherte Fensterhöhe. */
     private int     lastHeight = DEFAULT_HEIGHT;
-    /** The frame rate of the application. */
+    /** Ziel-Bildwiederholrate. */
     private int     frameRate  = DEFAULT_FRAME_RATE;
 
-    /** No-arg constructor used by Gson for deserialization and first-time creation. */
+    /** No-Arg-Konstruktor — wird von Gson zur Deserialisierung und bei der Erstanlage genutzt. */
     public ScreenConfiguration() {
     }
 

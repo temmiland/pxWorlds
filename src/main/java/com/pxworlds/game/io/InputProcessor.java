@@ -111,7 +111,7 @@ public class InputProcessor {
      * @return {@code true} nur im Tick des ersten Tastendrucks
      */
     public boolean wasPressed(final InputAction action) {
-        return pressedThisTick.contains(action.defaultKey);
+        return pressedThisTick.contains(action.getDefaultKey());
     }
 
     /**
@@ -121,7 +121,7 @@ public class InputProcessor {
      * @return {@code true} solange die Taste gehalten wird
      */
     public boolean isHeld(final InputAction action) {
-        return heldKeys.contains(action.defaultKey);
+        return heldKeys.contains(action.getDefaultKey());
     }
 
     // --- Maus-Abfragen ---

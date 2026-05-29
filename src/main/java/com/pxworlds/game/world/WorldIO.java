@@ -147,8 +147,8 @@ public final class WorldIO {
                         continue;
                     }
                     final int idx = Byte.toUnsignedInt(id);
-                    if (idx < Tile.tiles.length && Tile.tiles[idx] != null) {
-                        world.setTile(Tile.tiles[idx], x, y);
+                    if (idx < Tile.getTiles().length && Tile.getTiles()[idx] != null) {
+                        world.setTile(Tile.getTiles()[idx], x, y);
                     }
                 }
             }

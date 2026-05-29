@@ -12,25 +12,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Shader implements AutoCloseable {
-	/** The logger for this class. */
+	/** Logger dieser Klasse. */
 	private static final Logger LOGGER = LoggerFactory.getLogger(Shader.class);
-	/** The OpenGL program object ID. */
+	/** OpenGL-Programm-Objekt-ID. */
 	private int programObject;
-	/** The OpenGL vertex shader object ID. */
+	/** OpenGL-Vertex-Shader-Objekt-ID. */
 	private int vertexShaderObject;
-	/** The OpenGL fragment shader object ID. */
+	/** OpenGL-Fragment-Shader-Objekt-ID. */
 	private int fragmentShaderObject;
 
-	// Shader constants
-	/** The OpenGL success code. */
+	// Shader-Konstanten
+	/** OpenGL-Erfolgscode. */
 	private static final int GL_SUCCESS = 1;
-	/** The attribute location for vertices. */
+	/** Attribut-Location für Vertices. */
 	private static final int VERTICES_ATTRIB_LOCATION = 0;
-	/** The attribute location for textures. */
+	/** Attribut-Location für Textur-Koordinaten. */
 	private static final int TEXTURES_ATTRIB_LOCATION = 1;
-	/** The invalid uniform location value. */
+	/** Ungültiger Uniform-Location-Wert. */
 	private static final int INVALID_UNIFORM_LOCATION = -1;
-	/** The buffer size for matrices. */
+	/** Puffergröße für Matrizen (4×4 = 16 Floats). */
 	private static final int MATRIX_BUFFER_SIZE = 16;
 
 	public Shader(String filename) {

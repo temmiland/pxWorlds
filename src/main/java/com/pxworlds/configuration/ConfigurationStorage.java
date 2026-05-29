@@ -9,11 +9,11 @@ import java.io.IOException;
 
 public class ConfigurationStorage {
 
-        /** The JSON config used for reading/writing configurations. */
+        /** JSON-Konfiguration für Lesen/Schreiben der Einstellungen. */
         private final JsonConfig jsonConfig;
-        /** The screen configuration. */
+        /** Bildschirm-Konfiguration. */
         private ScreenConfiguration screenConfiguration;
-        /** The profiles configuration. */
+        /** Profile-Konfiguration. */
         private ProfilesConfiguration profilesConfiguration;
 
         public ConfigurationStorage(JsonConfig jsonConfig) {

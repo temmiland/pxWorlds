@@ -5,18 +5,18 @@ import org.joml.Vector2f;
 
 public class PauseGui extends Gui {
 
-    /** The width of buttons. */
+    /** Breite der Buttons. */
     private static final float BUTTON_WIDTH = 200;
-    /** The height of buttons. */
+    /** Höhe der Buttons. */
     private static final float BUTTON_HEIGHT = 45;
-    /** The Y position of the resume button. */
+    /** Y-Position des Weiter-Buttons. */
     private static final float RESUME_BUTTON_Y = 80;
-    /** The Y position of the options button. */
+    /** Y-Position des Optionen-Buttons. */
     private static final float OPTIONS_BUTTON_Y = -15;
-    /** The Y position of the main menu button. */
+    /** Y-Position des Hauptmenü-Buttons. */
     private static final float MAIN_MENU_BUTTON_Y = -110;
 
-    /** Callback to unpause the game. */
+    /** Callback zum Fortsetzen des Spiels. */
     private final Runnable onResume;
 
     public PauseGui(Window window, String tileSheetTexture, int amountOfTiles, Runnable onResume, Runnable onMainMenu) {

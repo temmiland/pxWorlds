@@ -2,12 +2,12 @@ package com.pxworlds.game.entity;
 
 public enum MovementSpeed {
 
-    /** Walking movement speed. */
+    /** Gehgeschwindigkeit. */
     WALKING(5),
-    /** Running movement speed. */
+    /** Laufgeschwindigkeit. */
     RUNNING(8);
 
-    /** The value of the movement speed. */
+    /** Wert der Bewegungsgeschwindigkeit in Einheiten/Sekunde. */
     private final int movementSpeed;
 
     MovementSpeed(int newMovementSpeed) {

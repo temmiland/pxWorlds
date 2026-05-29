@@ -7,19 +7,19 @@ import java.security.MessageDigest;
 
 public enum Hash {
 
-    /** MD5 hash algorithm. */
+    /** MD5-Hash-Algorithmus. */
     MD5("MD5"),
-    /** SHA1 hash algorithm. */
+    /** SHA1-Hash-Algorithmus. */
     SHA1("SHA1"),
-    /** SHA256 hash algorithm. */
+    /** SHA256-Hash-Algorithmus. */
     SHA256("SHA-256"),
-    /** SHA512 hash algorithm. */
+    /** SHA512-Hash-Algorithmus. */
     SHA512("SHA-512");
 
-    /** The buffer size for hashing. */
+    /** Puffergröße für Hashing in Bytes. */
     private static final int BUFFER_SIZE = 4096;
 
-    /** The name of the hash algorithm. */
+    /** Name des Hash-Algorithmus. */
     private String name;
 
     Hash(String hashName) {

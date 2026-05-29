@@ -4,26 +4,26 @@ import com.pxworlds.game.rendering.tiles.tile.Brick;
 import com.pxworlds.game.rendering.tiles.tile.Grass;
 
 public class Tile {
-	/** The maximum number of tiles. */
+	/** Maximale Anzahl an Tiles. */
 	public static final int MAX_TILES = 255;
-	/** The starting ID for tiles. */
+	/** Start-ID für Tiles. */
 	public static final byte START_ID = 0;
 
-	/** The array of all tiles. */
-	public static Tile[] tiles = new Tile[MAX_TILES];
-	/** The next available tile ID. */
-	public static byte not = START_ID;
+	/** Registry aller Tiles, indiziert durch ID. */
+	private static final Tile[] tiles = new Tile[MAX_TILES];
+	/** Nächste freie Tile-ID. */
+	private static byte not = START_ID;
 
-	/** The grass tile instance. */
+	/** Gras-Tile. */
 	public static final Tile GRASS = new Grass();
-	/** The brick tile instance. */
+	/** Backstein-Tile. */
 	public static final Tile BRICK = new Brick();
 
-	/** The unique ID of the tile. */
+	/** Eindeutige ID dieses Tiles. */
 	private byte id;
-	/** Whether the tile is solid. */
+	/** Ob dieses Tile solide (nicht begehbar) ist. */
 	private boolean solid;
-	/** The texture name of the tile. */
+	/** Texturpfad dieses Tiles. */
 	private String texture;
 
 	public Tile(String newTexture, boolean newSolid) {

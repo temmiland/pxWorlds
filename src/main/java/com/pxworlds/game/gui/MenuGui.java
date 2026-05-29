@@ -7,20 +7,20 @@ import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
 
 public class MenuGui extends Gui {
 
-    // Menu GUI layout constants
-    /** The Y position of the logo. */
+    // Menü-GUI-Layout-Konstanten
+    /** Y-Position des Logos. */
     private static final float LOGO_Y_POSITION = 250;
-    /** The scale of the logo. */
+    /** Skalierung des Logos. */
     private static final float LOGO_SCALE = 64;
-    /** The Y position of the play button. */
+    /** Y-Position des Play-Buttons. */
     private static final float PLAY_BUTTON_Y_POSITION = -50;
-    /** The width of buttons. */
+    /** Breite der Buttons. */
     private static final float BUTTON_WIDTH = 200;
-    /** The height of buttons. */
+    /** Höhe der Buttons. */
     private static final float BUTTON_HEIGHT = 45;
-    /** The Y position of the option button. */
+    /** Y-Position des Optionen-Buttons. */
     private static final float OPTION_BUTTON_Y_POSITION = -145;
-    /** The Y position of the exit button. */
+    /** Y-Position des Beenden-Buttons. */
     private static final float EXIT_BUTTON_Y_POSITION = -240;
 
     public MenuGui(Window window, String tileSheetTexture, int amountOfTiles, Runnable onPlay) {

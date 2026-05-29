@@ -1,7 +1,7 @@
 package com.pxworlds.game.io;
 
 public class Timer {
-	/** The number of nanoseconds in a second. */
+	/** Nanosekunden pro Sekunde. */
 	private static final long NANOSECONDS_PER_SECOND = 1000000000L;
 
 	public static double getTime() {

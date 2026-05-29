@@ -7,7 +7,7 @@ import java.util.List;
 
 public class ProfilesConfiguration extends Configuration {
 
-    /** The list of profile configurations. */
+    /** Liste aller Profil-Konfigurationen. */
     private List<ProfileConfiguration> profileConfigurations = new ArrayList<>();
 
     public ProfilesConfiguration() {

@@ -8,7 +8,6 @@ import com.pxworlds.Constants;
 import com.pxworlds.game.collision.AABB;
 import com.pxworlds.game.entity.Entity;
 import com.pxworlds.game.entity.Player;
-import com.pxworlds.game.entity.Transform;
 import com.pxworlds.game.io.Window;
 import com.pxworlds.game.rendering.Camera;
 import com.pxworlds.game.rendering.Shader;
@@ -465,8 +464,8 @@ public class World {
         final int tileX;
         final int tileY;
         if (playerEntity != null) {
-            final float wx = playerEntity.getPosition().x;
-            final float wy = playerEntity.getPosition().y;
+            final float wx = playerEntity.getPosX();
+            final float wy = playerEntity.getPosY();
             tileX = (int) Math.floor( wx / Constants.TILE_SIZE);
             tileY = (int) Math.floor(-wy / Constants.TILE_SIZE);
         } else {
@@ -561,7 +560,7 @@ public class World {
     public void capturePlayerPosition() {
         for (final Entity e : entities) {
             if (e instanceof Player) {
-                spawnState.setLastPos(e.getPosition().x, e.getPosition().y);
+                spawnState.setLastPos(e.getPosX(), e.getPosY());
                 return;
             }
         }
@@ -592,13 +591,10 @@ public class World {
         } else {
             return; // keine Position bekannt
         }
-        final Transform transform = new Transform();
-        transform.pos.x = posX;
-        transform.pos.y = posY;
         if (playable) {
-            entities.add(new Player(transform));
+            entities.add(new Player(posX, posY));
         }
-        camera.getPosition().set(transform.pos.mul(-scale, new Vector3f()));
+        camera.getPosition().set(-posX * scale, -posY * scale, 0f);
     }
 
     /** Gibt alle OpenGL-Ressourcen der Chunks frei. Muss im GL-Thread aufgerufen werden. */

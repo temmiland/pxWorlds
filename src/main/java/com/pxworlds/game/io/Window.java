@@ -7,20 +7,20 @@ import org.joml.Vector2f;
 import org.lwjgl.glfw.*;
 
 public class Window {
-	/** The default window width. */
+	/** Standard-Fensterbreite. */
 	private static final int DEFAULT_WIDTH = 640;
-	/** The default window height. */
+	/** Standard-Fensterhöhe. */
 	private static final int DEFAULT_HEIGHT = 480;
-	/** The GLFW window handle. */
+	/** GLFW-Fenster-Handle. */
 	private long window;
 
-	/** The width of the window. */
+	/** Breite und Höhe des Fensters in Pixeln. */
 	private int width, height;
-	/** Whether the window is in fullscreen mode. */
+	/** Ob das Fenster im Vollbildmodus ist. */
 	private boolean fullscreen;
-	/** Whether the window has been resized. */
+	/** Ob das Fenster seit dem letzten Tick skaliert wurde. */
 	private boolean hasResized;
-	/** The callback for window size changes. */
+	/** Callback für Größänderungen des Fensters. */
 	private GLFWWindowSizeCallback windowSizeCallback;
 
 	/** Event-Produzent: GLFW-Callbacks → InputEvent-Queue. */

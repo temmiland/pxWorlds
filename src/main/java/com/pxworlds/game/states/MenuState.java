@@ -16,21 +16,21 @@ public class MenuState extends GameState {
 
     /** Name des Levels das als Menü-Hintergrund geladen wird. */
     private static final String WORLD_NAME = "test_level";
-    /** The default GUI scale for menu. */
+    /** Standard GUI-Skalierung für das Menü. */
     private static final int MENU_GUI_SCALE = 21;
 
-    /** The menu GUI. */
+    /** Menü-GUI. */
     private MenuGui gui;
 
-    /** The world being rendered. */
+    /** Die Hintergrundwelt. */
     private World world;
-    /** The camera for rendering. */
+    /** Kamera für das Rendering. */
     private Camera camera;
-    /** The tile renderer. */
+    /** Tile-Renderer. */
     private TileRenderer tiles;
-    /** The shader for rendering. */
+    /** Shader für das Rendering. */
     private Shader shader;
-    /** The window. */
+    /** Das Spielfenster. */
     private Window window;
 
     public MenuState(GameStateManager gsm) {

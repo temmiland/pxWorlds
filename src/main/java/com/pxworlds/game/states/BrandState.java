@@ -7,12 +7,12 @@ import com.pxworlds.game.io.Window;
  */
 public class BrandState extends GameState {
 
-    /** The duration of the brand screen in seconds. */
+    /** Anzeigedauer des Splash-Screens in Sekunden. */
     private static final double BRAND_DURATION = 1.0;
 
-    /** The window. */
+    /** Das Spielfenster. */
     private Window window;
-    /** Accumulated time since the state was entered. */
+    /** Vergangene Zeit seit Eintritt in diesen State. */
     private double elapsed = 0.0;
 
     public BrandState(GameStateManager gsm) {

@@ -14,19 +14,21 @@ import java.util.List;
 
 
 public abstract class Entity {
-    /** The bounding box for collision detection. */
+    /** Kollisions-AABB der Entity. */
     protected AABB boundingBox;
-    /** The array of animations. */
+    /** Array der Animationen. */
     protected Animation[] animations;
-    /** The index of the current animation. */
+    /** Index der aktuell genutzten Animation. */
     private int useAnimation;
 
-    /** The transform of the entity. */
-    protected Transform transform;
+    /** World-Space-Position der Entity. */
+    protected float posX, posY;
+    /** Render-Skalierung der Entity. */
+    protected final float scaleX, scaleY;
     /** Position am Ende des letzten Ticks — Ausgangspunkt für Render-Interpolation. */
-    protected Vector3f prevPos;
+    protected float prevX, prevY;
 
-    /** The divide by two value. */
+    /** Divisor für symmetrischen Push-out zwischen zwei Entities. */
     private static final int DIVIDE_BY_TWO = 2;
 
     /**
@@ -35,26 +37,22 @@ public abstract class Entity {
      */
     private final AABB sweptBounds = new AABB(0, 0, 0, 0);
 
-    /**
-     * Gibt die aktuelle World-Space-Position der Entity zurück (live reference).
-     * @return {@code transform.pos} — kein Defensive-Copy, nicht cachen
-     */
-    public Vector3f getPosition() {
-        return transform.pos;
-    }
+    /** @return aktuelle X-Position im World-Space */
+    public float getPosX() { return posX; }
 
-    public Entity(int maxAnimations, Transform newTransform) {
+    /** @return aktuelle Y-Position im World-Space */
+    public float getPosY() { return posY; }
+
+    public Entity(int maxAnimations, float posX, float posY, float scaleX, float scaleY) {
         this.animations = new Animation[maxAnimations];
-
-        this.transform = newTransform;
+        this.posX   = posX;
+        this.posY   = posY;
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
         this.useAnimation = 0;
-        this.prevPos = new Vector3f(transform.pos);
-
-        final float px = transform.pos.x;
-        final float py = transform.pos.y;
-        final float hw = transform.scale.x;
-        final float hh = transform.scale.y;
-        boundingBox = new AABB(px - hw, py - hh, px + hw, py + hh);
+        this.prevX  = posX;
+        this.prevY  = posY;
+        boundingBox = new AABB(posX - scaleX, posY - scaleY, posX + scaleX, posY + scaleY);
     }
 
     /**
@@ -66,8 +64,8 @@ public abstract class Entity {
      * @param out   Ziel-AABB (wird in-place überschrieben)
      */
     public void getInterpolatedBoundingBox(final float alpha, final AABB out) {
-        final float rx = prevPos.x + (transform.pos.x - prevPos.x) * alpha;
-        final float ry = prevPos.y + (transform.pos.y - prevPos.y) * alpha;
+        final float rx = prevX + (posX - prevX) * alpha;
+        final float ry = prevY + (posY - prevY) * alpha;
         final float hw = boundingBox.getHalfWidth();
         final float hh = boundingBox.getHalfHeight();
         out.minX = rx - hw;
@@ -77,15 +75,15 @@ public abstract class Entity {
     }
 
     /**
-     * Setzt die Hitbox-Ausdehnung unabhängig von {@code transform.scale}.
+     * Setzt die Hitbox-Ausdehnung unabhängig von der Render-Skalierung.
      * Ermöglicht Subklassen, eine kleinere Hitbox als den Render-Sprite zu definieren.
      *
      * @param hw  halbe Breite in Tile-Einheiten
      * @param hh  halbe Höhe in Tile-Einheiten
      */
     protected void setBoundingBoxSize(final float hw, final float hh) {
-        final float cx = transform.pos.x;
-        final float cy = transform.pos.y;
+        final float cx = posX;
+        final float cy = posY;
         boundingBox.minX = cx - hw;
         boundingBox.maxX = cx + hw;
         boundingBox.minY = cy - hh;
@@ -141,8 +139,8 @@ public abstract class Entity {
         }
         boundingBox.move(xa, 0);
 
-        transform.pos.x = boundingBox.getCenterX();
-        transform.pos.y = boundingBox.getCenterY();
+        posX = boundingBox.getCenterX();
+        posY = boundingBox.getCenterY();
     }
 
     /**
@@ -166,10 +164,11 @@ public abstract class Entity {
             }
         }
         if (moved) {
-            transform.pos.x = boundingBox.getCenterX();
-            transform.pos.y = boundingBox.getCenterY();
+            posX = boundingBox.getCenterX();
+            posY = boundingBox.getCenterY();
             // Keine Interpolation über die Korrektur — prevPos nachziehen
-            prevPos.set(transform.pos);
+            prevX = posX;
+            prevY = posY;
         }
     }
 
@@ -177,7 +176,8 @@ public abstract class Entity {
 
     /** Synchronisiert prevPos auf die aktuelle Position — stoppt Render-Interpolation. */
     public void snapPrevPosition() {
-        prevPos.set(transform.pos);
+        prevX = posX;
+        prevY = posY;
     }
 
     /**
@@ -190,7 +190,8 @@ public abstract class Entity {
      * @param world    die Spielwelt
      */
     public final void tick(float delta, Window window, Camera camera, World world) {
-        prevPos.set(transform.pos);
+        prevX = posX;
+        prevY = posY;
         update(delta, window, camera, world);
     }
 
@@ -198,10 +199,10 @@ public abstract class Entity {
         final Matrix4f target = camera.getProjection(alpha);
         target.mul(world.getWorldMatrix());
 
-        final float renderX = prevPos.x + (transform.pos.x - prevPos.x) * alpha;
-        final float renderY = prevPos.y + (transform.pos.y - prevPos.y) * alpha;
-        target.translate(renderX, renderY, transform.pos.z);
-        target.scale(transform.scale);
+        final float renderX = prevX + (posX - prevX) * alpha;
+        final float renderY = prevY + (posY - prevY) * alpha;
+        target.translate(renderX, renderY, 0f);
+        target.scale(scaleX, scaleY, 1f);
 
         shader.bind();
         shader.setUniform("sampler", 0);
@@ -250,14 +251,18 @@ public abstract class Entity {
                 entity.boundingBox.move(0, halfDy * -dirY);
             }
 
-            transform.pos.set(boundingBox.getCenterX(), boundingBox.getCenterY(), 0);
+            posX = boundingBox.getCenterX();
+            posY = boundingBox.getCenterY();
             // prevPos mitsynchronisieren — sonst interpoliert der Renderer
             // über den gesamten Push-out-Delta und erzeugt einen sichtbaren
             // Positions-Pop in der nächsten Render-Frame.
-            prevPos.set(transform.pos);
+            prevX = posX;
+            prevY = posY;
 
-            entity.transform.pos.set(entity.boundingBox.getCenterX(), entity.boundingBox.getCenterY(), 0);
-            entity.prevPos.set(entity.transform.pos);
+            entity.posX = entity.boundingBox.getCenterX();
+            entity.posY = entity.boundingBox.getCenterY();
+            entity.prevX = entity.posX;
+            entity.prevY = entity.posY;
         }
     }
 }

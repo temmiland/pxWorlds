@@ -7,14 +7,14 @@ import com.pxworlds.game.io.Window;
  */
 public abstract class GameState {
 
-    /** The game state manager. */
+    /** Der zugehörige Game-State-Manager. */
     protected GameStateManager gsm;
     public abstract void init(Window window);
     public abstract void resize();
     public abstract void update(double delta);
 
     /**
-     * Renders the current state.
+     * Rendert den aktuellen State.
      * @param alpha Interpolationsfaktor 0.0–1.0 zwischen letztem und nächstem Tick.
      */
     public abstract void render(float alpha);

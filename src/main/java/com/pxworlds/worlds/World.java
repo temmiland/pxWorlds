@@ -8,9 +8,9 @@ import java.util.Map;
 
 public class World {
 
-    /** The name of the world. */
+    /** Name der Welt. */
     private final String worldName;
-    /** The map of locations to tile layers. */
+    /** Karte der Locations zu Tile-Layern. */
     private Map<Location, ArrayList<TileLayer>> locationTileLayersHashMap;
 
     public World(String name) {

@@ -10,41 +10,41 @@ import com.pxworlds.game.rendering.Camera;
 import com.pxworlds.game.world.World;
 
 public class Player extends Entity {
-	/** Idle animation index. */
+	/** Index der Idle-Animation. */
 	public static final int ANIM_IDLE = 0;
-	/** Walk animation index. */
+	/** Index der Walk-Animation. */
 	public static final int ANIM_WALK = 1;
-	/** Run animation index. */
+	/** Index der Run-Animation. */
 	public static final int ANIM_RUN = 2;
-    /** Total number of animations. */
+    /** Gesamtanzahl der Animationen. */
     public static final int ANIM_SIZE = 3;
-    /** The movement speed of the player. */
+    /** Aktuelle Bewegungsgeschwindigkeit in Einheiten/Sekunde. */
     private int movementSpeed = MovementSpeed.WALKING.getValue();
 
-    /** Number of idle animation frames. */
+    /** Anzahl der Idle-Animations-Frames. */
     private static final int IDLE_FRAMES = 4;
-    /** Frames per second for idle animation. */
+    /** Frames pro Sekunde der Idle-Animation. */
     private static final int IDLE_FPS = 3;
-    /** Number of walk/run animation frames. */
+    /** Anzahl der Walk/Run-Animations-Frames. */
     private static final int WALK_RUN_FRAMES = 4;
-    /** Multiplier for diagonal movement speed. */
+    /** Geschwindigkeitsmultiplikator für diagonale Bewegung. */
     private static final float DIAGONAL_SPEED_MULTIPLIER = 1.5f;
-    /** Lerp factor for camera smoothing. */
+    /** Lerp-Faktor für die Kamera-Glättung. */
     private static final float CAMERA_LERP_FACTOR = 0.09f;
     /**
      * Halbe Breite der Spieler-Hitbox in Tile-Einheiten (65 % der Texturbreite).
-     * Die Textur belegt 2 × transform.scale.x = 2.0 Einheiten; 65 % davon ergibt
+     * Die Textur belegt 2 × scaleX = 2.0 Einheiten; 65 % davon ergibt
      * eine Gesamtbreite von 1.3 Einheiten (±0.65), zentriert auf der Textur.
      */
     private static final float HITBOX_HALF_WIDTH = 0.65f;
 
-    public Player(Transform transform) {
-		super(ANIM_SIZE, transform);
+    public Player(float posX, float posY) {
+		super(ANIM_SIZE, posX, posY, 1f, 1f);
 		setAnimation(ANIM_IDLE, new Animation(IDLE_FRAMES, IDLE_FPS, "player/idle"));
 		setAnimation(ANIM_WALK, new Animation(WALK_RUN_FRAMES, MovementSpeed.WALKING.getValue(), "player/walking"));
 		setAnimation(ANIM_RUN, new Animation(WALK_RUN_FRAMES, MovementSpeed.RUNNING.getValue(), "player/walking"));
 		// Hitbox schmaler als Render-Sprite: 65 % der Texturbreite, volle Höhe
-		setBoundingBoxSize(HITBOX_HALF_WIDTH, transform.scale.y);
+		setBoundingBoxSize(HITBOX_HALF_WIDTH, scaleY);
 	}
 
 	public void setMovementSpeed(MovementSpeed newMovementSpeed) {
@@ -109,6 +109,6 @@ public class Player extends Entity {
             useAnimation(ANIM_IDLE);
         }
 
-		camera.getPosition().lerp(transform.pos.mul(-world.getScale(), new Vector3f()), CAMERA_LERP_FACTOR);
+		camera.getPosition().lerp(new Vector3f(-posX * world.getScale(), -posY * world.getScale(), 0), CAMERA_LERP_FACTOR);
 	}
 }
