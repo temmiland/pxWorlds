@@ -110,7 +110,7 @@ public class SpriteBatch implements AutoCloseable {
         // Dreieck 2: TL → BR → BL
         buffer[i++] = x0; buffer[i++] = y1; buffer[i++] = u0; buffer[i++] = v0;
         buffer[i++] = x1; buffer[i++] = y0; buffer[i++] = u1; buffer[i++] = v1;
-        buffer[i]   = x0; buffer[i+1] = y0; buffer[i+2] = u0; buffer[i+3] = v1;
+        buffer[i]   = x0; buffer[i + 1] = y0; buffer[i + 2] = u0; buffer[i + FLOATS_PER_VERTEX - 1] = v1;
 
         spriteCount++;
     }

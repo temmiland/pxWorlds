@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
@@ -35,10 +36,13 @@ public class TextureAtlas implements AutoCloseable {
     /** Bytes pro Pixel (RGBA). */
     private static final int BYTES_PER_PIXEL = 4;
 
-    // Bit-Shifts für java.awt.image ARGB-Format (Rückgabe von getRGB)
+    /** Bit-Shift für den Rot-Kanal im ARGB-Format. */
     private static final int RED_SHIFT   = 16;
+    /** Bit-Shift für den Grün-Kanal im ARGB-Format. */
     private static final int GREEN_SHIFT = 8;
+    /** Bit-Shift für den Alpha-Kanal im ARGB-Format. */
     private static final int ALPHA_SHIFT = 24;
+    /** Maske zum Extrahieren eines 8-Bit-Farbkanals. */
     private static final int COLOR_MASK  = 0xFF;
 
     /** OpenGL-Textur-ID. 0 = nicht initialisiert. */
@@ -52,7 +56,7 @@ public class TextureAtlas implements AutoCloseable {
      */
     public TextureAtlas() {
         // 1. Alle eindeutigen Tile-Texturen einsammeln
-        final LinkedHashMap<String, int[]> images = new LinkedHashMap<>(); // name → ARGB pixels (TILE_PX × TILE_PX)
+        final Map<String, int[]> images = new LinkedHashMap<>(); // name → ARGB pixels (TILE_PX × TILE_PX)
         for (final Tile tile : Tile.getTiles()) {
             if (tile == null) {
                 continue;
@@ -123,13 +127,18 @@ public class TextureAtlas implements AutoCloseable {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    /** Bindet den Atlas an den angegebenen Sampler-Slot. */
+    /**
+     * Bindet den Atlas an den angegebenen Sampler-Slot.
+     * @param sampler OpenGL-Sampler-Slot (0-basiert)
+     */
     public void bind(final int sampler) {
         glActiveTexture(GL_TEXTURE0 + sampler);
         glBindTexture(GL_TEXTURE_2D, textureId);
     }
 
     /**
+     * Gibt die UV-Koordinaten für die angegebene Textur zurück.
+     * @param textureName Name der Textur (ohne Pfad/Endung)
      * @return float[]{u0, v0, u1, v1} oder {@code null} wenn Textur nicht im Atlas
      */
     public float[] getUV(final String textureName) {
@@ -148,7 +157,9 @@ public class TextureAtlas implements AutoCloseable {
 
     /**
      * Lädt eine PNG und skaliert sie per nearest-neighbour auf TILE_PX×TILE_PX.
-     * Gibt ein ARGB-int[TILE_PX*TILE_PX]-Array zurück, oder null bei Fehler.
+     *
+     * @param name Texturname (ohne Pfad und Endung)
+     * @return ARGB-int[TILE_PX*TILE_PX]-Array, oder null bei Fehler
      */
     private int[] loadAndScale(final String name) {
         final BufferedImage src;

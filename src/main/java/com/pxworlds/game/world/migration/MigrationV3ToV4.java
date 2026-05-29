@@ -21,11 +21,15 @@ import java.io.IOException;
  */
 public final class MigrationV3ToV4 implements WorldMigration {
 
+    /** Logger dieser Klasse. */
     private static final Logger LOGGER = LoggerFactory.getLogger(MigrationV3ToV4.class);
+
+    /** Maximale Format-Version die diese Migration einliest. */
+    private static final int MAX_SUPPORTED_INPUT_VERSION = 3;
 
     @Override
     public boolean supports(final int formatVersion) {
-        return formatVersion >= 1 && formatVersion <= 3;
+        return formatVersion >= 1 && formatVersion <= MAX_SUPPORTED_INPUT_VERSION;
     }
 
     @Override

@@ -22,8 +22,10 @@ import java.util.List;
  */
 public final class MigrationRunner {
 
+    /** Logger dieser Klasse. */
     private static final Logger LOGGER = LoggerFactory.getLogger(MigrationRunner.class);
 
+    /** Alle bekannten Migrationen in Reihenfolge. */
     private static final List<WorldMigration> MIGRATIONS = List.of(
             new MigrationV3ToV4()
     );
@@ -64,6 +66,8 @@ public final class MigrationRunner {
      * sie sind selbst bereits ein Backup. Ansonsten werden vorhandene {@code _backup}-Suffixe
      * vor dem Anhängen entfernt, damit keine {@code _backup_backup_backup}-Ketten entstehen.
      * Eine vorhandene Backup-Datei wird überschrieben.</p>
+     *
+     * @param worldName Name der zu sichernden Welt (ohne Dateiendung)
      */
     private static void backup(final String worldName) {
         if (worldName.endsWith("_backup")) {

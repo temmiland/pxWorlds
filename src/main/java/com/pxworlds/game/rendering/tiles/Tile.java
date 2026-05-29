@@ -10,7 +10,7 @@ public class Tile {
 	public static final byte START_ID = 0;
 
 	/** Registry aller Tiles, indiziert durch ID. */
-	private static final Tile[] tiles = new Tile[MAX_TILES];
+	private static final Tile[] TILES = new Tile[MAX_TILES];
 	/** Nächste freie Tile-ID. */
 	private static byte not = START_ID;
 
@@ -31,10 +31,10 @@ public class Tile {
 		not++;
 		this.texture = newTexture;
 		this.solid = newSolid;
-		if (tiles[id] != null) {
+		if (TILES[id] != null) {
 			throw new IllegalStateException("Tiles at [" + id + "] is already being used!");
 		}
-		tiles[id] = this;
+		TILES[id] = this;
 	}
 
 	public Tile setSolid() {
@@ -55,6 +55,6 @@ public class Tile {
 	}
 
     public static Tile[] getTiles() {
-        return tiles;
+        return TILES;
     }
 }

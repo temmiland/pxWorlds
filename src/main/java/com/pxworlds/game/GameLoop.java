@@ -25,30 +25,34 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class GameLoop {
 
+    /** Logger dieser Klasse. */
     private static final Logger LOGGER = LoggerFactory.getLogger(GameLoop.class);
 
     /** Wiederverwendbares leeres Debug-Zeilen-Array — vermeidet Allokation wenn F3 inaktiv. */
     private static final String[] NO_DEBUG_LINES = new String[0];
 
+    /** GameStateManager, der jeden Frame gesteuert wird. */
     private final GameStateManager gsm;
+    /** HUD-Overlay für FPS- und Debug-Informationen. */
     private final DebugOverlay     debugOverlay;
+    /** Ziel-Render-FPS. */
     private final int              fpsRate;
     /** Wird beim normalen Ende der Schleife oder über den Shutdown-Hook aufgerufen, um den Zustand zu persistieren. */
     private final Consumer<Boolean> onShutdown;
 
     /**
-     * @param gsm          der GameStateManager, der jeden Frame gesteuert wird
-     * @param debugOverlay das HUD-Overlay für FPS- und Debug-Informationen
-     * @param fpsRate      Ziel-Render-FPS
-     * @param onShutdown   wird mit {@code true} aufgerufen wenn der Shutdown-Hook feuert,
-     *                     mit {@code false} wenn die Schleife normal endet
+     * @param newGsm          der GameStateManager, der jeden Frame gesteuert wird
+     * @param newDebugOverlay das HUD-Overlay für FPS- und Debug-Informationen
+     * @param newFpsRate      Ziel-Render-FPS
+     * @param newOnShutdown   wird mit {@code true} aufgerufen wenn der Shutdown-Hook feuert,
+     *                        mit {@code false} wenn die Schleife normal endet
      */
-    public GameLoop(final GameStateManager gsm, final DebugOverlay debugOverlay,
-                    final int fpsRate, final Consumer<Boolean> onShutdown) {
-        this.gsm          = gsm;
-        this.debugOverlay = debugOverlay;
-        this.fpsRate      = fpsRate;
-        this.onShutdown   = onShutdown;
+    public GameLoop(final GameStateManager newGsm, final DebugOverlay newDebugOverlay,
+                    final int newFpsRate, final Consumer<Boolean> newOnShutdown) {
+        this.gsm          = newGsm;
+        this.debugOverlay = newDebugOverlay;
+        this.fpsRate      = newFpsRate;
+        this.onShutdown   = newOnShutdown;
     }
 
     /**

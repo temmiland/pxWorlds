@@ -22,6 +22,7 @@ import java.io.InputStream;
  */
 public final class WorldLoadingService {
 
+    /** Logger dieser Klasse. */
     private static final Logger LOGGER = LoggerFactory.getLogger(WorldLoadingService.class);
 
     private WorldLoadingService() {
@@ -42,9 +43,12 @@ public final class WorldLoadingService {
                              final boolean useLastPos, final Class<?> context) {
         final File userFile = new File(Constants.WORLDS_DIRECTORY_PATH, worldName + ".pxwl");
         try {
-            final InputStream stream = userFile.exists()
-                    ? new FileInputStream(userFile)
-                    : context.getResourceAsStream("/levels/" + worldName + ".pxwl");
+            final InputStream stream;
+            if (userFile.exists()) {
+                stream = new FileInputStream(userFile);
+            } else {
+                stream = context.getResourceAsStream("/levels/" + worldName + ".pxwl");
+            }
             if (stream == null) {
                 throw new IOException("Kein .pxwl-Stream verfügbar für '" + worldName + "'");
             }
@@ -63,6 +67,16 @@ public final class WorldLoadingService {
 
     /** Name der gebündelten Vorlage für neue Welten. */
     private static final String TEMPLATE_WORLD = "test_level";
+    /** Standardbreite einer neuen Fallback-Welt in Tiles. */
+    private static final int DEFAULT_WORLD_WIDTH = 64;
+    /** Standardhöhe einer neuen Fallback-Welt in Tiles. */
+    private static final int DEFAULT_WORLD_HEIGHT = 20;
+    /** Standard-Scale einer neuen Fallback-Welt. */
+    private static final int DEFAULT_WORLD_SCALE = 16;
+    /** Standard-Spawn-X für die Fallback-Welt. */
+    private static final int DEFAULT_SPAWN_X = 32;
+    /** Standard-Spawn-Y für die Fallback-Welt. */
+    private static final int DEFAULT_SPAWN_Y = 10;
 
     /**
      * Erstellt eine neue Welt als Kopie der gebündelten Vorlage ({@value #TEMPLATE_WORLD}).
@@ -87,8 +101,8 @@ public final class WorldLoadingService {
                     TEMPLATE_WORLD, e.getMessage());
         }
         // Fallback: leere Welt mit Spawn in der Mitte
-        final World fallback = new World(64, 20, 16);
-        fallback.setSpawn(32, 10);
+        final World fallback = new World(DEFAULT_WORLD_WIDTH, DEFAULT_WORLD_HEIGHT, DEFAULT_WORLD_SCALE);
+        fallback.setSpawn(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y);
         save(fallback, worldName);
         LOGGER.info("Neue leere Welt '{}' (Fallback) erstellt.", worldName);
     }

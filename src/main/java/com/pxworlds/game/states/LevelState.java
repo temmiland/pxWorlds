@@ -39,9 +39,9 @@ public class LevelState extends GameState {
     /** Debug-Renderer für Kollisionsrahmen und Chunk-Grenzen. */
     private WorldDebugRenderer debugRenderer;
 
-    public LevelState(GameStateManager gsm, String worldName) {
+    public LevelState(GameStateManager gsm, String newWorldName) {
         this.gsm = gsm;
-        this.worldName = worldName;
+        this.worldName = newWorldName;
     }
 
     @Override
@@ -72,7 +72,10 @@ public class LevelState extends GameState {
         this.paused = false;
         this.pauseGui = new PauseGui(newWindow, "menustate", PAUSE_GUI_SCALE,
                 () -> paused = false,
-                () -> { save(); gsm.setState(GameStateType.MENU); });
+                () -> {
+                    save();
+                    gsm.setState(GameStateType.MENU);
+                });
         this.debugRenderer = new WorldDebugRenderer(newWorld);
 
         newWorld.calculateView(newCamera);

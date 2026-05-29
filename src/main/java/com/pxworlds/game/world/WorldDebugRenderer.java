@@ -24,21 +24,28 @@ import static org.lwjgl.opengl.GL20.glUseProgram;
  */
 public final class WorldDebugRenderer {
 
+    /** Anzahl Floats in einer 4×4-Matrix. */
     private static final int   MATRIX_FLOAT_COUNT = 16;
+    /** Shader-Programm-ID für „kein Shader" (Legacy-GL). */
     private static final int   NO_SHADER          = 0;
+    /** Vollständig gesättigter Farbkanal (1.0). */
     private static final float COLOR_FULL         = 1.0f;
+    /** Nicht gesättigter Farbkanal (0.0). */
     private static final float COLOR_NONE         = 0.0f;
+    /** Linienbreite für Debug-Rahmen. */
     private static final float DEBUG_LINE_WIDTH   = 2.0f;
+    /** Standard-Linienbreite (OpenGL-Default). */
     private static final float DEFAULT_LINE_WIDTH  = 1.0f;
 
+    /** Zu rendernde Welt. */
     private final World      world;
     /** Wiederverwendbare Scratch-AABB für interpolierte Bounding-Box-Abfragen von Entities. */
     private final AABB       scratchEntityBox = new AABB(0, 0, 0, 0);
     /** Wiederverwendbarer nativer Buffer zum Hochladen der Projektionsmatrix via Legacy-GL. */
     private final FloatBuffer matBuf          = BufferUtils.createFloatBuffer(MATRIX_FLOAT_COUNT);
 
-    public WorldDebugRenderer(final World world) {
-        this.world = world;
+    public WorldDebugRenderer(final World newWorld) {
+        this.world = newWorld;
     }
 
     /**

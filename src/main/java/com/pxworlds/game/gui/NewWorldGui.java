@@ -18,27 +18,46 @@ import static org.lwjgl.opengl.GL20.glUseProgram;
  */
 public class NewWorldGui extends Gui {
 
+    /** Tilesheet-Name für das GUI. */
     private static final String GUI_TILESHEET   = "menustate";
+    /** Anzahl Tiles im Tilesheet. */
     private static final int    TILESHEET_TILES  = 21;
 
+    /** Y-Position des Titels. */
     private static final float TITLE_Y     = 100f;
+    /** Y-Position des Textfelds. */
     private static final float INPUT_Y     = 20f;
+    /** Halbe Breite des Textfelds. */
     private static final float INPUT_HW    = 150f;
+    /** Halbe Höhe des Textfelds. */
     private static final float INPUT_HH    = 22f;
+    /** Y-Position der Fehlermeldung. */
     private static final float ERROR_Y     = -30f;
+    /** X-Position des Erstellen-Buttons. */
     private static final float CREATE_X    = -115f;
+    /** X-Position des Zurück-Buttons. */
     private static final float BACK_X      =  115f;
+    /** Y-Position der Aktions-Buttons. */
     private static final float ACTION_Y    = -100f;
+    /** Halbe Breite der Aktions-Buttons. */
     private static final float ACTION_HW   = 100f;
+    /** Halbe Höhe der Aktions-Buttons. */
     private static final float ACTION_HH   = 22f;
 
+    /** Skalierung des Titeltexts. */
     private static final float TITLE_SCALE = 2.5f;
+    /** Skalierung der Fehlermeldung. */
     private static final float ERROR_SCALE = 1.8f;
+    /** Fehlerfarbe Rot. */
     private static final float ERROR_R     = 1.0f;
+    /** Fehlerfarbe Grün. */
     private static final float ERROR_G     = 0.3f;
+    /** Fehlerfarbe Blau. */
     private static final float ERROR_B     = 0.3f;
 
+    /** Texteingabefeld für den Weltnamen. */
     private final TextInput nameInput;
+    /** Aktuell angezeigte Fehlermeldung (leer = keine). */
     private String errorMessage = "";
 
     public NewWorldGui(
@@ -83,9 +102,16 @@ public class NewWorldGui extends Gui {
         return nameInput.getValue();
     }
 
-    /** Setzt die Fehlermeldung (leer = keine Anzeige). */
+    /**
+     * Setzt die Fehlermeldung (leer = keine Anzeige).
+     * @param message anzuzeigende Fehlermeldung oder {@code null}
+     */
     public void setError(final String message) {
-        this.errorMessage = message == null ? "" : message;
+        if (message == null) {
+            this.errorMessage = "";
+        } else {
+            this.errorMessage = message;
+        }
     }
 
     /** Löscht das Eingabefeld und die Fehlermeldung. */

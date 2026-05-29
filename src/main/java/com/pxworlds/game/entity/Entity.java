@@ -38,21 +38,25 @@ public abstract class Entity {
     private final AABB sweptBounds = new AABB(0, 0, 0, 0);
 
     /** @return aktuelle X-Position im World-Space */
-    public float getPosX() { return posX; }
+    public float getPosX() {
+        return posX;
+    }
 
     /** @return aktuelle Y-Position im World-Space */
-    public float getPosY() { return posY; }
+    public float getPosY() {
+        return posY;
+    }
 
-    public Entity(int maxAnimations, float posX, float posY, float scaleX, float scaleY) {
+    public Entity(int maxAnimations, float initPosX, float initPosY, float initScaleX, float initScaleY) {
         this.animations = new Animation[maxAnimations];
-        this.posX   = posX;
-        this.posY   = posY;
-        this.scaleX = scaleX;
-        this.scaleY = scaleY;
+        this.posX   = initPosX;
+        this.posY   = initPosY;
+        this.scaleX = initScaleX;
+        this.scaleY = initScaleY;
         this.useAnimation = 0;
-        this.prevX  = posX;
-        this.prevY  = posY;
-        boundingBox = new AABB(posX - scaleX, posY - scaleY, posX + scaleX, posY + scaleY);
+        this.prevX  = initPosX;
+        this.prevY  = initPosY;
+        boundingBox = new AABB(initPosX - initScaleX, initPosY - initScaleY, initPosX + initScaleX, initPosY + initScaleY);
     }
 
     /**

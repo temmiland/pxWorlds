@@ -25,14 +25,22 @@ import java.util.List;
  */
 public class WorldSelectState extends GameState {
 
+    /** Logger dieser Klasse. */
     private static final Logger LOGGER = LoggerFactory.getLogger(WorldSelectState.class);
 
+    /** GUI für die Weltenauswahl. */
     private WorldSelectGui gui;
+    /** Referenz auf das Spielfenster. */
     private Window window;
+    /** Welt, deren Löschung noch bestätigt werden muss. */
     private WorldMeta pendingDeleteMeta;
+    /** Welt, die umbenannt werden soll. */
     private WorldMeta pendingRenameMeta;
+    /** Welt, die migriert werden soll. */
     private WorldMeta pendingMigrationMeta;
+    /** Backup-Welt, die migriert werden soll. */
     private WorldMeta pendingBackupMigrationMeta;
+    /** Fehlermeldung der letzten Migration (null = kein Fehler). */
     private String migrationError;
 
     public WorldSelectState(final GameStateManager gsm) {
@@ -113,7 +121,11 @@ public class WorldSelectState extends GameState {
                 gsm.startLevel(name);
             } catch (final Exception e) {
                 LOGGER.error("Migration fehlgeschlagen für '{}'", pendingMigrationMeta.name(), e);
-                migrationError = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+                if (e.getMessage() != null) {
+                    migrationError = e.getMessage();
+                } else {
+                    migrationError = e.getClass().getSimpleName();
+                }
                 pendingMigrationMeta = null;
                 init(window);
             }
@@ -201,7 +213,11 @@ public class WorldSelectState extends GameState {
                 gsm.startLevel(name);
             } catch (final Exception e) {
                 LOGGER.error("Migration fehlgeschlagen für '{}'", pendingBackupMigrationMeta.name(), e);
-                migrationError = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+                if (e.getMessage() != null) {
+                    migrationError = e.getMessage();
+                } else {
+                    migrationError = e.getClass().getSimpleName();
+                }
                 pendingBackupMigrationMeta = null;
                 init(window);
             }

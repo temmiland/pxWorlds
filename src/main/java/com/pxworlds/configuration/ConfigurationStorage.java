@@ -16,8 +16,8 @@ public class ConfigurationStorage {
         /** Profile-Konfiguration. */
         private ProfilesConfiguration profilesConfiguration;
 
-        public ConfigurationStorage(JsonConfig jsonConfig) {
-            this.jsonConfig = jsonConfig;
+        public ConfigurationStorage(JsonConfig newJsonConfig) {
+            this.jsonConfig = newJsonConfig;
         }
 
         public void init() {

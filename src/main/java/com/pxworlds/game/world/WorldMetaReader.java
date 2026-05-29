@@ -20,6 +20,7 @@ import java.util.zip.GZIPInputStream;
  */
 public final class WorldMetaReader {
 
+    /** Logger dieser Klasse. */
     private static final Logger LOGGER = LoggerFactory.getLogger(WorldMetaReader.class);
 
     private WorldMetaReader() { }
@@ -53,7 +54,7 @@ public final class WorldMetaReader {
 
             final String gameVersion;
             final long lastPlayed;
-            if (version >= 4) {
+            if (version >= WorldIO.FORMAT_VERSION) {
                 gameVersion = data.readUTF();
                 lastPlayed  = data.readLong();
             } else {
@@ -73,6 +74,12 @@ public final class WorldMetaReader {
 
     private static String stripExtension(final String filename) {
         final int dot = filename.lastIndexOf('.');
-        return dot > 0 ? filename.substring(0, dot) : filename;
+        final String result;
+        if (dot > 0) {
+            result = filename.substring(0, dot);
+        } else {
+            result = filename;
+        }
+        return result;
     }
 }

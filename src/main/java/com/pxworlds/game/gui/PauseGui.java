@@ -19,9 +19,9 @@ public class PauseGui extends Gui {
     /** Callback zum Fortsetzen des Spiels. */
     private final Runnable onResume;
 
-    public PauseGui(Window window, String tileSheetTexture, int amountOfTiles, Runnable onResume, Runnable onMainMenu) {
+    public PauseGui(Window window, String tileSheetTexture, int amountOfTiles, Runnable newOnResume, Runnable onMainMenu) {
         super(window, tileSheetTexture, amountOfTiles);
-        this.onResume = onResume;
+        this.onResume = newOnResume;
 
         final Button resumeButton = new Button(new Vector2f(0, RESUME_BUTTON_Y),
                 new Vector2f(BUTTON_WIDTH, BUTTON_HEIGHT), "Resume", onResume);

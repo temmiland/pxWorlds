@@ -37,7 +37,7 @@ public class Camera {
 	}
 
 	public void setProjection(int width, int height) {
-		float aspect = (float) width / height;
+		final float aspect = (float) width / height;
 		virtualHeight = referenceHeight;
 		virtualWidth  = (int) (referenceHeight * aspect);
 		projection = new Matrix4f().setOrtho2D(
@@ -46,15 +46,24 @@ public class Camera {
 	}
 
 	/** @return virtuelle Viewport-Breite (in Weltpixel-Einheiten) */
-	public int getVirtualWidth() { return virtualWidth; }
+	public int getVirtualWidth() {
+		return virtualWidth;
+	}
+
 	/** @return virtuelle Viewport-Höhe (in Weltpixel-Einheiten) */
-	public int getVirtualHeight() { return virtualHeight; }
+	public int getVirtualHeight() {
+		return virtualHeight;
+	}
 
 	public void setPosition(Vector3f newPosition) {
 		this.position.set(newPosition);
 	}
 
-	/** Setzt die Kamera-Position auf die angegebenen x/y-Werte (z bleibt unverändert). */
+	/**
+	 * Setzt die Kamera-Position auf die angegebenen x/y-Werte (z bleibt unverändert).
+	 * @param x neue X-Position
+	 * @param y neue Y-Position
+	 */
 	public void setPosition(final float x, final float y) {
 		this.position.set(x, y, this.position.z);
 	}

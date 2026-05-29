@@ -11,8 +11,8 @@ public class JsonConfig {
     /** Gson-Instanz für Serialisierung/Deserialisierung. */
     private final Gson gson;
 
-    public JsonConfig(Gson gson) {
-        this.gson = gson;
+    public JsonConfig(Gson newGson) {
+        this.gson = newGson;
     }
 
     public String generateConfigName(String configName) {

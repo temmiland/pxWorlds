@@ -6,7 +6,7 @@
 
     <groupId>com.pxworlds</groupId>
     <artifactId>pxWorlds</artifactId>
-    <version>0.3.1</version>
+    <version>0.3.2d</version>
 
     <properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

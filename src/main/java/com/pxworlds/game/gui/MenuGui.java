@@ -22,10 +22,13 @@ public class MenuGui extends Gui {
     private static final float OPTION_BUTTON_Y_POSITION = -145;
     /** Y-Position des Beenden-Buttons. */
     private static final float EXIT_BUTTON_Y_POSITION = -240;
-    /** Position und Größe des Debug-Buttons. */
+    /** X-Position des Debug-Buttons. */
     private static final float DBG_BTN_X = 250;
+    /** Y-Position des Debug-Buttons. */
     private static final float DBG_BTN_Y = -290;
+    /** Breite des Debug-Buttons. */
     private static final float DBG_BTN_W = 45;
+    /** Höhe des Debug-Buttons. */
     private static final float DBG_BTN_H = 14;
 
     public MenuGui(Window window, String tileSheetTexture, int amountOfTiles,

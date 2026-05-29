@@ -54,6 +54,10 @@ public final class WorldIO {
     public static final byte FORMAT_VERSION = 4;
     /** Älteste noch lesbare Format-Version. */
     private static final byte MIN_SUPPORTED_VERSION = 1;
+    /** Minimale Version mit Spawn-Punkt-Daten. */
+    private static final byte MIN_VERSION_SPAWN = 2;
+    /** Minimale Version mit gespeicherter Spielerposition. */
+    private static final byte MIN_VERSION_LAST_POS = 3;
     /** Byte-Wert der für Luft / kein Tile steht. */
     private static final byte AIR = (byte) -1;
     /** Short-Wert für „kein Spawn gesetzt". */
@@ -95,7 +99,11 @@ public final class WorldIO {
             for (int y = 0; y < world.getHeight(); y++) {
                 for (int x = 0; x < world.getWidth(); x++) {
                     final Tile tile = world.getTile(x, y);
-                    data.writeByte(tile != null ? tile.getId() : AIR);
+                    if (tile != null) {
+                        data.writeByte(tile.getId());
+                    } else {
+                        data.writeByte(AIR);
+                    }
                 }
             }
 
@@ -144,7 +152,7 @@ public final class WorldIO {
 
             // Version 4: Spielversion und Zeitstempel lesen (und verwerfen –
             // WorldMetaReader liest sie separat aus dem Header)
-            if (version >= 4) {
+            if (version >= FORMAT_VERSION) {
                 data.readUTF();  // gameVersion
                 data.readLong(); // lastPlayed
             }
@@ -165,7 +173,7 @@ public final class WorldIO {
             }
 
             // Version 2+: Spawn-Punkt
-            if (version >= 2) {
+            if (version >= MIN_VERSION_SPAWN) {
                 final int spawnX = data.readShort();
                 final int spawnY = data.readShort();
                 if (spawnX != NO_SPAWN && spawnY != NO_SPAWN) {
@@ -174,7 +182,7 @@ public final class WorldIO {
             }
 
             // Version 3+: Letztposition
-            if (version >= 3) {
+            if (version >= MIN_VERSION_LAST_POS) {
                 final float lastX = data.readFloat();
                 final float lastY = data.readFloat();
                 if (!Float.isNaN(lastX) && !Float.isNaN(lastY)) {

@@ -16,7 +16,9 @@ import java.io.File;
 public class NewWorldState extends GameState {
 
 
+    /** GUI für die Neue-Welt-Erstellung. */
     private NewWorldGui gui;
+    /** Referenz auf das Spielfenster. */
     private Window window;
 
     public NewWorldState(final GameStateManager gsm) {

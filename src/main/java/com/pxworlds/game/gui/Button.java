@@ -22,27 +22,41 @@ public class Button {
 	 * {@code baseCol} ist die Spalte im IDLE-Zustand; SELECTED addiert +3, CLICKED +6.
 	 * {@code row} ist die feste Zeile im Tilesheet (0=oben, 1=mitte, 2=unten).
 	 */
+	/** Anzahl Spalten pro Button-Zustand im Tilesheet. */
+	private static final int TILE_STATE_STRIDE = 3;
+
 	private enum ButtonTile {
+		/** Mittelfüll-Tile. */
 		FILL(1, 1),
+		/** Oberer Rand. */
 		TOP(1, 0),
+		/** Unterer Rand. */
 		BOTTOM(1, 2),
+		/** Linker Rand. */
 		LEFT(0, 1),
+		/** Rechter Rand. */
 		RIGHT(2, 1),
+		/** Ecke oben-links. */
 		CORNER_TOP_LEFT(0, 0),
+		/** Ecke oben-rechts. */
 		CORNER_TOP_RIGHT(2, 0),
+		/** Ecke unten-links. */
 		CORNER_BOTTOM_LEFT(0, 2),
+		/** Ecke unten-rechts. */
 		CORNER_BOTTOM_RIGHT(2, 2);
 
+		/** Basisspalte im IDLE-Zustand. */
 		final int baseCol;
+		/** Feste Zeile im Tilesheet. */
 		final int row;
 
-		ButtonTile(int baseCol, int row) {
-			this.baseCol = baseCol;
-			this.row = row;
+		ButtonTile(final int newBaseCol, final int newRow) {
+			this.baseCol = newBaseCol;
+			this.row = newRow;
 		}
 
 		int col(ButtonState state) {
-			return baseCol + state.ordinal() * 3;
+			return baseCol + state.ordinal() * TILE_STATE_STRIDE;
 		}
 	}
 
@@ -71,18 +85,18 @@ public class Button {
 	/** Transformationsmatrix für das Button-Rendering. */
 	private static Matrix4f transform = new Matrix4f();
 
-	public Button(Vector2f position, Vector2f scale, String label, Runnable onClick) {
+	public Button(Vector2f position, Vector2f scale, String newLabel, Runnable newOnClick) {
 		this.boundingBox = new AABB(
 			position.x - scale.x, position.y - scale.y,
 			position.x + scale.x, position.y + scale.y
 		);
-		this.label = label;
-		this.onClick = onClick;
+		this.label = newLabel;
+		this.onClick = newOnClick;
 		selectedState = ButtonState.IDLE;
 	}
 
-	public Button(Vector2f position, Vector2f scale, String label) {
-		this(position, scale, label, null);
+	public Button(Vector2f position, Vector2f scale, String newLabel) {
+		this(position, scale, newLabel, null);
 	}
 
 	public Button(Vector2f position, Vector2f scale) {
@@ -149,6 +163,7 @@ public class Button {
 	/**
 	 * Rendert den Button-Label-Text zentriert über dem Button.
 	 * Nutzt STBEasyFont (gleicher Font wie das Debug-Overlay).
+	 * @param camera aktive GUI-Kamera
 	 */
 	private void renderLabel(final Camera camera) {
 		if (label == null || label.isEmpty()) {

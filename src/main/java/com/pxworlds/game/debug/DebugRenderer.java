@@ -33,13 +33,17 @@ public final class DebugRenderer {
     /** Privater Konstruktor — statische Utility-Klasse, nicht instanziierbar. */
     private DebugRenderer() { }
 
-    /** Schattenfarbe: dunkelgrau, wirkt leicht transparent auf jedem Hintergrund. */
+    /** Schattenfarbe Rot: dunkelgrau, wirkt leicht transparent auf jedem Hintergrund. */
     private static final float SHADOW_R = 0.1f;
+    /** Schattenfarbe Grün. */
     private static final float SHADOW_G = 0.1f;
+    /** Schattenfarbe Blau. */
     private static final float SHADOW_B = 0.1f;
-    /** Vordergrundfarbe: weiß. */
+    /** Vordergrundfarbe Rot: weiß. */
     private static final float FG_R = 1.0f;
+    /** Vordergrundfarbe Grün. */
     private static final float FG_G = 1.0f;
+    /** Vordergrundfarbe Blau. */
     private static final float FG_B = 1.0f;
     /** Schatten-Pixel-Offset in Font-Koordinaten (vor TEXT_SCALE). */
     private static final float SHADOW_OFFSET = 1.0f;

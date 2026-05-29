@@ -32,7 +32,9 @@ public class TextInput {
      */
     public static final int MAX_LENGTH = 18;
 
+    /** Schrift-Skalierungsfaktor für die Texteingabe. */
     private static final float FONT_SCALE  = 2.5f;
+    /** Höhe einer Textzeile in STBEasyFont-Einheiten. */
     private static final float FONT_HEIGHT = 7.0f;
     /** Cursor-Blinkintervall in Sekunden. */
     private static final float BLINK_INTERVAL = 0.5f;
@@ -44,24 +46,29 @@ public class TextInput {
     /** Rahmendicke in virtuellen Einheiten. */
     private static final float BORDER = 2f;
 
+    /** Mittelpunkt des Felds in GUI-Koordinaten. */
     private final Vector2f position;
+    /** Halbe Breite/Höhe des Felds. */
     private final Vector2f halfExtent;
+    /** Aktuell eingegebener Text. */
     private final StringBuilder value = new StringBuilder();
+    /** Akkumulierte Zeit für das Cursor-Blinken. */
     private float blinkTimer;
+    /** Ob der Cursor gerade sichtbar ist. */
     private boolean cursorVisible = true;
 
     /** Callback bei Enter-Taste (Eingabe bestätigen). */
     private final Runnable onConfirm;
 
     /**
-     * @param position   Mittelpunkt des Felds in GUI-Koordinaten
-     * @param halfExtent Halbe Breite/Höhe des Felds
-     * @param onConfirm  Callback bei Enter – erhält den aktuellen Wert via {@link #getValue()}
+     * @param newPosition   Mittelpunkt des Felds in GUI-Koordinaten
+     * @param newHalfExtent Halbe Breite/Höhe des Felds
+     * @param newOnConfirm  Callback bei Enter – erhält den aktuellen Wert via {@link #getValue()}
      */
-    public TextInput(final Vector2f position, final Vector2f halfExtent, final Runnable onConfirm) {
-        this.position   = position;
-        this.halfExtent = halfExtent;
-        this.onConfirm  = onConfirm;
+    public TextInput(final Vector2f newPosition, final Vector2f newHalfExtent, final Runnable newOnConfirm) {
+        this.position   = newPosition;
+        this.halfExtent = newHalfExtent;
+        this.onConfirm  = newOnConfirm;
     }
 
     /**
@@ -164,7 +171,13 @@ public class TextInput {
         glLoadIdentity();
         glScalef(FONT_SCALE, FONT_SCALE, 1f);
 
-        final String display = value.toString() + (cursorVisible ? "|" : " ");
+        final String cursor;
+        if (cursorVisible) {
+            cursor = "|";
+        } else {
+            cursor = " ";
+        }
+        final String display = value.toString() + cursor;
         final float scaledH  = FONT_HEIGHT * FONT_SCALE;
         // Vertical center within the field
         final float textY = (-cy - scaledH / 2.0f + vh / 2.0f) / FONT_SCALE;
@@ -191,7 +204,10 @@ public class TextInput {
         resetCursor();
     }
 
-    /** Setzt den Inhalt des Felds; erlaubte Zeichen werden gefiltert. */
+    /**
+     * Setzt den Inhalt des Felds; erlaubte Zeichen werden gefiltert.
+     * @param text neuer Inhalt
+     */
     public void setValue(final String text) {
         value.setLength(0);
         text.codePoints()
@@ -214,7 +230,10 @@ public class TextInput {
                 || cp == '-';
     }
 
-    /** Pixel-Breite des aktuellen Textes in STBEasyFont-Einheiten × FONT_SCALE. */
+    /**
+     * Pixel-Breite des aktuellen Textes in STBEasyFont-Einheiten × FONT_SCALE.
+     * @return skalierte Textbreite
+     */
     @SuppressWarnings("unused")
     public float getTextWidth() {
         return STBEasyFont.stb_easy_font_width(value.toString()) * FONT_SCALE;

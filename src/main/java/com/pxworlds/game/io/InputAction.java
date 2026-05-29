@@ -40,8 +40,8 @@ public enum InputAction {
     /** Standard-GLFW-Keycode für diese Aktion. */
     private final int defaultKey;
 
-    InputAction(final int defaultKey) {
-        this.defaultKey = defaultKey;
+    InputAction(final int key) {
+        this.defaultKey = key;
     }
 
     /** @return Standard-GLFW-Keycode für diese Aktion */

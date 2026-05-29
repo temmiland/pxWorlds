@@ -43,7 +43,9 @@ public class World {
 
     /** Tile-Kacheln links/rechts/oben/unten außerhalb des berechneten Viewports rendern. */
     static final int VIEW_OFFSET   = 4;
+    /** Divisor für Halbe-Berechnung (2 = halbieren). */
     static final int HALF_DIVISOR  = 2;
+    /** Zusätzlicher Tile-Offset für die Render-Grenze. */
     static final int RENDER_OFFSET = 1;
 
     /** AABB-Halb-Ausdehnung für solid Tiles (= TILE_SIZE / 2). */
@@ -57,16 +59,18 @@ public class World {
     // -------------------------------------------------------------------------
     // Felder
 
-    /** Breite/Höhe der Welt in Tiles. */
+    /** Weltbreite in Tiles. */
     private int width;
+    /** Welthöhe in Tiles. */
     private int height;
     /** World-Scale (Pixel-Multiplikator). */
     private int scale;
 
     /** Chunk-Grid [chunkX][chunkY]. */
     private Chunk[][] chunks;
-    /** Anzahl Chunks horizontal / vertikal. */
+    /** Anzahl Chunks horizontal. */
     private int chunkCountX;
+    /** Anzahl Chunks vertikal. */
     private int chunkCountY;
 
     // kein boundingBoxes-Array mehr — AABBs werden in getCollidingBoxes on-the-fly erzeugt
@@ -77,33 +81,42 @@ public class World {
     /** Listener die bei Tile-Änderungen benachrichtigt werden. */
     private final List<WorldListener> listeners = new ArrayList<>();
 
-    /** Viewportgröße in Tiles — berechnet in {@link #calculateView}. */
+    /** Viewportgröße in Tiles horizontal — berechnet in {@link #calculateView}. */
     private int viewX;
+    /** Viewportgröße in Tiles vertikal — berechnet in {@link #calculateView}. */
     private int viewY;
 
     /** World-Transform-Matrix (Skalierung um {@link #scale}). */
     private Matrix4f world;
 
-    // Scratch-Objekte — vermeiden Heap-Allokationen im Hot-Path
+    /** Anzahl Debug-Zeilen (Tile, Chunk, Stats). */
+    private static final int DEBUG_LINE_COUNT = 3;
+
+    /** Scratch-Liste für Kollisionsabfragen — vermeidet Heap-Allokation im Hot-Path. */
     private final List<AABB>   scratchColliders = new ArrayList<>();
-    /** Reusable array for getDebugLines() — avoids per-frame String[] allocation. */
-    private final String[]     debugLines       = new String[3];
+    /** Wiederverwendbares Array für getDebugLines() — vermeidet per-Frame-Allokation. */
+    private final String[]     debugLines       = new String[DEBUG_LINE_COUNT];
 
     /**
      * Unsichtbare Grenz-Wände an den vier Welträndern —
      * verhindern, dass Entities die Welt verlassen.
      * Werden einmalig in {@link #initBoundaries()} erzeugt.
      */
+    /** Linke Grenz-Wand. */
     private AABB boundaryLeft;
+    /** Rechte Grenz-Wand. */
     private AABB boundaryRight;
+    /** Obere Grenz-Wand. */
     private AABB boundaryTop;
+    /** Untere Grenz-Wand. */
     private AABB boundaryBottom;
 
     /** Spawn-Punkt und Letztposition des Spielers. */
     private final PlayerSpawnState spawnState = new PlayerSpawnState();
 
-    // Debug-Statistiken — aktualisiert in render()
+    /** Anzahl gerenderter Chunks im letzten Frame. */
     private int lastRenderedChunks = 0;
+    /** Anzahl neu gebauter Chunks im letzten Frame. */
     private int lastRebuiltChunks  = 0;
 
     // -------------------------------------------------------------------------
@@ -336,6 +349,10 @@ public class World {
     /**
      * Gibt das Tile an der globalen Position zurück oder {@code null} für Luft
      * bzw. außerhalb der Welt.
+     *
+     * @param x globale X-Tile-Koordinate
+     * @param y globale Y-Tile-Koordinate
+     * @return Tile oder {@code null}
      */
     public Tile getTile(final int x, final int y) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
@@ -383,10 +400,18 @@ public class World {
         scratchColliders.clear();
 
         // Weltgrenz-Wände — verhindern, dass Entities den Welt-Bereich verlassen
-        if (area.minX < boundaryLeft.maxX)   { scratchColliders.add(boundaryLeft);   }
-        if (area.maxX > boundaryRight.minX)  { scratchColliders.add(boundaryRight);  }
-        if (area.maxY > boundaryTop.minY)    { scratchColliders.add(boundaryTop);    }
-        if (area.minY < boundaryBottom.maxY) { scratchColliders.add(boundaryBottom); }
+        if (area.minX < boundaryLeft.maxX) {
+            scratchColliders.add(boundaryLeft);
+        }
+        if (area.maxX > boundaryRight.minX) {
+            scratchColliders.add(boundaryRight);
+        }
+        if (area.maxY > boundaryTop.minY) {
+            scratchColliders.add(boundaryTop);
+        }
+        if (area.minY < boundaryBottom.maxY) {
+            scratchColliders.add(boundaryBottom);
+        }
 
         final int x0 = (int) Math.floor( area.minX / Constants.TILE_SIZE) - 1;
         final int x1 = (int) Math.ceil(  area.maxX / Constants.TILE_SIZE) + 1;
@@ -422,22 +447,44 @@ public class World {
     }
 
     /** @return Weltbreite in Tiles */
-    public int getWidth()  { return width;  }
+    public int getWidth() {
+        return width;
+    }
+
     /** @return Welthöhe in Tiles */
-    public int getHeight() { return height; }
+    public int getHeight() {
+        return height;
+    }
+
     /** @return World-Scale (Pixel-Multiplikator) */
-    public int getScale()  { return scale;  }
+    public int getScale() {
+        return scale;
+    }
 
     /** @return last viewport X-range in tiles (for {@link WorldDebugRenderer}) */
-    int getViewX() { return viewX; }
+    int getViewX() {
+        return viewX;
+    }
+
     /** @return last viewport Y-range in tiles (for {@link WorldDebugRenderer}) */
-    int getViewY() { return viewY; }
+    int getViewY() {
+        return viewY;
+    }
+
     /** @return number of chunks horizontally (for {@link WorldDebugRenderer}) */
-    int getChunkCountX() { return chunkCountX; }
+    int getChunkCountX() {
+        return chunkCountX;
+    }
+
     /** @return number of chunks vertically (for {@link WorldDebugRenderer}) */
-    int getChunkCountY() { return chunkCountY; }
+    int getChunkCountY() {
+        return chunkCountY;
+    }
+
     /** @return unmodifiable view of the entity list (for {@link WorldDebugRenderer}) */
-    List<Entity> getEntities() { return Collections.unmodifiableList(entities); }
+    List<Entity> getEntities() {
+        return Collections.unmodifiableList(entities);
+    }
 
     /**
      * Liefert Debug-Zeilen über den aktuellen Welt-Zustand:
@@ -524,28 +571,45 @@ public class World {
     }
 
     /** @return Spawn-Tile-X oder {@value #NO_SPAWN} wenn kein Spawn gesetzt. */
-    public int getSpawnTileX() { return spawnState.getSpawnTileX(); }
+    public int getSpawnTileX() {
+        return spawnState.getSpawnTileX();
+    }
+
     /** @return Spawn-Tile-Y oder {@value #NO_SPAWN} wenn kein Spawn gesetzt. */
-    public int getSpawnTileY() { return spawnState.getSpawnTileY(); }
+    public int getSpawnTileY() {
+        return spawnState.getSpawnTileY();
+    }
 
     /**
      * Setzt den Spawn-Punkt direkt (in Tile-Koordinaten).
      * Wird von {@link WorldIO} nach dem Laden einer Version-2/3-Datei aufgerufen.
+     * @param tileX Spawn-Tile-X
+     * @param tileY Spawn-Tile-Y
      */
     public void setSpawn(final int tileX, final int tileY) {
         spawnState.setSpawn(tileX, tileY);
     }
 
     /** @return letzte gespeicherte X-Position oder {@link Float#NaN} wenn nicht gesetzt. */
-    public float getLastSavedPosX() { return spawnState.getLastSavedPosX(); }
+    public float getLastSavedPosX() {
+        return spawnState.getLastSavedPosX();
+    }
+
     /** @return letzte gespeicherte Y-Position oder {@link Float#NaN} wenn nicht gesetzt. */
-    public float getLastSavedPosY() { return spawnState.getLastSavedPosY(); }
+    public float getLastSavedPosY() {
+        return spawnState.getLastSavedPosY();
+    }
+
     /** @return {@code true} wenn eine Letztposition gespeichert wurde. */
-    public boolean hasLastPos() { return spawnState.hasLastPos(); }
+    public boolean hasLastPos() {
+        return spawnState.hasLastPos();
+    }
 
     /**
      * Setzt die Letztposition direkt (in Entity-World-Space-Koordinaten).
      * Wird von {@link WorldIO} nach dem Laden einer Version-3-Datei aufgerufen.
+     * @param x X-Position im Entity-World-Space
+     * @param y Y-Position im Entity-World-Space
      */
     public void setLastPos(final float x, final float y) {
         spawnState.setLastPos(x, y);

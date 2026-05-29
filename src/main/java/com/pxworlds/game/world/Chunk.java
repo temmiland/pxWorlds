@@ -50,6 +50,9 @@ public class Chunk {
     /** UV-Offset in Bytes (nach x, y). */
     private static final long UV_OFFSET      = 2L * Float.BYTES;
 
+    /** Index des v1-Eintrags im UV-Array ({u0, v0, u1, v1}). */
+    private static final int UV_V1_INDEX = 3;
+
     /**
      * Sentinel-Wert für "kein Tile gesetzt" in {@link #tiles}.
      * Tile-IDs beginnen bei 0 — daher eignet sich -1 als sicherer Sentinel
@@ -76,9 +79,9 @@ public class Chunk {
 
     // -------------------------------------------------------------------------
 
-    public Chunk(final int chunkX, final int chunkY) {
-        this.chunkX = chunkX;
-        this.chunkY = chunkY;
+    public Chunk(final int newChunkX, final int newChunkY) {
+        this.chunkX = newChunkX;
+        this.chunkY = newChunkY;
 
         tiles = new byte[SIZE * SIZE];
         Arrays.fill(tiles, EMPTY);
@@ -101,12 +104,20 @@ public class Chunk {
      * @param tile    zu setzendes Tile oder {@code null} für Luft
      */
     public void setTile(final int localX, final int localY, final Tile tile) {
-        tiles[localX + localY * SIZE] = (tile != null) ? tile.getId() : EMPTY;
+        if (tile != null) {
+            tiles[localX + localY * SIZE] = tile.getId();
+        } else {
+            tiles[localX + localY * SIZE] = EMPTY;
+        }
         dirty = true;
     }
 
     /**
      * Gibt das Tile an der lokalen Position zurück oder {@code null} für Luft.
+     *
+     * @param localX X innerhalb des Chunks (0..SIZE-1)
+     * @param localY Y innerhalb des Chunks (0..SIZE-1)
+     * @return Tile oder {@code null} für Luft
      */
     public Tile getTile(final int localX, final int localY) {
         final byte id = tiles[localX + localY * SIZE];
@@ -210,7 +221,7 @@ public class Chunk {
                 final float u0 = uv[0]; // linke UV-Kante des Tiles im Atlas
                 final float v0 = uv[1]; // obere  UV-Kante
                 final float u1 = uv[2]; // rechte UV-Kante
-                final float v1 = uv[3]; // untere UV-Kante
+                final float v1 = uv[UV_V1_INDEX]; // untere UV-Kante
 
                 // Dreieck 1: TL → TR → BR
                 buf[idx++] = x0; buf[idx++] = y1; buf[idx++] = u0; buf[idx++] = v0;

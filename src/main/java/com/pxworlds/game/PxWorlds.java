@@ -81,7 +81,10 @@ public class PxWorlds {
 		}
 	}
 
-	/** Initialises OpenGL capabilities and base render state for the given window. */
+	/**
+	 * Initialises OpenGL capabilities and base render state for the given window.
+	 * @param window das initialisierte GLFW-Fenster
+	 */
 	private void initOpenGL(final Window window) {
 		GL.createCapabilities();
 		glEnable(GL_BLEND);
