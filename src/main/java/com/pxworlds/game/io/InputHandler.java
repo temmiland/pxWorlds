@@ -1,5 +1,6 @@
 package com.pxworlds.game.io;
 
+import org.lwjgl.glfw.GLFWCharCallback;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
@@ -11,6 +12,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
+import static org.lwjgl.glfw.GLFW.glfwSetCharCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
@@ -49,6 +51,11 @@ public class InputHandler {
      * damit der InputProcessor stuck keys zurücksetzen kann.
      */
     private GLFWWindowFocusCallback windowFocusCallback;
+    /**
+     * Char-Callback — liefert Unicode-Codepoints für Texteingaben (TextInput-Widget).
+     * Wird nur für printbare Zeichen gefeuert, nicht für Sondertasten wie Backspace.
+     */
+    private GLFWCharCallback charCallback;
 
     /**
      * Registriert die GLFW-Callbacks für das angegebene Fenster-Handle.
@@ -92,10 +99,15 @@ public class InputHandler {
             }
         });
 
+        charCallback = GLFWCharCallback.create((win, codepoint) ->
+            eventQueue.add(InputEvent.charTyped(codepoint))
+        );
+
         glfwSetKeyCallback(handle, keyCallback);
         glfwSetMouseButtonCallback(handle, mouseButtonCallback);
         glfwSetCursorPosCallback(handle, cursorPosCallback);
         glfwSetWindowFocusCallback(handle, windowFocusCallback);
+        glfwSetCharCallback(handle, charCallback);
     }
 
     /**
@@ -121,6 +133,7 @@ public class InputHandler {
         glfwSetMouseButtonCallback(windowHandle, null);
         glfwSetCursorPosCallback(windowHandle, null);
         glfwSetWindowFocusCallback(windowHandle, null);
+        glfwSetCharCallback(windowHandle, null);
 
         // Dann die LWJGL-Wrapper-Objekte freigeben
         if (keyCallback != null) {
@@ -138,6 +151,10 @@ public class InputHandler {
         if (windowFocusCallback != null) {
             windowFocusCallback.free();
             windowFocusCallback = null;
+        }
+        if (charCallback != null) {
+            charCallback.free();
+            charCallback = null;
         }
     }
 }

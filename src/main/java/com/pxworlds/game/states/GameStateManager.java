@@ -22,15 +22,35 @@ public class GameStateManager {
         // Setzt den BrandState als erster State nach dem Erstellen
         currentState = 0;
 
-        gameStates.add(new BrandState(this)); // gameState 0
-        gameStates.add(new MenuState(this));  // gameState 1
-        gameStates.add(new LevelState(this, "test_level"));      // gameState 2
+        gameStates.add(new BrandState(this));           // 0 – BRAND
+        gameStates.add(new MenuState(this));            // 1 – MENU
+        gameStates.add(new LevelState(this, null));     // 2 – LEVEL (Welt wird via startLevel gesetzt)
+        gameStates.add(new WorldSelectState(this));     // 3 – WORLD_SELECT
+        gameStates.add(new NewWorldState(this));        // 4 – NEW_WORLD
 
     }
 
     public void setState(GameStateType state) {
         currentState = state.getIndex();
         gameStates.get(currentState).init(window);
+    }
+
+    /**
+     * Setzt die Zielwelt und wechselt in den {@link LevelState}.
+     * Ersetzt den bestehenden LevelState durch eine frische Instanz mit dem neuen Weltnamen,
+     * sodass alte OpenGL-Ressourcen korrekt freigegeben werden.
+     *
+     * @param worldName Weltname ohne {@code .pxwl}-Endung
+     */
+    public void startLevel(final String worldName) {
+        gameStates.set(GameStateType.LEVEL.getIndex(), new LevelState(this, worldName));
+        setState(GameStateType.LEVEL);
+    }
+
+    public void showMigrationError(final String message) {
+        ((WorldSelectState) gameStates.get(GameStateType.WORLD_SELECT.getIndex()))
+                .setMigrationError(message);
+        setState(GameStateType.WORLD_SELECT);
     }
 
     public void init(Window newWindow) {

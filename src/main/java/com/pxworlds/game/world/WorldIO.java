@@ -1,5 +1,6 @@
 package com.pxworlds.game.world;
 
+import com.pxworlds.Constants;
 import com.pxworlds.game.rendering.tiles.Tile;
 
 import java.io.DataInputStream;
@@ -14,45 +15,43 @@ import java.util.zip.GZIPOutputStream;
 /**
  * Serialisiert und deserialisiert Welten in einem kompakten GZIP-Binärformat.
  *
- * <h3>Format-Spezifikation (Version 3)</h3>
+ * <h3>Format-Spezifikation (Version 4)</h3>
  * <pre>
  *  Offset        Länge  Typ      Inhalt
  *  ────────────  ─────  ───────  ──────────────────────────────────────────────
  *             0      4  byte[]   Magic "PXWL"
- *             4      1  byte     Format-Version (3)
+ *             4      1  byte     Format-Version (4)
  *             5      2  short    Weltbreite in Tiles
  *             7      2  short    Welthöhe in Tiles
  *             9      2  short    Scale (Pixel-Multiplikator)
- *            11  W × H  byte[]   Tile-IDs, Zeilenweise (y=0..H-1, x=0..W-1)
+ *            11  2+n    String   Spielversion (Java-UTF: 2-Byte-Länge + UTF-8-Bytes)
+ *         11+2+n      8  long     Zeitstempel des letzten Speicherns (Unix ms)
+ *  19+n       W × H  byte[]   Tile-IDs, Zeilenweise (y=0..H-1, x=0..W-1)
  *                                  0xFF (= byte -1) → Luft / kein Tile
  *                                  0x00..0xFE      → registrierte Tile-ID
- *  11 + W×H       2  short    Spawn-Tile-X (−1 = kein Spawn gesetzt)
- *  13 + W×H       2  short    Spawn-Tile-Y (−1 = kein Spawn gesetzt)
- *  15 + W×H       4  float    letzte Spieler-X-Position (NaN = nicht gesetzt)
- *  19 + W×H       4  float    letzte Spieler-Y-Position (NaN = nicht gesetzt)
+ *  …              2  short    Spawn-Tile-X (−1 = kein Spawn gesetzt)
+ *  …              2  short    Spawn-Tile-Y (−1 = kein Spawn gesetzt)
+ *  …              4  float    letzte Spieler-X-Position (NaN = nicht gesetzt)
+ *  …              4  float    letzte Spieler-Y-Position (NaN = nicht gesetzt)
  * </pre>
  *
  * <h3>Rückwärtskompatibilität</h3>
  * <ul>
  *   <li><b>Version 1</b> — nur Tiles; Spawn und Letztposition bleiben ungesetzt.</li>
  *   <li><b>Version 2</b> — Tiles + Spawn-Shorts; Letztposition bleibt ungesetzt.</li>
- *   <li><b>Version 3</b> — Tiles + Spawn + Letztposition (aktuelles Format).</li>
+ *   <li><b>Version 3</b> — Tiles + Spawn + Letztposition.</li>
+ *   <li><b>Version 4</b> — wie v3, plus Spielversion-String und Letztspiel-Zeitstempel
+ *       (zwischen Dimensionen und Tiles) → Header-Only-Reader möglich.</li>
  * </ul>
  *
  * <p>Der gesamte Inhalt ist GZIP-komprimiert.</p>
- *
- * <h3>Hinweise für Future-Proofing</h3>
- * <ul>
- *   <li>Tile-IDs müssen zwischen Speichern und Laden identisch registriert sein.</li>
- *   <li>Weitere Entity-Typen: Version auf 4 erhöhen und eine Entity-Sektion anhängen.</li>
- * </ul>
  */
 public final class WorldIO {
 
     /** Magic bytes zur Formatidentifikation. */
-    private static final byte[] MAGIC = {'P', 'X', 'W', 'L'};
+    static final byte[] MAGIC = {'P', 'X', 'W', 'L'};
     /** Aktuelle Format-Version. Erhöhen bei inkompatiblen Änderungen. */
-    private static final byte FORMAT_VERSION = 3;
+    public static final byte FORMAT_VERSION = 4;
     /** Älteste noch lesbare Format-Version. */
     private static final byte MIN_SUPPORTED_VERSION = 1;
     /** Byte-Wert der für Luft / kein Tile steht. */
@@ -87,6 +86,11 @@ public final class WorldIO {
             data.writeShort(world.getWidth());
             data.writeShort(world.getHeight());
             data.writeShort(world.getScale());
+
+            // Version 4: Spielversion und Zeitstempel (vor den Tiles, damit WorldMetaReader
+            // sie ohne vollständigen Tile-Load lesen kann)
+            data.writeUTF(Constants.VERSION);
+            data.writeLong(System.currentTimeMillis());
 
             for (int y = 0; y < world.getHeight(); y++) {
                 for (int x = 0; x < world.getWidth(); x++) {
@@ -137,6 +141,13 @@ public final class WorldIO {
             final int width  = data.readShort();
             final int height = data.readShort();
             final int scale  = data.readShort();
+
+            // Version 4: Spielversion und Zeitstempel lesen (und verwerfen –
+            // WorldMetaReader liest sie separat aus dem Header)
+            if (version >= 4) {
+                data.readUTF();  // gameVersion
+                data.readLong(); // lastPlayed
+            }
 
             final World world = new World(width, height, scale);
 

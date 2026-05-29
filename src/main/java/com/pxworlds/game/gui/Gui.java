@@ -16,8 +16,8 @@ public class Gui {
     private Window window;
     /** Shader für das Rendering. */
     private Shader shader;
-    /** Kamera für das Rendering. */
-    private Camera camera;
+    /** Kamera für das Rendering (protected – Subklassen können eigene Overlays rendern). */
+    protected Camera camera;
     /** TileSheet für GUI-Elemente. */
     private TileSheet sheet;
 

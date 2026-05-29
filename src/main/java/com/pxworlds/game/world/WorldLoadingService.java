@@ -61,6 +61,38 @@ public final class WorldLoadingService {
         }
     }
 
+    /** Name der gebündelten Vorlage für neue Welten. */
+    private static final String TEMPLATE_WORLD = "test_level";
+
+    /**
+     * Erstellt eine neue Welt als Kopie der gebündelten Vorlage ({@value #TEMPLATE_WORLD}).
+     *
+     * <p>Die Vorlage wird aus dem Classpath geladen und unter dem neuen Namen gespeichert.
+     * Spawn-Punkt und Tiles der Vorlage bleiben erhalten.
+     * Fällt die Vorlage weg, wird eine leere 64×20-Welt als Fallback erstellt.</p>
+     *
+     * @param worldName Weltname ohne Dateiendung
+     */
+    public static void createNew(final String worldName) {
+        try (InputStream s = WorldLoadingService.class
+                .getResourceAsStream("/levels/" + TEMPLATE_WORLD + ".pxwl")) {
+            if (s != null) {
+                final World world = WorldIO.load(s);
+                save(world, worldName);
+                LOGGER.info("Neue Welt '{}' aus Vorlage '{}' erstellt.", worldName, TEMPLATE_WORLD);
+                return;
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Vorlage '{}' konnte nicht geladen werden, erstelle leere Welt: {}",
+                    TEMPLATE_WORLD, e.getMessage());
+        }
+        // Fallback: leere Welt mit Spawn in der Mitte
+        final World fallback = new World(64, 20, 16);
+        fallback.setSpawn(32, 10);
+        save(fallback, worldName);
+        LOGGER.info("Neue leere Welt '{}' (Fallback) erstellt.", worldName);
+    }
+
     /**
      * Speichert die Welt nach {@link Constants#WORLDS_DIRECTORY_PATH} als {@code <worldName>.pxwl},
      * dabei wird zuerst die aktuelle Spielerposition gespeichert.

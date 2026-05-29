@@ -1,9 +1,12 @@
 package com.pxworlds.game.io;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_BACKSPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F3;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_F4;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
@@ -26,7 +29,13 @@ public enum InputAction {
     /** LEFT_SHIFT – Sprint aktivieren. */
     SPRINT(GLFW_KEY_LEFT_SHIFT),
     /** F3 – Debug-Overlay umschalten. */
-    DEBUG_TOGGLE(GLFW_KEY_F3);
+    DEBUG_TOGGLE(GLFW_KEY_F3),
+    /** F4 – Debug-UI umschalten (nur Dev-Mode). */
+    DEBUG_UI_TOGGLE(GLFW_KEY_F4),
+    /** BACKSPACE – letztes Zeichen löschen (Texteingabe). */
+    BACKSPACE(GLFW_KEY_BACKSPACE),
+    /** ENTER – Eingabe bestätigen. */
+    CONFIRM(GLFW_KEY_ENTER);
 
     /** Standard-GLFW-Keycode für diese Aktion. */
     private final int defaultKey;

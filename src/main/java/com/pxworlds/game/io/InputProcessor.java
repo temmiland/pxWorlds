@@ -2,7 +2,9 @@ package com.pxworlds.game.io;
 
 import org.joml.Vector2f;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
@@ -35,6 +37,8 @@ public class InputProcessor {
     private final Set<Integer> heldMouseButtons = new HashSet<>();
     /** Maustasten, die in diesem Tick das erste Mal gedrückt wurden. */
     private final Set<Integer> pressedMouseButtonsThisTick = new HashSet<>();
+    /** Unicode-Zeichen die in diesem Tick getippt wurden (für TextInput-Widgets). */
+    private final List<Integer> typedCodepoints = new ArrayList<>();
 
     /** Letzte bekannte Cursor-X-Position in GLFW-Bildschirmkoordinaten (von oben links). */
     private double rawMouseX;
@@ -61,6 +65,7 @@ public class InputProcessor {
     public void processEvents(final Queue<InputEvent> eventQueue) {
         pressedThisTick.clear();
         pressedMouseButtonsThisTick.clear();
+        typedCodepoints.clear();
 
         InputEvent event;
         while ((event = eventQueue.poll()) != null) {
@@ -87,6 +92,9 @@ public class InputProcessor {
                     heldKeys.clear();
                     heldMouseButtons.clear();
                     pressedMouseButtonsThisTick.clear();
+                    break;
+                case CHAR_TYPED:
+                    typedCodepoints.add(event.getCodepoint());
                     break;
                 default:
                     break;
@@ -158,6 +166,20 @@ public class InputProcessor {
         final float centeredX = (float) rawMouseX - (windowWidth / 2.0f);
         final float centeredY = -((float) rawMouseY - (windowHeight / 2.0f));
         return new Vector2f(centeredX, centeredY);
+    }
+
+    // --- Texteingabe ---
+
+    /**
+     * Gibt die Liste der in diesem Tick getippten Unicode-Codepoints zurück.
+     * Wird pro Tick von {@link #processEvents} geleert und neu befüllt.
+     * Nur printbare Zeichen (via GLFW-Char-Callback) sind enthalten —
+     * Sondertasten wie Backspace erscheinen hier nicht.
+     *
+     * @return unveränderliche Sicht auf die Codepoint-Liste für diesen Tick
+     */
+    public List<Integer> getTypedCodepoints() {
+        return typedCodepoints;
     }
 
     // --- Bewegungs-Abfragen (GLFW-freie API für Entities) ---

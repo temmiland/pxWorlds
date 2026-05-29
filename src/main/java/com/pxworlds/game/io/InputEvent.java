@@ -26,7 +26,9 @@ public final class InputEvent {
          * {@link com.pxworlds.game.io.InputProcessor} löscht beim Empfang alle
          * gedrückt-gehaltenen Tasten und Maustasten, damit keine Keys „stecken" bleiben.
          */
-        FOCUS_LOST
+        FOCUS_LOST,
+        /** Ein Unicode-Zeichen wurde getippt (via GLFW-Char-Callback, für Texteingaben). */
+        CHAR_TYPED
     }
 
     /** Typ dieses Events. */
@@ -39,18 +41,22 @@ public final class InputEvent {
     private final double mouseX;
     /** Cursor-Y in Bildschirmkoordinaten (nur bei Maus-Events relevant). */
     private final double mouseY;
+    /** Unicode-Codepoint des getippten Zeichens (nur bei CHAR_TYPED relevant). */
+    private final int codepoint;
 
     private InputEvent(
             final Type eventType,
             final int eventKeyCode,
             final int eventMouseButton,
             final double eventMouseX,
-            final double eventMouseY) {
+            final double eventMouseY,
+            final int eventCodepoint) {
         this.type = eventType;
         this.keyCode = eventKeyCode;
         this.mouseButton = eventMouseButton;
         this.mouseX = eventMouseX;
         this.mouseY = eventMouseY;
+        this.codepoint = eventCodepoint;
     }
 
     // --- Factory-Methoden ---
@@ -61,7 +67,7 @@ public final class InputEvent {
      * @return neues {@code InputEvent}
      */
     public static InputEvent keyDown(final int eventKeyCode) {
-        return new InputEvent(Type.KEY_DOWN, eventKeyCode, -1, 0, 0);
+        return new InputEvent(Type.KEY_DOWN, eventKeyCode, -1, 0, 0, 0);
     }
 
     /**
@@ -70,7 +76,7 @@ public final class InputEvent {
      * @return neues {@code InputEvent}
      */
     public static InputEvent keyUp(final int eventKeyCode) {
-        return new InputEvent(Type.KEY_UP, eventKeyCode, -1, 0, 0);
+        return new InputEvent(Type.KEY_UP, eventKeyCode, -1, 0, 0, 0);
     }
 
     /**
@@ -84,7 +90,7 @@ public final class InputEvent {
             final int button,
             final double eventMouseX,
             final double eventMouseY) {
-        return new InputEvent(Type.MOUSE_PRESS, GLFW_KEY_UNKNOWN, button, eventMouseX, eventMouseY);
+        return new InputEvent(Type.MOUSE_PRESS, GLFW_KEY_UNKNOWN, button, eventMouseX, eventMouseY, 0);
     }
 
     /**
@@ -98,7 +104,7 @@ public final class InputEvent {
             final int button,
             final double eventMouseX,
             final double eventMouseY) {
-        return new InputEvent(Type.MOUSE_RELEASE, GLFW_KEY_UNKNOWN, button, eventMouseX, eventMouseY);
+        return new InputEvent(Type.MOUSE_RELEASE, GLFW_KEY_UNKNOWN, button, eventMouseX, eventMouseY, 0);
     }
 
     /**
@@ -108,7 +114,7 @@ public final class InputEvent {
      * @return neues {@code InputEvent}
      */
     public static InputEvent mouseMove(final double eventMouseX, final double eventMouseY) {
-        return new InputEvent(Type.MOUSE_MOVE, GLFW_KEY_UNKNOWN, -1, eventMouseX, eventMouseY);
+        return new InputEvent(Type.MOUSE_MOVE, GLFW_KEY_UNKNOWN, -1, eventMouseX, eventMouseY, 0);
     }
 
     /**
@@ -118,7 +124,16 @@ public final class InputEvent {
      * @return neues {@code InputEvent}
      */
     public static InputEvent focusLost() {
-        return new InputEvent(Type.FOCUS_LOST, GLFW_KEY_UNKNOWN, -1, 0, 0);
+        return new InputEvent(Type.FOCUS_LOST, GLFW_KEY_UNKNOWN, -1, 0, 0, 0);
+    }
+
+    /**
+     * Erzeugt ein CHAR_TYPED-Event.
+     * @param codepoint Unicode-Codepoint des getippten Zeichens
+     * @return neues {@code InputEvent}
+     */
+    public static InputEvent charTyped(final int codepoint) {
+        return new InputEvent(Type.CHAR_TYPED, GLFW_KEY_UNKNOWN, -1, 0, 0, codepoint);
     }
 
     // --- Getter ---
@@ -156,6 +171,13 @@ public final class InputEvent {
      */
     public double getMouseY() {
         return mouseY;
+    }
+
+    /**
+     * @return Unicode-Codepoint des getippten Zeichens (nur bei CHAR_TYPED relevant)
+     */
+    public int getCodepoint() {
+        return codepoint;
     }
 
     @Override
