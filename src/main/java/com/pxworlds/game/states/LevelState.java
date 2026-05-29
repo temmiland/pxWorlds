@@ -8,6 +8,7 @@ import com.pxworlds.game.rendering.Camera;
 import com.pxworlds.game.rendering.Shader;
 import com.pxworlds.game.rendering.tiles.TileRenderer;
 import com.pxworlds.game.world.World;
+import com.pxworlds.game.world.WorldDebugRenderer;
 import com.pxworlds.game.world.WorldLoadingService;
 
 /**
@@ -35,6 +36,8 @@ public class LevelState extends GameState {
     private PauseGui pauseGui;
     /** Ob das Spiel pausiert ist. */
     private boolean paused;
+    /** Debug-Renderer für Kollisionsrahmen und Chunk-Grenzen. */
+    private WorldDebugRenderer debugRenderer;
 
     public LevelState(GameStateManager gsm) {
         this.gsm = gsm;
@@ -69,6 +72,7 @@ public class LevelState extends GameState {
         this.pauseGui = new PauseGui(newWindow, "menustate", PAUSE_GUI_SCALE,
                 () -> paused = false,
                 () -> { save(); gsm.setState(GameStateType.MENU); });
+        this.debugRenderer = new WorldDebugRenderer(newWorld);
 
         newWorld.calculateView(newCamera);
     }
@@ -120,7 +124,7 @@ public class LevelState extends GameState {
      */
     @Override
     public void renderDebug(final float alpha) {
-        world.renderDebugBoxes(camera, alpha);
+        debugRenderer.renderDebugBoxes(camera, alpha);
     }
 
     /**

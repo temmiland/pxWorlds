@@ -1,7 +1,7 @@
 package com.pxworlds.game.world;
 
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.pxworlds.Constants;
@@ -17,10 +17,6 @@ import com.pxworlds.game.rendering.tiles.Tile;
 import com.pxworlds.game.rendering.tiles.TileRenderer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
-
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL20.glUseProgram;
 
 /**
  * Spielwelt — verwaltet Tiles (Chunk-Grid), Kollisions-AABBs und Entities.
@@ -47,25 +43,17 @@ public class World {
     // Konstanten
 
     /** Tile-Kacheln links/rechts/oben/unten außerhalb des berechneten Viewports rendern. */
-    private static final int VIEW_OFFSET   = 4;
-    private static final int HALF_DIVISOR  = 2;
-    private static final int RENDER_OFFSET = 1;
+    static final int VIEW_OFFSET   = 4;
+    static final int HALF_DIVISOR  = 2;
+    static final int RENDER_OFFSET = 1;
 
     /** AABB-Halb-Ausdehnung für solid Tiles (= TILE_SIZE / 2). */
-    private static final float BOUNDING_BOX_SIZE = 1.0f;
+    static final float BOUNDING_BOX_SIZE = 1.0f;
     /** Dicke der unsichtbaren Grenz-Wände an den Welträndern (in World-Space-Einheiten). */
     private static final float BOUNDARY_THICKNESS = 8.0f;
 
-    /** Sentinel-Wert für „kein Spawn gesetzt" in {@link #spawnTileX}/{@link #spawnTileY}. */
+    /** Sentinel-Wert für „kein Spawn gesetzt". */
     public static final int NO_SPAWN = -1;
-
-    // Debug-Rendering
-    private static final int   MATRIX_FLOAT_COUNT = 16;
-    private static final int   NO_SHADER          = 0;
-    private static final float COLOR_FULL         = 1.0f;
-    private static final float COLOR_NONE         = 0.0f;
-    private static final float DEBUG_LINE_WIDTH   = 2.0f;
-    private static final float DEFAULT_LINE_WIDTH  = 1.0f;
 
     // -------------------------------------------------------------------------
     // Felder
@@ -98,12 +86,9 @@ public class World {
     private Matrix4f world;
 
     // Scratch-Objekte — vermeiden Heap-Allokationen im Hot-Path
-    private final AABB         scratchEntityDebugBox = new AABB(0, 0, 0, 0);
-    private final List<AABB>   scratchColliders      = new ArrayList<>();
-    /** Reusable native buffer for uploading the debug projection matrix via legacy GL. */
-    private final FloatBuffer  debugMatBuf           = BufferUtils.createFloatBuffer(MATRIX_FLOAT_COUNT);
+    private final List<AABB>   scratchColliders = new ArrayList<>();
     /** Reusable array for getDebugLines() — avoids per-frame String[] allocation. */
-    private final String[]     debugLines            = new String[3];
+    private final String[]     debugLines       = new String[3];
 
     /**
      * Unsichtbare Grenz-Wände an den vier Welträndern —
@@ -115,21 +100,8 @@ public class World {
     private AABB boundaryTop;
     private AABB boundaryBottom;
 
-    /**
-     * Spawn-Position des Spielers in Tile-Koordinaten.
-     * {@value #NO_SPAWN} = kein Spawn gesetzt (Standard nach {@link World#World(int,int,int)}).
-     */
-    private int spawnTileX = NO_SPAWN;
-    private int spawnTileY = NO_SPAWN;
-
-    /**
-     * Letzte gespeicherte Spieler-Position in Entity-World-Space-Koordinaten.
-     * {@link Float#NaN} = keine Letztposition gespeichert.
-     * Wird beim Speichern durch {@link #capturePlayerPosition()} befüllt
-     * und beim Laden über {@link #setLastPos(float, float)} gesetzt.
-     */
-    private float lastSavedPosX = Float.NaN;
-    private float lastSavedPosY = Float.NaN;
+    /** Spawn-Punkt und Letztposition des Spielers. */
+    private final PlayerSpawnState spawnState = new PlayerSpawnState();
 
     // Debug-Statistiken — aktualisiert in render()
     private int lastRenderedChunks = 0;
@@ -441,108 +413,6 @@ public class World {
     }
 
     // -------------------------------------------------------------------------
-    // Debug
-
-    /**
-     * Zeichnet Tile-AABBs (grün) und Entity-AABBs (rot) als Linienrahmen.
-     * Wird nur im F3-Debug-Modus aufgerufen.
-     */
-    public void renderDebugBoxes(final Camera camera, final float alpha) {
-        final Matrix4f combined = camera.getProjection(alpha).mul(world);
-        debugMatBuf.clear();
-        combined.get(debugMatBuf);
-
-        glUseProgram(NO_SHADER);
-        glDisable(GL_TEXTURE_2D);
-        glLineWidth(DEBUG_LINE_WIDTH);
-
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadMatrixf(debugMatBuf);
-
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glLoadIdentity();
-
-        // Sichtbarer Tile-Bereich — identische Logik wie in render()
-        final int posX  = (int) camera.getPosition().x / (scale * HALF_DIVISOR);
-        final int posY  = (int) camera.getPosition().y / (scale * HALF_DIVISOR);
-        final int halfX = viewX / HALF_DIVISOR;
-        final int halfY = viewY / HALF_DIVISOR;
-        final int minTX = Math.max(0,          -posX - halfX - RENDER_OFFSET);
-        final int maxTX = Math.min(width  - 1, -posX + halfX + RENDER_OFFSET);
-        final int minTY = Math.max(0,           posY - halfY - RENDER_OFFSET);
-        final int maxTY = Math.min(height - 1,  posY + halfY + RENDER_OFFSET);
-
-        glColor3f(COLOR_NONE, COLOR_FULL, COLOR_NONE);
-        for (int ty = minTY; ty <= maxTY; ty++) {
-            for (int tx = minTX; tx <= maxTX; tx++) {
-                final Tile tile = getTile(tx, ty);
-                if (tile != null && tile.isSolid()) {
-                    final float bx = tx * Constants.TILE_SIZE;
-                    final float by = -ty * Constants.TILE_SIZE;
-                    drawDebugBox(bx - BOUNDING_BOX_SIZE, by - BOUNDING_BOX_SIZE,
-                                 bx + BOUNDING_BOX_SIZE, by + BOUNDING_BOX_SIZE);
-                }
-            }
-        }
-
-        glColor3f(COLOR_FULL, COLOR_NONE, COLOR_NONE);
-        for (final Entity entity : entities) {
-            entity.getInterpolatedBoundingBox(alpha, scratchEntityDebugBox);
-            drawDebugBox(scratchEntityDebugBox.minX, scratchEntityDebugBox.minY,
-                         scratchEntityDebugBox.maxX, scratchEntityDebugBox.maxY);
-        }
-
-        // --- Chunk-Grenzen (blau) ---
-        // half = halbe Tile-Breite; Tile (0,0) hat Mittelpunkt bei (0,0),
-        // daher liegt die linke/obere Weltkante bei (-half, +half).
-        final float half       = Constants.TILE_SIZE * 0.5f;
-        final float worldLeft  = -half;
-        final float worldRight =  width  * Constants.TILE_SIZE - half;
-        final float worldTop   =  half;
-        final float worldBot   = -height * Constants.TILE_SIZE + half;
-
-        glColor3f(COLOR_NONE, COLOR_NONE, COLOR_FULL);
-
-        // Vertikale Trennlinien zwischen Chunk-Spalten
-        for (int cx = 1; cx < chunkCountX; cx++) {
-            final float x = cx * Chunk.SIZE * Constants.TILE_SIZE - half;
-            glBegin(GL_LINES);
-            glVertex2f(x, worldTop);
-            glVertex2f(x, worldBot);
-            glEnd();
-        }
-
-        // Horizontale Trennlinien zwischen Chunk-Zeilen
-        for (int cy = 1; cy < chunkCountY; cy++) {
-            final float y = -cy * Chunk.SIZE * Constants.TILE_SIZE + half;
-            glBegin(GL_LINES);
-            glVertex2f(worldLeft,  y);
-            glVertex2f(worldRight, y);
-            glEnd();
-        }
-
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
-
-        glLineWidth(DEFAULT_LINE_WIDTH);
-        glEnable(GL_TEXTURE_2D);
-    }
-
-    private static void drawDebugBox(final float minX, final float minY,
-                                      final float maxX, final float maxY) {
-        glBegin(GL_LINE_LOOP);
-        glVertex2f(minX, minY);
-        glVertex2f(maxX, minY);
-        glVertex2f(maxX, maxY);
-        glVertex2f(minX, maxY);
-        glEnd();
-    }
-
-    // -------------------------------------------------------------------------
     // Getter
 
     public Matrix4f getWorldMatrix() {
@@ -555,6 +425,17 @@ public class World {
     public int getHeight() { return height; }
     /** @return World-Scale (Pixel-Multiplikator) */
     public int getScale()  { return scale;  }
+
+    /** @return last viewport X-range in tiles (for {@link WorldDebugRenderer}) */
+    int getViewX() { return viewX; }
+    /** @return last viewport Y-range in tiles (for {@link WorldDebugRenderer}) */
+    int getViewY() { return viewY; }
+    /** @return number of chunks horizontally (for {@link WorldDebugRenderer}) */
+    int getChunkCountX() { return chunkCountX; }
+    /** @return number of chunks vertically (for {@link WorldDebugRenderer}) */
+    int getChunkCountY() { return chunkCountY; }
+    /** @return unmodifiable view of the entity list (for {@link WorldDebugRenderer}) */
+    List<Entity> getEntities() { return Collections.unmodifiableList(entities); }
 
     /**
      * Liefert Debug-Zeilen über den aktuellen Welt-Zustand:
@@ -641,33 +522,31 @@ public class World {
     }
 
     /** @return Spawn-Tile-X oder {@value #NO_SPAWN} wenn kein Spawn gesetzt. */
-    public int getSpawnTileX() { return spawnTileX; }
+    public int getSpawnTileX() { return spawnState.getSpawnTileX(); }
     /** @return Spawn-Tile-Y oder {@value #NO_SPAWN} wenn kein Spawn gesetzt. */
-    public int getSpawnTileY() { return spawnTileY; }
+    public int getSpawnTileY() { return spawnState.getSpawnTileY(); }
 
     /**
      * Setzt den Spawn-Punkt direkt (in Tile-Koordinaten).
      * Wird von {@link WorldIO} nach dem Laden einer Version-2/3-Datei aufgerufen.
      */
     public void setSpawn(final int tileX, final int tileY) {
-        this.spawnTileX = tileX;
-        this.spawnTileY = tileY;
+        spawnState.setSpawn(tileX, tileY);
     }
 
     /** @return letzte gespeicherte X-Position oder {@link Float#NaN} wenn nicht gesetzt. */
-    public float getLastSavedPosX() { return lastSavedPosX; }
+    public float getLastSavedPosX() { return spawnState.getLastSavedPosX(); }
     /** @return letzte gespeicherte Y-Position oder {@link Float#NaN} wenn nicht gesetzt. */
-    public float getLastSavedPosY() { return lastSavedPosY; }
+    public float getLastSavedPosY() { return spawnState.getLastSavedPosY(); }
     /** @return {@code true} wenn eine Letztposition gespeichert wurde. */
-    public boolean hasLastPos() { return !Float.isNaN(lastSavedPosX); }
+    public boolean hasLastPos() { return spawnState.hasLastPos(); }
 
     /**
      * Setzt die Letztposition direkt (in Entity-World-Space-Koordinaten).
      * Wird von {@link WorldIO} nach dem Laden einer Version-3-Datei aufgerufen.
      */
     public void setLastPos(final float x, final float y) {
-        this.lastSavedPosX = x;
-        this.lastSavedPosY = y;
+        spawnState.setLastPos(x, y);
     }
 
     /**
@@ -679,8 +558,7 @@ public class World {
     public void capturePlayerPosition() {
         for (final Entity e : entities) {
             if (e instanceof Player) {
-                lastSavedPosX = e.getPosition().x;
-                lastSavedPosY = e.getPosition().y;
+                spawnState.setLastPos(e.getPosition().x, e.getPosition().y);
                 return;
             }
         }
@@ -691,8 +569,8 @@ public class World {
      *
      * <p>Priorität der Startposition:
      * <ol>
-     *   <li>Letztposition ({@link #lastSavedPosX}/{@link #lastSavedPosY}) — wenn gesetzt</li>
-     *   <li>Spawn-Tile ({@link #spawnTileX}/{@link #spawnTileY}) — als Fallback</li>
+     *   <li>Letztposition — wenn gesetzt</li>
+     *   <li>Spawn-Tile — als Fallback</li>
      * </ol>
      * Hat keinen Effekt wenn weder Letztposition noch Spawn-Tile bekannt sind.</p>
      *
@@ -702,12 +580,12 @@ public class World {
     public void spawnPlayer(final Camera camera, final boolean playable) {
         final float posX;
         final float posY;
-        if (hasLastPos()) {
-            posX = lastSavedPosX;
-            posY = lastSavedPosY;
-        } else if (spawnTileX != NO_SPAWN && spawnTileY != NO_SPAWN) {
-            posX =  spawnTileX * Constants.TILE_SIZE;
-            posY = -spawnTileY * Constants.TILE_SIZE;
+        if (spawnState.hasLastPos()) {
+            posX = spawnState.getLastSavedPosX();
+            posY = spawnState.getLastSavedPosY();
+        } else if (spawnState.getSpawnTileX() != NO_SPAWN && spawnState.getSpawnTileY() != NO_SPAWN) {
+            posX =  spawnState.getSpawnTileX() * Constants.TILE_SIZE;
+            posY = -spawnState.getSpawnTileY() * Constants.TILE_SIZE;
         } else {
             return; // keine Position bekannt
         }
