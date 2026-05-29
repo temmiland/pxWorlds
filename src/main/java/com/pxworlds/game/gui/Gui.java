@@ -22,9 +22,9 @@ public class Gui {
     private TileSheet sheet;
 
     /** The list of buttons. */
-    public ArrayList<Button> buttons;
+    private ArrayList<Button> buttons;
     /** The list of logos. */
-    public ArrayList<Logo> logos;
+    private ArrayList<Logo> logos;
 
     public Gui(Window newWindow, String tileSheetTexture, int amountOfTiles) {
         this.window = newWindow;

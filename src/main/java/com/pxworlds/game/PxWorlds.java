@@ -33,7 +33,7 @@ public class PxWorlds {
 	/** The target FPS rate. */
 	private int fpsRate;
 	/** The game state manager. */
-	public GameStateManager gsm;
+	private GameStateManager gsm;
 
     /** Wiederverwendbares leeres Array — vermeidet Heap-Allokation pro Render-Frame. */
     private static final String[] NO_DEBUG_LINES = new String[0];
@@ -52,6 +52,10 @@ public class PxWorlds {
 	public static PxWorlds getInstance() {
 	    return instance;
     }
+
+	public GameStateManager getGameStateManager() {
+		return gsm;
+	}
 
 	public void run() {
 

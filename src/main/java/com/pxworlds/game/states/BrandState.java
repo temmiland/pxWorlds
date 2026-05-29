@@ -33,7 +33,7 @@ public class BrandState extends GameState {
     public void update(double delta) {
         elapsed += delta;
         if (elapsed >= BRAND_DURATION) {
-            gsm.setState(1);
+            gsm.setState(GameStateType.MENU);
         }
     }
 

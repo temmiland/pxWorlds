@@ -2,6 +2,7 @@ package com.pxworlds.game.gui;
 
 import com.pxworlds.game.PxWorlds;
 import com.pxworlds.game.io.Window;
+import com.pxworlds.game.states.GameStateType;
 import org.joml.Vector2f;
 
 import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
@@ -32,7 +33,7 @@ public class PauseGui extends Gui {
                 new Vector2f(BUTTON_WIDTH, BUTTON_HEIGHT), "Options");
         final Button mainMenuButton = new Button(new Vector2f(0, MAIN_MENU_BUTTON_Y),
                 new Vector2f(BUTTON_WIDTH, BUTTON_HEIGHT), "Main Menu",
-                () -> PxWorlds.getInstance().gsm.setState(1));
+                () -> PxWorlds.getInstance().getGameStateManager().setState(GameStateType.MENU));
 
         registerButtons(resumeButton, optionsButton, mainMenuButton);
     }

@@ -17,13 +17,6 @@ import static org.lwjgl.opengl.GL20.glUseProgram;
 
 
 public class Button {
-	/** Idle state for button. */
-	public static final int STATE_IDLE = 0;
-	/** Selected state for button. */
-	public static final int STATE_SELECTED = 1;
-	/** Clicked state for button. */
-	public static final int STATE_CLICKED = 2;
-
 	/** Tile coordinates for button rendering. */
 	/** Top left corner tile. */
 	private static final int BUTTON_CORNER_TOP_LEFT = 4;
@@ -93,7 +86,7 @@ public class Button {
 	private AABB boundingBox;
 
 	/** The current selected state of the button. */
-	private int selectedState;
+	private ButtonState selectedState;
 
 	/** The label text displayed on the button (may be null for no text). */
 	private String label;
@@ -111,7 +104,7 @@ public class Button {
 		);
 		this.label = label;
 		this.onClick = onClick;
-		selectedState = STATE_IDLE;
+		selectedState = ButtonState.IDLE;
 	}
 
 	public Button(Vector2f position, Vector2f scale, String label) {
@@ -132,16 +125,16 @@ public class Button {
 		final Collision data = boundingBox.getCollision(mousePos);
 
 		if (data.isIntersecting) {
-			selectedState = STATE_SELECTED;
+			selectedState = ButtonState.SELECTED;
 
 			if (input.isMouseButtonDown(0)) {
-				selectedState = STATE_CLICKED;
+				selectedState = ButtonState.CLICKED;
 				if (onClick != null) {
 					onClick.run();
 				}
 			}
 		} else {
-			selectedState = STATE_IDLE;
+			selectedState = ButtonState.IDLE;
 		}
 	}
 
@@ -152,10 +145,10 @@ public class Button {
 
 		shader.setUniform("projection", camera.getProjection().mul(transform));
 		switch (selectedState) {
-			case STATE_SELECTED :
+			case SELECTED :
 				sheet.bindTile(shader, BUTTON_CORNER_TOP_LEFT, BUTTON_FILL_ROW);
 				break;
-			case STATE_CLICKED :
+			case CLICKED :
 				sheet.bindTile(shader, BUTTON_CORNER_TOP_RIGHT, BUTTON_FILL_ROW);
 				break;
 			default :
@@ -175,10 +168,10 @@ public class Button {
 
 		shader.setUniform("projection", camera.getProjection().mul(transform));
 		switch (selectedState) {
-			case STATE_SELECTED :
+			case SELECTED :
 				sheet.bindTile(shader, BUTTON_EDGE_TOP, BUTTON_TOP_ROW);
 				break;
-			case STATE_CLICKED :
+			case CLICKED :
 				sheet.bindTile(shader, BUTTON_EDGE_BOTTOM, BUTTON_TOP_ROW);
 				break;
 			default :
@@ -191,10 +184,10 @@ public class Button {
 
 		shader.setUniform("projection", camera.getProjection().mul(transform));
 		switch (selectedState) {
-			case STATE_SELECTED :
+			case SELECTED :
 				sheet.bindTile(shader, BUTTON_EDGE_TOP, BUTTON_BOTTOM_ROW);
 				break;
-			case STATE_CLICKED :
+			case CLICKED :
 				sheet.bindTile(shader, BUTTON_EDGE_BOTTOM, BUTTON_BOTTOM_ROW);
 				break;
 			default :
@@ -207,10 +200,10 @@ public class Button {
 
 		shader.setUniform("projection", camera.getProjection().mul(transform));
 		switch (selectedState) {
-			case STATE_SELECTED :
+			case SELECTED :
 				sheet.bindTile(shader, BUTTON_LEFT_COL, BUTTON_FILL_ROW);
 				break;
-			case STATE_CLICKED :
+			case CLICKED :
 				sheet.bindTile(shader, BUTTON_LEFT_SELECTED_COL, BUTTON_FILL_ROW);
 				break;
 			default :
@@ -223,10 +216,10 @@ public class Button {
 
 		shader.setUniform("projection", camera.getProjection().mul(transform));
 		switch (selectedState) {
-			case STATE_SELECTED :
+			case SELECTED :
 				sheet.bindTile(shader, BUTTON_RIGHT_COL, BUTTON_FILL_ROW);
 				break;
-			case STATE_CLICKED :
+			case CLICKED :
 				sheet.bindTile(shader, BUTTON_RIGHT_SELECTED_COL, BUTTON_FILL_ROW);
 				break;
 			default :
@@ -241,10 +234,10 @@ public class Button {
 
 		shader.setUniform("projection", camera.getProjection().mul(transform));
 		switch (selectedState) {
-			case STATE_SELECTED :
+			case SELECTED :
 				sheet.bindTile(shader, BUTTON_CORNER_TOP_LEFT_COL, BUTTON_CORNER_TOP_LEFT_ROW);
 				break;
-			case STATE_CLICKED :
+			case CLICKED :
 				sheet.bindTile(shader, BUTTON_CORNER_SELECTED_LEFT_COL, BUTTON_CORNER_TOP_LEFT_ROW);
 				break;
 			default :
@@ -257,10 +250,10 @@ public class Button {
 
 		shader.setUniform("projection", camera.getProjection().mul(transform));
 		switch (selectedState) {
-			case STATE_SELECTED :
+			case SELECTED :
 				sheet.bindTile(shader, BUTTON_CORNER_TOP_RIGHT_COL, BUTTON_CORNER_TOP_RIGHT_ROW);
 				break;
-			case STATE_CLICKED :
+			case CLICKED :
 				sheet.bindTile(shader, BUTTON_CORNER_SELECTED_RIGHT_COL, BUTTON_CORNER_TOP_RIGHT_ROW);
 				break;
 			default :
@@ -273,10 +266,10 @@ public class Button {
 
 		shader.setUniform("projection", camera.getProjection().mul(transform));
 		switch (selectedState) {
-			case STATE_SELECTED :
+			case SELECTED :
 				sheet.bindTile(shader, BUTTON_CORNER_BOTTOM_LEFT_COL, BUTTON_CORNER_BOTTOM_LEFT_ROW);
 				break;
-			case STATE_CLICKED :
+			case CLICKED :
 				sheet.bindTile(shader, BUTTON_CORNER_SELECTED_LEFT_COL, BUTTON_CORNER_BOTTOM_LEFT_ROW);
 				break;
 			default :
@@ -289,10 +282,10 @@ public class Button {
 
 		shader.setUniform("projection", camera.getProjection().mul(transform));
 		switch (selectedState) {
-			case STATE_SELECTED :
+			case SELECTED :
 				sheet.bindTile(shader, BUTTON_CORNER_BOTTOM_RIGHT_COL, BUTTON_CORNER_BOTTOM_RIGHT_ROW);
 				break;
-			case STATE_CLICKED :
+			case CLICKED :
 				sheet.bindTile(shader, BUTTON_CORNER_SELECTED_RIGHT_COL, BUTTON_CORNER_BOTTOM_RIGHT_ROW);
 				break;
 			default :

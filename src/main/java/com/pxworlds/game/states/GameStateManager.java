@@ -28,8 +28,8 @@ public class GameStateManager {
 
     }
 
-    public void setState(int state) {
-        currentState = state;
+    public void setState(GameStateType state) {
+        currentState = state.getIndex();
         gameStates.get(currentState).init(window);
     }
 
