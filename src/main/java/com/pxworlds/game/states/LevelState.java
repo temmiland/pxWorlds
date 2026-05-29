@@ -2,6 +2,7 @@ package com.pxworlds.game.states;
 
 import com.pxworlds.Constants;
 import com.pxworlds.game.gui.PauseGui;
+import com.pxworlds.game.io.InputAction;
 import com.pxworlds.game.io.Window;
 import com.pxworlds.game.rendering.Camera;
 import com.pxworlds.game.rendering.Shader;
@@ -100,7 +101,7 @@ public class LevelState extends GameState {
 
     @Override
     public void update(double delta) {
-        if (window.getInputProcessor().wasPressed(org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE)) {
+        if (window.getInputProcessor().wasPressed(InputAction.PAUSE)) {
             paused = !paused;
             if (paused) {
                 camera.savePrevPosition();

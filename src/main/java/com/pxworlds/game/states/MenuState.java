@@ -2,15 +2,13 @@ package com.pxworlds.game.states;
 
 import com.pxworlds.Constants;
 import com.pxworlds.game.gui.MenuGui;
+import com.pxworlds.game.io.InputAction;
 import com.pxworlds.game.io.Window;
 import com.pxworlds.game.rendering.Camera;
 import com.pxworlds.game.rendering.Shader;
 import com.pxworlds.game.rendering.tiles.TileRenderer;
 import com.pxworlds.game.world.World;
 import com.pxworlds.game.world.WorldIO;
-
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -87,8 +85,8 @@ public class MenuState extends GameState {
 
     @Override
     public void update(double delta) {
-        if (window.getInputProcessor().wasPressed(GLFW_KEY_ESCAPE)) {
-            glfwSetWindowShouldClose(window.getWindow(), true);
+        if (window.getInputProcessor().wasPressed(InputAction.PAUSE)) {
+            window.requestClose();
             return;
         }
         world.update((float) delta, window, camera);

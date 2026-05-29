@@ -4,17 +4,18 @@ import com.pxworlds.Bootstrap;
 import com.pxworlds.Constants;
 import com.pxworlds.game.assets.Assets;
 import com.pxworlds.game.debug.DebugOverlay;
-import com.pxworlds.game.states.GameStateManager;
+import com.pxworlds.game.io.InputAction;
 import com.pxworlds.game.io.Timer;
 import com.pxworlds.game.io.Window;
+import com.pxworlds.game.states.GameStateManager;
 import org.lwjgl.opengl.GL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PxWorlds {
 	/** The logger for PxWorlds. */
@@ -131,7 +132,7 @@ public class PxWorlds {
                         glViewport(0, 0, window.getFramebufferWidth(), window.getFramebufferHeight());
                     }
 
-                    if (window.getInputProcessor().wasPressed(GLFW_KEY_F3)) {
+                    if (window.getInputProcessor().wasPressed(InputAction.DEBUG_TOGGLE)) {
                         debugOverlay.toggleDetailed();
                     }
 

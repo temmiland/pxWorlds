@@ -6,12 +6,6 @@ import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
-
 /**
  * Verarbeitet rohe {@link InputEvent}s aus der Queue und übersetzt sie
  * in GLFW-freie, hochsprachige Spiel-Aktionen.
@@ -95,24 +89,34 @@ public class InputProcessor {
         }
 
         // Gedrückte Tasten auf benannte Aktionen abbilden
-        moveLeft  = heldKeys.contains(GLFW_KEY_A);
-        moveRight = heldKeys.contains(GLFW_KEY_D);
-        moveUp    = heldKeys.contains(GLFW_KEY_W);
-        moveDown  = heldKeys.contains(GLFW_KEY_S);
-        sprint    = heldKeys.contains(GLFW_KEY_LEFT_SHIFT);
+        moveLeft  = isHeld(InputAction.MOVE_LEFT);
+        moveRight = isHeld(InputAction.MOVE_RIGHT);
+        moveUp    = isHeld(InputAction.MOVE_UP);
+        moveDown  = isHeld(InputAction.MOVE_DOWN);
+        sprint    = isHeld(InputAction.SPRINT);
     }
 
     // --- One-Shot-Abfragen ---
 
     /**
-     * Gibt {@code true} zurück, wenn die Taste in diesem Tick das erste Mal gedrückt wurde.
-     * Ideal für einmalige Aktionen (Menü öffnen, Debug-Toggle etc.).
+     * Gibt {@code true} zurück, wenn die der Aktion zugeordnete Taste in diesem Tick
+     * das erste Mal gedrückt wurde. Ideal für einmalige Aktionen (Pause, Debug-Toggle etc.).
      *
-     * @param keyCode GLFW-Keycode
+     * @param action die zu prüfende {@link InputAction}
      * @return {@code true} nur im Tick des ersten Tastendrucks
      */
-    public boolean wasPressed(final int keyCode) {
-        return pressedThisTick.contains(keyCode);
+    public boolean wasPressed(final InputAction action) {
+        return pressedThisTick.contains(action.defaultKey);
+    }
+
+    /**
+     * Gibt {@code true} zurück, wenn die der Aktion zugeordnete Taste aktuell gehalten wird.
+     *
+     * @param action die zu prüfende {@link InputAction}
+     * @return {@code true} solange die Taste gehalten wird
+     */
+    public boolean isHeld(final InputAction action) {
+        return heldKeys.contains(action.defaultKey);
     }
 
     // --- Maus-Abfragen ---

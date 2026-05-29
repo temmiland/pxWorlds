@@ -110,6 +110,10 @@ public class Window {
 		return glfwWindowShouldClose(window);
 	}
 
+	public void requestClose() {
+		glfwSetWindowShouldClose(window, true);
+	}
+
 	public void swapBuffers() {
 		glfwSwapBuffers(window);
 	}
