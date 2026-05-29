@@ -1,12 +1,19 @@
 package com.pxworlds.configuration;
 
-import com.pxworlds.Bootstrap;
+import com.google.gson.Gson;
 import com.pxworlds.Constants;
 
 import java.io.*;
 import java.lang.reflect.Type;
 
 public class JsonConfig {
+
+    /** The Gson instance used for serialization/deserialization. */
+    private final Gson gson;
+
+    public JsonConfig(Gson gson) {
+        this.gson = gson;
+    }
 
     public String generateConfigName(String configName) {
         return Constants.CONFIG_DIRECTORY_PATH + configName + ".json";
@@ -15,7 +22,7 @@ public class JsonConfig {
     public void saveConfig(Configuration configuration, String fileName) {
         try {
             final Writer writer = new OutputStreamWriter(new FileOutputStream(fileName));
-            writer.write(configuration.serializeToJson());
+            writer.write(gson.toJson(configuration, configuration.getClass()));
             writer.flush();
             writer.close();
         } catch (IOException e) {
@@ -25,11 +32,11 @@ public class JsonConfig {
 
     public <T extends Configuration> T readConfiguration(String fileName, Type type) {
         final StringBuilder stringBuilder = new StringBuilder();
-        final File file          = new File(fileName);
+        final File file = new File(fileName);
         try {
             final FileReader     fileReader     = new FileReader(file);
             final BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String         currentLine    = "";
+            String currentLine;
             while ((currentLine = bufferedReader.readLine()) != null) {
                 stringBuilder.append(currentLine);
             }
@@ -38,10 +45,10 @@ public class JsonConfig {
             e.printStackTrace();
         }
         try {
-            return Bootstrap.getInstance().getGson().fromJson(stringBuilder.toString(), type);
-        }catch(Exception e){
+            return gson.fromJson(stringBuilder.toString(), type);
+        } catch (Exception e) {
             saveConfig(new Configuration(), fileName);
-            return Bootstrap.getInstance().getGson().fromJson("{}", type);
+            return gson.fromJson("{}", type);
         }
     }
 

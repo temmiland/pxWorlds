@@ -1,6 +1,5 @@
 package com.pxworlds.configuration;
 
-import com.pxworlds.Bootstrap;
 import com.pxworlds.Constants;
 import com.pxworlds.configuration.profile.ProfilesConfiguration;
 import com.pxworlds.configuration.screen.ScreenConfiguration;
@@ -10,10 +9,16 @@ import java.io.IOException;
 
 public class ConfigurationStorage {
 
+        /** The JSON config used for reading/writing configurations. */
+        private final JsonConfig jsonConfig;
         /** The screen configuration. */
         private ScreenConfiguration screenConfiguration;
         /** The profiles configuration. */
         private ProfilesConfiguration profilesConfiguration;
+
+        public ConfigurationStorage(JsonConfig jsonConfig) {
+            this.jsonConfig = jsonConfig;
+        }
 
         public void init() {
             createScreenConfigurationIfNotExists();
@@ -34,12 +39,12 @@ public class ConfigurationStorage {
                 try {
                     file.createNewFile();
                     final ScreenConfiguration newScreenConfiguration = new ScreenConfiguration();
-                    Bootstrap.getInstance().getJsonConfig().saveConfig(newScreenConfiguration, Bootstrap.getInstance().getJsonConfig().generateConfigName("screen_configuration"));
+                    jsonConfig.saveConfig(newScreenConfiguration, jsonConfig.generateConfigName("screen_configuration"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            setScreenConfiguration(Bootstrap.getInstance().getJsonConfig().<ScreenConfiguration>readConfiguration(Bootstrap.getInstance().getJsonConfig().generateConfigName("screen_configuration"), Configuration.ConfigurationType.SCREEN_CONFIGURATION.getType()));
+            setScreenConfiguration(jsonConfig.<ScreenConfiguration>readConfiguration(jsonConfig.generateConfigName("screen_configuration"), Configuration.ConfigurationType.SCREEN_CONFIGURATION.getType()));
         }
 
         public void createProfilesConfigurationIfNotExists() {
@@ -49,12 +54,12 @@ public class ConfigurationStorage {
                 try {
                     file.createNewFile();
                     final ProfilesConfiguration newProfilesConfiguration = new ProfilesConfiguration();
-                    Bootstrap.getInstance().getJsonConfig().saveConfig(newProfilesConfiguration, Bootstrap.getInstance().getJsonConfig().generateConfigName("profiles"));
+                    jsonConfig.saveConfig(newProfilesConfiguration, jsonConfig.generateConfigName("profiles"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            setProfilesConfiguration(Bootstrap.getInstance().getJsonConfig().<ProfilesConfiguration>readConfiguration(Bootstrap.getInstance().getJsonConfig().generateConfigName("profiles"), Configuration.ConfigurationType.PROFILES_CONFIGURATION.getType()));
+            setProfilesConfiguration(jsonConfig.<ProfilesConfiguration>readConfiguration(jsonConfig.generateConfigName("profiles"), Configuration.ConfigurationType.PROFILES_CONFIGURATION.getType()));
         }
 
         public ScreenConfiguration getScreenConfiguration() {
@@ -82,14 +87,14 @@ public class ConfigurationStorage {
         }
 
         public ConfigurationStorage saveScreenConfiguration() {
-            createScreenConfigurationIfNotExists();
-            Bootstrap.getInstance().getJsonConfig().saveConfig(getScreenConfiguration(), Bootstrap.getInstance().getJsonConfig().generateConfigName("screen_configuration"));
+            createConfigDirectoryIfNotExists();
+            jsonConfig.saveConfig(getScreenConfiguration(), jsonConfig.generateConfigName("screen_configuration"));
             return this;
         }
 
         public ConfigurationStorage saveProfilesConfiguration() {
-            createProfilesConfigurationIfNotExists();
-            Bootstrap.getInstance().getJsonConfig().saveConfig(getProfilesConfiguration(), Bootstrap.getInstance().getJsonConfig().generateConfigName("profiles"));
+            createConfigDirectoryIfNotExists();
+            jsonConfig.saveConfig(getProfilesConfiguration(), jsonConfig.generateConfigName("profiles"));
             return this;
         }
 }

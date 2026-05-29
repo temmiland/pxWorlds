@@ -3,6 +3,7 @@ package com.pxworlds.game.states;
 import com.pxworlds.Constants;
 import com.pxworlds.game.gui.MenuGui;
 import com.pxworlds.game.io.Window;
+import com.pxworlds.game.states.GameStateType;
 import com.pxworlds.game.rendering.Camera;
 import com.pxworlds.game.rendering.Shader;
 import com.pxworlds.game.rendering.tiles.TileRenderer;
@@ -65,7 +66,8 @@ public class MenuState extends GameState {
             throw new RuntimeException("Kann Menü-Level '" + WORLD_NAME + "' nicht laden", e);
         }
 
-        this.gui = new MenuGui(newWindow, "menustate", MENU_GUI_SCALE);
+        this.gui = new MenuGui(newWindow, "menustate", MENU_GUI_SCALE,
+                () -> gsm.setState(GameStateType.LEVEL));
         this.camera = newCamera;
         this.world = newWorld;
         this.tiles = newTiles;

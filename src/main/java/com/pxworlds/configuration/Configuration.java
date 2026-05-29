@@ -1,17 +1,12 @@
 package com.pxworlds.configuration;
 
 import com.google.gson.reflect.TypeToken;
-import com.pxworlds.Bootstrap;
 import com.pxworlds.configuration.profile.ProfilesConfiguration;
 import com.pxworlds.configuration.screen.ScreenConfiguration;
 
 import java.lang.reflect.Type;
 
 public class Configuration {
-
-    public String serializeToJson() {
-        return Bootstrap.getInstance().getGson().toJson(this, this.getClass());
-    }
 
     public enum ConfigurationType {
         /** Screen configuration type. */

@@ -1,7 +1,7 @@
 package com.pxworlds.game;
 
-import com.pxworlds.Bootstrap;
 import com.pxworlds.Constants;
+import com.pxworlds.configuration.ConfigurationStorage;
 import com.pxworlds.game.assets.Assets;
 import com.pxworlds.game.debug.DebugOverlay;
 import com.pxworlds.game.io.InputAction;
@@ -21,8 +21,6 @@ public class PxWorlds {
 	/** The logger for PxWorlds. */
 	private static final Logger LOGGER = LoggerFactory.getLogger(PxWorlds.class);
 
-    /** The singleton instance of PxWorlds. */
-    private static PxWorlds instance;
 	/** The title of the window. */
 	private String title;
 	/** The width of the window. */
@@ -35,24 +33,21 @@ public class PxWorlds {
 	private int fpsRate;
 	/** The game state manager. */
 	private GameStateManager gsm;
+	/** The configuration storage for saving on exit. */
+	private ConfigurationStorage configurationStorage;
 
     /** Wiederverwendbares leeres Array — vermeidet Heap-Allokation pro Render-Frame. */
     private static final String[] NO_DEBUG_LINES = new String[0];
 
-	public PxWorlds(String newTitle, int newWidth, int newHeight, boolean newFullscreen, int newFpsRate) {
-	    instance = this;
-
+	public PxWorlds(String newTitle, int newWidth, int newHeight, boolean newFullscreen, int newFpsRate, ConfigurationStorage newConfigurationStorage) {
 		this.title = newTitle;
 		this.width = newWidth;
 		this.height = newHeight;
 		this.fullscreen = newFullscreen;
         this.fpsRate = newFpsRate;
 		this.gsm = new GameStateManager();
+		this.configurationStorage = newConfigurationStorage;
 	}
-
-	public static PxWorlds getInstance() {
-	    return instance;
-    }
 
 	public GameStateManager getGameStateManager() {
 		return gsm;
@@ -172,7 +167,10 @@ public class PxWorlds {
                 gsm.save();
             }
             Assets.deleteAsset();
-            Bootstrap.getInstance().getConfigurationStorage().saveAllConfigurations();
+            configurationStorage.getScreenConfiguration()
+                    .setLastWidth(window.getWidth())
+                    .setLastHeight(window.getHeight());
+            configurationStorage.saveAllConfigurations();
             window.cleanUp();
             glfwTerminate();
         }

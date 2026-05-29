@@ -7,14 +7,9 @@ import com.pxworlds.configuration.JsonConfig;
 import com.pxworlds.game.PxWorlds;
 import com.pxworlds.worlds.WorldManager;
 
-import java.awt.*;
-
 import static com.pxworlds.Constants.TITLE;
 
 public class Bootstrap {
-
-    /** The singleton instance of Bootstrap. */
-    private static Bootstrap instance;
 
     /** The Gson instance for JSON handling. */
     private Gson                 gson;
@@ -31,8 +26,6 @@ public class Bootstrap {
      * The method which is the entrance point after psvm.
      */
     public void onEnable() {
-        instance = this;
-
         this.apiKey = "abc";
 
         initGson();
@@ -48,16 +41,8 @@ public class Bootstrap {
         final int frameRate = getConfigurationStorage().getScreenConfiguration().getFrameRate();
         final boolean fullscreen = getConfigurationStorage().getScreenConfiguration().isFullscreen();
 
-        new PxWorlds(TITLE, width, height, fullscreen, frameRate).run();
+        new PxWorlds(TITLE, width, height, fullscreen, frameRate, configurationStorage).run();
 
-    }
-
-    public Dimension getDimension() {
-        return Toolkit.getDefaultToolkit().getScreenSize();
-    }
-
-    public static Bootstrap getInstance() {
-        return instance;
     }
 
     public void initGson() {
@@ -65,11 +50,11 @@ public class Bootstrap {
     }
 
     public void initJsonConfig() {
-        jsonConfig = new JsonConfig();
+        jsonConfig = new JsonConfig(gson);
     }
 
     public void initConfigurationStorage() {
-        configurationStorage = new ConfigurationStorage();
+        configurationStorage = new ConfigurationStorage(jsonConfig);
     }
 
     public void initWorldManager() {
