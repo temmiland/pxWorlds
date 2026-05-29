@@ -10,6 +10,12 @@ public class Camera {
 	private Vector3f prevPosition;
 	/** The projection matrix. */
 	private Matrix4f projection;
+	/** Reusable scratch matrix for getProjection() — avoids per-frame allocation. */
+	private final Matrix4f projectionScratch = new Matrix4f();
+	/** Reusable scratch matrix for getProjection(alpha) — avoids per-frame allocation. */
+	private final Matrix4f projectionAlphaScratch = new Matrix4f();
+	/** Reusable scratch vector for lerp in getProjection(alpha) — avoids per-frame allocation. */
+	private final Vector3f interpolatedScratch = new Vector3f();
 
 	/** Reference height used to keep proportional scaling on resize. */
 	private final int referenceHeight;
@@ -78,7 +84,7 @@ public class Camera {
 	 * @return The projection matrix.
 	 */
 	public Matrix4f getProjection() {
-		return projection.translate(position, new Matrix4f());
+		return projection.translate(position, projectionScratch);
 	}
 
 	/**
@@ -88,7 +94,7 @@ public class Camera {
 	 * @return The interpolated projection matrix.
 	 */
 	public Matrix4f getProjection(final float alpha) {
-		final Vector3f interpolated = new Vector3f(prevPosition).lerp(position, alpha);
-		return projection.translate(interpolated, new Matrix4f());
+		prevPosition.lerp(position, alpha, interpolatedScratch);
+		return projection.translate(interpolatedScratch, projectionAlphaScratch);
 	}
 }

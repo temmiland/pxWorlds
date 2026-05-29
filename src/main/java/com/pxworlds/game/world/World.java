@@ -100,6 +100,10 @@ public class World {
     // Scratch-Objekte — vermeiden Heap-Allokationen im Hot-Path
     private final AABB         scratchEntityDebugBox = new AABB(0, 0, 0, 0);
     private final List<AABB>   scratchColliders      = new ArrayList<>();
+    /** Reusable native buffer for uploading the debug projection matrix via legacy GL. */
+    private final FloatBuffer  debugMatBuf           = BufferUtils.createFloatBuffer(MATRIX_FLOAT_COUNT);
+    /** Reusable array for getDebugLines() — avoids per-frame String[] allocation. */
+    private final String[]     debugLines            = new String[3];
 
     /**
      * Unsichtbare Grenz-Wände an den vier Welträndern —
@@ -445,8 +449,8 @@ public class World {
      */
     public void renderDebugBoxes(final Camera camera, final float alpha) {
         final Matrix4f combined = camera.getProjection(alpha).mul(world);
-        final FloatBuffer matBuf = BufferUtils.createFloatBuffer(MATRIX_FLOAT_COUNT);
-        combined.get(matBuf);
+        debugMatBuf.clear();
+        combined.get(debugMatBuf);
 
         glUseProgram(NO_SHADER);
         glDisable(GL_TEXTURE_2D);
@@ -454,7 +458,7 @@ public class World {
 
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
-        glLoadMatrixf(matBuf);
+        glLoadMatrixf(debugMatBuf);
 
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
@@ -590,13 +594,12 @@ public class World {
         final int chunkX = Math.floorDiv(tileX, Chunk.SIZE);
         final int chunkY = Math.floorDiv(tileY, Chunk.SIZE);
 
-        return new String[] {
-            "Tile:    " + tileX  + ", " + tileY,
-            "Chunk:   " + chunkX + ", " + chunkY
-                + "  (" + chunkCountX + "x" + chunkCountY + " total)",
-            "Chunks:  " + lastRenderedChunks + " rendered, "
-                + lastRebuiltChunks + " rebuilt"
-        };
+        debugLines[0] = "Tile:    " + tileX  + ", " + tileY;
+        debugLines[1] = "Chunk:   " + chunkX + ", " + chunkY
+                + "  (" + chunkCountX + "x" + chunkCountY + " total)";
+        debugLines[2] = "Chunks:  " + lastRenderedChunks + " rendered, "
+                + lastRebuiltChunks + " rebuilt";
+        return debugLines;
     }
 
     /**
