@@ -101,11 +101,13 @@ public class Button {
 		if (data.isIntersecting) {
 			selectedState = ButtonState.SELECTED;
 
-			if (input.isMouseButtonDown(0)) {
+			if (input.wasMouseButtonPressed(0)) {
 				selectedState = ButtonState.CLICKED;
 				if (onClick != null) {
 					onClick.run();
 				}
+			} else if (input.isMouseButtonDown(0)) {
+				selectedState = ButtonState.CLICKED;
 			}
 		} else {
 			selectedState = ButtonState.IDLE;

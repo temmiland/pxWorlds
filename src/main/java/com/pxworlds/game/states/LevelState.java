@@ -4,6 +4,7 @@ import com.pxworlds.Constants;
 import com.pxworlds.game.gui.PauseGui;
 import com.pxworlds.game.io.InputAction;
 import com.pxworlds.game.io.Window;
+import com.pxworlds.game.states.GameStateType;
 import com.pxworlds.game.rendering.Camera;
 import com.pxworlds.game.rendering.Shader;
 import com.pxworlds.game.rendering.tiles.TileRenderer;
@@ -87,7 +88,9 @@ public class LevelState extends GameState {
         this.world  = newWorld;
         this.window = newWindow;
         this.paused = false;
-        this.pauseGui = new PauseGui(newWindow, "menustate", PAUSE_GUI_SCALE, () -> paused = false);
+        this.pauseGui = new PauseGui(newWindow, "menustate", PAUSE_GUI_SCALE,
+                () -> paused = false,
+                () -> { save(); gsm.setState(GameStateType.MENU); });
 
         newWorld.calculateView(newCamera);
     }

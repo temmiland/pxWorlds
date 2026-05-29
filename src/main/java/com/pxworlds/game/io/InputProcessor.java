@@ -33,6 +33,8 @@ public class InputProcessor {
     private final Set<Integer> pressedThisTick = new HashSet<>();
     /** Aktuell gedrückt gehaltene Maustasten als GLFW-Mausbutton-Codes. */
     private final Set<Integer> heldMouseButtons = new HashSet<>();
+    /** Maustasten, die in diesem Tick das erste Mal gedrückt wurden. */
+    private final Set<Integer> pressedMouseButtonsThisTick = new HashSet<>();
 
     /** Letzte bekannte Cursor-X-Position in GLFW-Bildschirmkoordinaten (von oben links). */
     private double rawMouseX;
@@ -58,6 +60,7 @@ public class InputProcessor {
      */
     public void processEvents(final Queue<InputEvent> eventQueue) {
         pressedThisTick.clear();
+        pressedMouseButtonsThisTick.clear();
 
         InputEvent event;
         while ((event = eventQueue.poll()) != null) {
@@ -71,6 +74,7 @@ public class InputProcessor {
                     break;
                 case MOUSE_PRESS:
                     heldMouseButtons.add(event.getMouseButton());
+                    pressedMouseButtonsThisTick.add(event.getMouseButton());
                     break;
                 case MOUSE_RELEASE:
                     heldMouseButtons.remove(event.getMouseButton());
@@ -82,6 +86,7 @@ public class InputProcessor {
                 case FOCUS_LOST:
                     heldKeys.clear();
                     heldMouseButtons.clear();
+                    pressedMouseButtonsThisTick.clear();
                     break;
                 default:
                     break;
@@ -120,6 +125,16 @@ public class InputProcessor {
     }
 
     // --- Maus-Abfragen ---
+
+    /**
+     * Gibt {@code true} zurück, wenn die Maustaste in diesem Tick das erste Mal gedrückt wurde.
+     *
+     * @param button GLFW-Mausbutton-Code (z.B. {@code GLFW_MOUSE_BUTTON_LEFT = 0})
+     * @return {@code true} nur im Tick des ersten Mausklicks
+     */
+    public boolean wasMouseButtonPressed(final int button) {
+        return pressedMouseButtonsThisTick.contains(button);
+    }
 
     /**
      * Gibt zurück, ob die angegebene Maustaste aktuell gedrückt gehalten wird.

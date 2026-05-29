@@ -1,11 +1,7 @@
 package com.pxworlds.game.gui;
 
-import com.pxworlds.game.PxWorlds;
 import com.pxworlds.game.io.Window;
-import com.pxworlds.game.states.GameStateType;
 import org.joml.Vector2f;
-
-import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
 
 public class PauseGui extends Gui {
 
@@ -23,7 +19,7 @@ public class PauseGui extends Gui {
     /** Callback to unpause the game. */
     private final Runnable onResume;
 
-    public PauseGui(Window window, String tileSheetTexture, int amountOfTiles, Runnable onResume) {
+    public PauseGui(Window window, String tileSheetTexture, int amountOfTiles, Runnable onResume, Runnable onMainMenu) {
         super(window, tileSheetTexture, amountOfTiles);
         this.onResume = onResume;
 
@@ -32,8 +28,7 @@ public class PauseGui extends Gui {
         final Button optionsButton = new Button(new Vector2f(0, OPTIONS_BUTTON_Y),
                 new Vector2f(BUTTON_WIDTH, BUTTON_HEIGHT), "Options");
         final Button mainMenuButton = new Button(new Vector2f(0, MAIN_MENU_BUTTON_Y),
-                new Vector2f(BUTTON_WIDTH, BUTTON_HEIGHT), "Main Menu",
-                () -> PxWorlds.getInstance().getGameStateManager().setState(GameStateType.MENU));
+                new Vector2f(BUTTON_WIDTH, BUTTON_HEIGHT), "Main Menu", onMainMenu);
 
         registerButtons(resumeButton, optionsButton, mainMenuButton);
     }
