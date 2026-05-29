@@ -9,39 +9,39 @@ import java.util.Properties;
 
 public class Constants {
 
-    /** The current game version resolved from pom.xml via filtered resources. */
+    /** Aktuelle Spielversion, aus pom.xml via Filtered Resources ermittelt. */
     public static final String VERSION               = loadVersion();
-    /** The title of the application. */
+    /** Titel der Anwendung. */
     public static final String TITLE                 = "pxWorlds - Let's Adventure!";
-    /** The name of the program directory. */
+    /** Name des Programmverzeichnisses. */
     public static final String PROGRAM_NAME          = ".pxworlds";
-    /** The home directory path. */
+    /** Pfad zum Home-Verzeichnis. */
     public static final String HOME_DIR              = OSHelperUtil.getHomeDirectory() + File.separator + PROGRAM_NAME + File.separator;
-    /** The configuration directory path. */
+    /** Pfad zum Konfigurationsverzeichnis. */
     public static final String CONFIG_DIRECTORY_PATH = HOME_DIR + "config" + File.separator;
-    /** The worlds directory path. */
+    /** Pfad zum Welten-Verzeichnis. */
     public static final String WORLDS_DIRECTORY_PATH = HOME_DIR + "worlds" + File.separator;
-    /** The web root URL. */
+    /** Web-Root-URL. */
     public static final String WEB_ROOT = "https://<API_URL>/pxworlds/";
-    /** The web API root URL. */
+    /** Web-API-Root-URL. */
     public static final String WEB_API_ROOT = WEB_ROOT + "api/";
 
-    // --- Game Loop ---
-    /** Fixed logic update rate in ticks per second.
-     *  Rendering runs independently at the configured FPS. */
+    // --- Spielschleife ---
+    /** Feste Logik-Update-Rate in Ticks pro Sekunde.
+     *  Das Rendering läuft unabhängig davon mit der konfigurierten FPS. */
     public static final int TICK_RATE = 20;
-    /** Maximum number of update ticks processed per frame.
-     *  Caps accumulated time to prevent the spiral-of-death on lag spikes. */
+    /** Maximale Anzahl an Update-Ticks pro Frame.
+     *  Begrenzt akkumulierte Zeit, um die Spiral-of-Death bei Lag-Spikes zu verhindern. */
     public static final int MAX_UPDATES_PER_FRAME = 10;
 
-    // --- World / Tiles ---
-    /** Size of one tile in world-space units.
-     *  Used for tile rendering (TileRenderer) and entity/AABB positioning (World).
-     *  Changing this value scales the entire world consistently. */
+    // --- Welt / Tiles ---
+    /** Größe eines Tiles in Weltkoordinaten.
+     *  Wird für Tile-Rendering (TileRenderer) und Entity/AABB-Positionierung (World) verwendet.
+     *  Ändert man diesen Wert, skaliert die gesamte Welt konsistent. */
     public static final float TILE_SIZE = 2.0f;
 
-    /** Number of tiles per chunk side (chunks are CHUNK_SIZE × CHUNK_SIZE tiles).
-     *  Used by the Chunk system and procedural world generation. */
+    /** Anzahl Tiles pro Chunk-Seite (Chunks sind CHUNK_SIZE × CHUNK_SIZE Tiles).
+     *  Wird vom Chunk-System und der prozeduralen Weltgenerierung verwendet. */
     public static final int CHUNK_SIZE = 16;
 
     private static String loadVersion() {

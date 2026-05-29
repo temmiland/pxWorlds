@@ -98,7 +98,7 @@ public class Button {
 	public void update(final InputProcessor input, final Vector2f mousePos) {
 		final Collision data = boundingBox.getCollision(mousePos);
 
-		if (data.isIntersecting) {
+		if (data.isIntersecting()) {
 			selectedState = ButtonState.SELECTED;
 
 			if (input.wasMouseButtonPressed(0)) {

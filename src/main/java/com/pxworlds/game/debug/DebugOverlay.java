@@ -27,27 +27,27 @@ import static org.lwjgl.opengl.GL20.glUseProgram;
  */
 public class DebugOverlay {
 
-    /** Scale factor applied to the debug font for readability on modern screens. */
+    /** Skalierungsfaktor des Debug-Fonts für Lesbarkeit auf modernen Bildschirmen. */
     private static final float TEXT_SCALE = 2.0f;
-    /** Left and top margin in STBEasyFont coordinate units (before TEXT_SCALE). */
+    /** Linker und oberer Rand in STBEasyFont-Koordinateneinheiten (vor TEXT_SCALE). */
     private static final float MARGIN = 4.0f;
-    /** Vertical line spacing in STBEasyFont coordinate units (before TEXT_SCALE). */
+    /** Vertikaler Zeilenabstand in STBEasyFont-Koordinateneinheiten (vor TEXT_SCALE). */
     private static final float LINE_HEIGHT = 10.0f;
-    /** OpenGL program ID 0 — unbinds any active shader. */
+    /** OpenGL-Programm-ID 0 — löst jeden aktiven Shader. */
     private static final int NO_SHADER = 0;
-    /** Separator drawn between built-in lines and state-specific extra lines. */
+    /** Trennlinie zwischen eingebauten Zeilen und state-spezifischen Zeilen. */
     private static final String SEPARATOR = "---";
-    /** Hint shown in compact mode. */
+    /** Hinweis im kompakten Modus. */
     private static final String F3_HINT = "[F3]";
-    /** Header shown in detailed mode. */
+    /** Überschrift im Detailmodus. */
     private static final String F3_HEADER = "[F3 Debug]";
 
-    /** Whether the detailed debug view is currently visible. */
+    /** Ob die erweiterte Debug-Ansicht aktuell sichtbar ist. */
     private boolean showDetailed = false;
-    /** Most recently recorded frames per second. */
+    /** Zuletzt gemessene Frames pro Sekunde. */
     private int currentFps = 0;
 
-    /** Toggles the detailed debug view on or off. */
+    /** Schaltet die erweiterte Debug-Ansicht ein oder aus. */
     public void toggleDetailed() {
         showDetailed = !showDetailed;
     }
@@ -58,19 +58,19 @@ public class DebugOverlay {
     }
 
     /**
-     * Updates the displayed FPS value.
-     * @param fps The measured frames per second.
+     * Aktualisiert den angezeigten FPS-Wert.
+     * @param fps die gemessenen Frames pro Sekunde
      */
     public void updateFps(final int fps) {
         currentFps = fps;
     }
 
     /**
-     * Renders the debug overlay on top of the current frame.
+     * Zeichnet das Debug-Overlay über dem aktuellen Frame.
      *
-     * @param window     The game window.
-     * @param alpha      The current render-interpolation factor (0.0–1.0).
-     * @param extraLines State-specific debug lines (may be empty, never null).
+     * @param window     das Spielfenster
+     * @param alpha      der aktuelle Render-Interpolationsfaktor (0.0–1.0)
+     * @param extraLines state-spezifische Debug-Zeilen (darf leer, aber nicht null sein)
      */
     public void render(final Window window, final float alpha, final String[] extraLines) {
         glUseProgram(NO_SHADER);

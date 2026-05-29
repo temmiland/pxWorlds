@@ -17,10 +17,10 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 
 /**
- * Renders debug visualisations (collision boxes, chunk borders) on top of the world.
+ * Rendert Debug-Visualisierungen (Kollisionsboxen, Chunk-Grenzen) über die Welt.
  *
- * <p>Uses legacy immediate-mode OpenGL (GL 1.x) so it must run on the render thread.
- * Only active when the F3 debug overlay is visible.</p>
+ * <p>Nutzt Legacy-Immediate-Mode-OpenGL (GL 1.x) und muss daher auf dem Render-Thread laufen.
+ * Nur aktiv wenn das F3-Debug-Overlay sichtbar ist.</p>
  */
 public final class WorldDebugRenderer {
 
@@ -32,9 +32,9 @@ public final class WorldDebugRenderer {
     private static final float DEFAULT_LINE_WIDTH  = 1.0f;
 
     private final World      world;
-    /** Reusable scratch AABB for entity interpolated bounding-box queries. */
+    /** Wiederverwendbare Scratch-AABB für interpolierte Bounding-Box-Abfragen von Entities. */
     private final AABB       scratchEntityBox = new AABB(0, 0, 0, 0);
-    /** Reusable native buffer for uploading the projection matrix via legacy GL. */
+    /** Wiederverwendbarer nativer Buffer zum Hochladen der Projektionsmatrix via Legacy-GL. */
     private final FloatBuffer matBuf          = BufferUtils.createFloatBuffer(MATRIX_FLOAT_COUNT);
 
     public WorldDebugRenderer(final World world) {
@@ -42,10 +42,10 @@ public final class WorldDebugRenderer {
     }
 
     /**
-     * Draws tile AABBs (green), entity AABBs (red) and chunk borders (blue).
+     * Zeichnet Tile-AABBs (grün), Entity-AABBs (rot) und Chunk-Grenzen (blau).
      *
-     * @param camera camera to derive the projection from
-     * @param alpha  interpolation factor 0.0–1.0
+     * @param camera Kamera, von der die Projektion abgeleitet wird
+     * @param alpha  Interpolationsfaktor 0.0–1.0
      */
     public void renderDebugBoxes(final Camera camera, final float alpha) {
         final Matrix4f combined = camera.getProjection(alpha).mul(world.getWorldMatrix());

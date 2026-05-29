@@ -160,7 +160,7 @@ public abstract class Entity {
         boolean moved = false;
         for (final AABB tile : overlapping) {
             final Collision col = boundingBox.getCollision(tile);
-            if (col.isIntersecting) {
+            if (col.isIntersecting()) {
                 boundingBox.correctPosition(tile, col);
                 moved = true;
             }
@@ -222,15 +222,15 @@ public abstract class Entity {
     public void collideWithEntity(Entity entity) {
         final Collision collision = boundingBox.getCollision(entity.boundingBox);
 
-        if (collision.isIntersecting) {
+        if (collision.isIntersecting()) {
             final float sepX = entity.boundingBox.getCenterX() - boundingBox.getCenterX();
             final float sepY = entity.boundingBox.getCenterY() - boundingBox.getCenterY();
 
             // Overlap gleichmäßig auf beide Entities aufteilen
-            final float halfDx = collision.distance.x / DIVIDE_BY_TWO;
-            final float halfDy = collision.distance.y / DIVIDE_BY_TWO;
+            final float halfDx = collision.getDistance().x / DIVIDE_BY_TWO;
+            final float halfDy = collision.getDistance().y / DIVIDE_BY_TWO;
 
-            if (collision.distance.x > collision.distance.y) {
+            if (collision.getDistance().x > collision.getDistance().y) {
                 final float dirX;
                 if (sepX > 0) {
                     dirX = 1f;

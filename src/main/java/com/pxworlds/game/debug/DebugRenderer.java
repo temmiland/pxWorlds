@@ -15,41 +15,41 @@ import static org.lwjgl.opengl.GL11.glEnableClientState;
 import static org.lwjgl.opengl.GL11.glVertexPointer;
 
 /**
- * Utility class for rendering debug text using STBEasyFont.
- * No external font assets required — the font is built into the STB library.
- * Uses the legacy OpenGL fixed-function pipeline (compatibility profile).
+ * Hilfsklasse zum Rendern von Debug-Text mit STBEasyFont.
+ * Keine externen Font-Assets erforderlich — der Font ist in der STB-Bibliothek eingebaut.
+ * Nutzt die Legacy-OpenGL-Fixed-Function-Pipeline (Compatibility Profile).
  */
 public final class DebugRenderer {
 
-    /** Bytes allocated per character in the STBEasyFont vertex buffer. */
+    /** Bytes pro Zeichen im STBEasyFont-Vertex-Buffer. */
     private static final int BYTES_PER_CHAR = 270;
-    /** Byte stride between vertices in the STBEasyFont vertex buffer. */
+    /** Byte-Stride zwischen Vertices im STBEasyFont-Vertex-Buffer. */
     private static final int VERTEX_STRIDE = 16;
-    /** Number of vertices per rendered glyph quad. */
+    /** Anzahl Vertices pro gerendertem Glyph-Quad. */
     private static final int VERTICES_PER_QUAD = 4;
-    /** Number of position components (x, y) per vertex. */
+    /** Anzahl Positionskomponenten (x, y) pro Vertex. */
     private static final int POSITION_COMPONENTS = 2;
 
-    /** Private constructor — static utility class, not instantiable. */
+    /** Privater Konstruktor — statische Utility-Klasse, nicht instanziierbar. */
     private DebugRenderer() { }
 
-    /** Shadow colour: dark grey, slightly transparent-looking against any background. */
+    /** Schattenfarbe: dunkelgrau, wirkt leicht transparent auf jedem Hintergrund. */
     private static final float SHADOW_R = 0.1f;
     private static final float SHADOW_G = 0.1f;
     private static final float SHADOW_B = 0.1f;
-    /** Foreground colour: white. */
+    /** Vordergrundfarbe: weiß. */
     private static final float FG_R = 1.0f;
     private static final float FG_G = 1.0f;
     private static final float FG_B = 1.0f;
-    /** Shadow pixel offset in font coordinates (before TEXT_SCALE is applied). */
+    /** Schatten-Pixel-Offset in Font-Koordinaten (vor TEXT_SCALE). */
     private static final float SHADOW_OFFSET = 1.0f;
 
     /**
-     * Draws a string at the given position in STBEasyFont coordinate space.
-     * The caller is responsible for setting up the OpenGL projection and modelview matrices.
-     * @param text The string to render.
-     * @param x    X position in font coordinates.
-     * @param y    Y position in font coordinates.
+     * Zeichnet einen String an der angegebenen Position im STBEasyFont-Koordinatenraum.
+     * Der Aufrufer ist für das Aufsetzen der OpenGL-Projektions- und Modelview-Matrizen verantwortlich.
+     * @param text der zu rendernde String
+     * @param x    X-Position in Font-Koordinaten
+     * @param y    Y-Position in Font-Koordinaten
      */
     public static void drawString(final String text, final float x, final float y) {
         if (text.isEmpty()) {
@@ -64,11 +64,11 @@ public final class DebugRenderer {
     }
 
     /**
-     * Draws a string with a dark drop shadow.
-     * Manages its own colours — no need to call {@code glColor3f} before this.
-     * @param text The string to render.
-     * @param x    X position in font coordinates.
-     * @param y    Y position in font coordinates.
+     * Zeichnet einen String mit dunklem Schlagschatten.
+     * Verwaltet eigene Farben — kein manuelles {@code glColor3f} nötig.
+     * @param text der zu rendernde String
+     * @param x    X-Position in Font-Koordinaten
+     * @param y    Y-Position in Font-Koordinaten
      */
     public static void drawStringShadowed(final String text, final float x, final float y) {
         glColor3f(SHADOW_R, SHADOW_G, SHADOW_B);

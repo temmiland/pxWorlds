@@ -24,7 +24,7 @@ public class GameStateManager {
 
         gameStates.add(new BrandState(this)); // gameState 0
         gameStates.add(new MenuState(this));  // gameState 1
-        gameStates.add(new LevelState(this));      // gameState 2
+        gameStates.add(new LevelState(this, "test_level"));      // gameState 2
 
     }
 

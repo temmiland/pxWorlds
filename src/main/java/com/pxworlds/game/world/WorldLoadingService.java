@@ -12,12 +12,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Handles loading and saving of {@link World} instances from/to {@code .pxwl} files.
+ * Lädt und speichert {@link World}-Instanzen aus/in {@code .pxwl}-Dateien.
  *
- * <p>Load priority:
+ * <p>Ladereihenfolge:
  * <ol>
- *   <li>User file in {@link Constants#WORLDS_DIRECTORY_PATH} — contains last position.</li>
- *   <li>Classpath resource under {@code /levels/} — initial bundled level.</li>
+ *   <li>Benutzerdatei in {@link Constants#WORLDS_DIRECTORY_PATH} — enthält letzte Position.</li>
+ *   <li>Classpath-Ressource unter {@code /levels/} — initiales gebündeltes Level.</li>
  * </ol>
  */
 public final class WorldLoadingService {
@@ -28,15 +28,15 @@ public final class WorldLoadingService {
     }
 
     /**
-     * Loads a world by name and spawns the player at the saved or spawn position.
+     * Lädt eine Welt nach Name und platziert den Spieler an der gespeicherten oder Spawn-Position.
      *
-     * @param worldName   level name without extension (e.g. {@code "test_level"})
-     * @param camera      camera to position at the player spawn
-     * @param useLastPos  {@code true} to restore the last player position (LevelState);
-     *                    {@code false} to always use the spawn tile (MenuState background)
-     * @param context     class used for classpath resource lookup
-     * @return loaded, fully initialised world
-     * @throws RuntimeException if the level cannot be found or parsed
+     * @param worldName   Level-Name ohne Dateiendung (z.B. {@code "test_level"})
+     * @param camera      Kamera, die auf den Spieler-Spawn positioniert wird
+     * @param useLastPos  {@code true} um die letzte Spielerposition wiederherzustellen (LevelState);
+     *                    {@code false} um immer das Spawn-Tile zu verwenden (MenuState-Hintergrund)
+     * @param context     Klasse für den Classpath-Ressourcenzugriff
+     * @return geladene, vollständig initialisierte Welt
+     * @throws RuntimeException wenn das Level nicht gefunden oder geparst werden kann
      */
     public static World load(final String worldName, final Camera camera,
                              final boolean useLastPos, final Class<?> context) {

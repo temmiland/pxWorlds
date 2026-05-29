@@ -15,13 +15,13 @@ import java.util.function.Consumer;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * Fixed-timestep game loop with an uncapped (FPS-limited) render pass.
+ * Spielschleife mit festem Zeitschritt und separatem (FPS-limitiertem) Render-Pass.
  *
- * <p>Tick logic runs at {@link Constants#TICK_RATE} TPS.
- * Rendering is capped to the configured {@code fpsRate}.</p>
+ * <p>Die Spiellogik läuft mit {@link Constants#TICK_RATE} TPS.
+ * Das Rendering wird auf das konfigurierte {@code fpsRate} begrenzt.</p>
  *
- * <p>A Spiral-of-Death guard limits the maximum number of catch-up ticks
- * per iteration to {@link Constants#MAX_UPDATES_PER_FRAME}.</p>
+ * <p>Ein Spiral-of-Death-Schutz begrenzt die maximale Anzahl der Nachholschritte
+ * pro Iteration auf {@link Constants#MAX_UPDATES_PER_FRAME}.</p>
  */
 public final class GameLoop {
 
@@ -37,11 +37,11 @@ public final class GameLoop {
     private final Consumer<Boolean> onShutdown;
 
     /**
-     * @param gsm         the game state manager to drive each frame
-     * @param debugOverlay the HUD overlay for FPS and debug info
-     * @param fpsRate     target render frames per second
-     * @param onShutdown  called with {@code true} when the shutdown-hook fires,
-     *                    {@code false} when the loop exits normally
+     * @param gsm          der GameStateManager, der jeden Frame gesteuert wird
+     * @param debugOverlay das HUD-Overlay für FPS- und Debug-Informationen
+     * @param fpsRate      Ziel-Render-FPS
+     * @param onShutdown   wird mit {@code true} aufgerufen wenn der Shutdown-Hook feuert,
+     *                     mit {@code false} wenn die Schleife normal endet
      */
     public GameLoop(final GameStateManager gsm, final DebugOverlay debugOverlay,
                     final int fpsRate, final Consumer<Boolean> onShutdown) {
@@ -52,9 +52,9 @@ public final class GameLoop {
     }
 
     /**
-     * Runs the loop until the window requests close.
+     * Führt die Schleife aus, bis das Fenster geschlossen werden soll.
      *
-     * @param window the GLFW window to poll and render into
+     * @param window das GLFW-Fenster, das abgefragt und gerendert wird
      */
     public void run(final Window window) {
         final AtomicBoolean saveGuard = new AtomicBoolean(false);

@@ -16,11 +16,11 @@ import com.pxworlds.game.world.WorldLoadingService;
  */
 public class LevelState extends GameState {
 
-    /** Name des aktuellen Levels (Unterordner unter {@code /levels/} und Dateiname ohne Endung). */
-    private static final String WORLD_NAME = "test_level";
-
     /** Pause-Menu GUI scale (gleich wie MenuGui). */
     private static final int PAUSE_GUI_SCALE = 21;
+
+    /** Name des aktuellen Levels (Unterordner unter {@code /levels/} und Dateiname ohne Endung). */
+    private final String worldName;
 
     /** The camera for rendering. */
     private Camera camera;
@@ -39,8 +39,9 @@ public class LevelState extends GameState {
     /** Debug-Renderer für Kollisionsrahmen und Chunk-Grenzen. */
     private WorldDebugRenderer debugRenderer;
 
-    public LevelState(GameStateManager gsm) {
+    public LevelState(GameStateManager gsm, String worldName) {
         this.gsm = gsm;
+        this.worldName = worldName;
     }
 
     @Override
@@ -61,7 +62,7 @@ public class LevelState extends GameState {
         final TileRenderer newTiles = new TileRenderer();
         final Shader newShader = new Shader("shader");
 
-        final World newWorld = WorldLoadingService.load(WORLD_NAME, newCamera, true, getClass());
+        final World newWorld = WorldLoadingService.load(worldName, newCamera, true, getClass());
 
         this.camera = newCamera;
         this.tiles  = newTiles;
@@ -142,6 +143,6 @@ public class LevelState extends GameState {
 
     @Override
     public void save() {
-        WorldLoadingService.save(world, WORLD_NAME);
+        WorldLoadingService.save(world, worldName);
     }
 }

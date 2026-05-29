@@ -3,20 +3,20 @@ package com.pxworlds.game.rendering;
 import com.pxworlds.game.io.Timer;
 
 public class Animation {
-	/** The array of texture frames. */
+	/** Das Array der Textur-Frames. */
 	private Texture[] frames;
-	/** The current frame index. */
+	/** Der aktuelle Frame-Index. */
 	private int texturePointer;
 
-	/** The elapsed time since the last frame. */
+	/** Die seit dem letzten Frame vergangene Zeit. */
 	private double elapsedTime;
-	/** The current time. */
+	/** Die aktuelle Zeit. */
 	private double currentTime;
-	/** The last time the frame was updated. */
+	/** Der Zeitpunkt des letzten Frame-Wechsels. */
 	private double lastTime;
-	/** The frames per second. */
+	/** Die Frames pro Sekunde (als Sekundenintervall). */
 	private double fps;
-	/** Whether this animation is paused. */
+	/** Ob diese Animation pausiert ist. */
 	private boolean paused;
 
 	public Animation(int amount, int newFps, String filename) {

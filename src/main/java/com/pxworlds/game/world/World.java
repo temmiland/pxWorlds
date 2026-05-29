@@ -284,25 +284,28 @@ public class World {
     }
 
     public void correctCamera(final Camera camera) {
-        final Vector3f pos = camera.getPosition();
         final int w = -width  * scale * HALF_DIVISOR;
         final int h =  height * scale * HALF_DIVISOR;
 
         final int halfVW = camera.getVirtualWidth()  / HALF_DIVISOR;
         final int halfVH = camera.getVirtualHeight() / HALF_DIVISOR;
 
-        if (pos.x > -halfVW + scale) {
-            pos.x = -halfVW + scale;
+        float x = camera.getPosition().x;
+        float y = camera.getPosition().y;
+
+        if (x > -halfVW + scale) {
+            x = -halfVW + scale;
         }
-        if (pos.x < w + halfVW + scale) {
-            pos.x =  w + halfVW + scale;
+        if (x < w + halfVW + scale) {
+            x =  w + halfVW + scale;
         }
-        if (pos.y < halfVH - scale) {
-            pos.y = halfVH - scale;
+        if (y < halfVH - scale) {
+            y = halfVH - scale;
         }
-        if (pos.y > h - halfVH - scale) {
-            pos.y = h - halfVH - scale;
+        if (y > h - halfVH - scale) {
+            y = h - halfVH - scale;
         }
+        camera.setPosition(x, y);
     }
 
     // -------------------------------------------------------------------------

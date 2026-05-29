@@ -11,19 +11,19 @@ import static com.pxworlds.Constants.TITLE;
 
 public class Bootstrap {
 
-    /** The Gson instance for JSON handling. */
+    /** Die Gson-Instanz für JSON-Verarbeitung. */
     private Gson                 gson;
-    /** The JSON configuration. */
+    /** Die JSON-Konfiguration. */
     private JsonConfig           jsonConfig;
-    /** The configuration storage. */
+    /** Der Konfigurationsspeicher. */
     private ConfigurationStorage configurationStorage;
-    /** The world manager. */
+    /** Der World-Manager. */
     private WorldManager         worldManager;
-    /** The API key. */
+    /** Der API-Schlüssel. */
     private String               apiKey;
 
     /**
-     * The method which is the entrance point after psvm.
+     * Einstiegspunkt nach {@code main()} — initialisiert alle Subsysteme und startet das Spiel.
      */
     public void onEnable() {
         this.apiKey = "abc";

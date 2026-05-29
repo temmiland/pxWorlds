@@ -4,30 +4,30 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public class Camera {
-	/** The current camera position. */
+	/** Die aktuelle Kamera-Position. */
 	private Vector3f position;
-	/** The camera position at the start of the last tick — used for render interpolation. */
+	/** Kamera-Position zu Beginn des letzten Ticks — wird für Render-Interpolation verwendet. */
 	private Vector3f prevPosition;
-	/** The projection matrix. */
+	/** Die Projektionsmatrix. */
 	private Matrix4f projection;
-	/** Reusable scratch matrix for getProjection() — avoids per-frame allocation. */
+	/** Wiederverwendbare Scratch-Matrix für getProjection() — vermeidet Allokation pro Frame. */
 	private final Matrix4f projectionScratch = new Matrix4f();
-	/** Reusable scratch matrix for getProjection(alpha) — avoids per-frame allocation. */
+	/** Wiederverwendbare Scratch-Matrix für getProjection(alpha) — vermeidet Allokation pro Frame. */
 	private final Matrix4f projectionAlphaScratch = new Matrix4f();
-	/** Reusable scratch vector for lerp in getProjection(alpha) — avoids per-frame allocation. */
+	/** Wiederverwendbarer Scratch-Vektor für Lerp in getProjection(alpha) — vermeidet Allokation pro Frame. */
 	private final Vector3f interpolatedScratch = new Vector3f();
 
-	/** Reference height used to keep proportional scaling on resize. */
+	/** Referenzhöhe zur proportionalen Skalierung bei Größänderungen. */
 	private final int referenceHeight;
-	/** Virtual viewport width (derived from referenceHeight + aspect ratio). */
+	/** Virtuelle Viewport-Breite (abgeleitet aus Referenzhöhe + Seitenverhältnis). */
 	private int virtualWidth;
-	/** Virtual viewport height (= referenceHeight). */
+	/** Virtuelle Viewport-Höhe (= referenceHeight). */
 	private int virtualHeight;
 
 	/**
-	 * Creates a new Camera with the given viewport size.
-	 * @param width  Viewport width in pixels.
-	 * @param height Viewport height in pixels.
+	 * Erstellt eine neue Kamera mit der angegebenen Viewport-Größe.
+	 * @param width  Viewport-Breite in Pixeln
+	 * @param height Viewport-Höhe in Pixeln
 	 */
 	public Camera(int width, int height) {
 		position = new Vector3f(0, 0, 0);
@@ -45,13 +45,18 @@ public class Camera {
 				-virtualHeight / 2f, virtualHeight / 2f);
 	}
 
-	/** @return virtual viewport width (in world-pixel units) */
+	/** @return virtuelle Viewport-Breite (in Weltpixel-Einheiten) */
 	public int getVirtualWidth() { return virtualWidth; }
-	/** @return virtual viewport height (in world-pixel units) */
+	/** @return virtuelle Viewport-Höhe (in Weltpixel-Einheiten) */
 	public int getVirtualHeight() { return virtualHeight; }
 
 	public void setPosition(Vector3f newPosition) {
 		this.position.set(newPosition);
+	}
+
+	/** Setzt die Kamera-Position auf die angegebenen x/y-Werte (z bleibt unverändert). */
+	public void setPosition(final float x, final float y) {
+		this.position.set(x, y, this.position.z);
 	}
 
 	public void addPosition(Vector3f newPosition) {
@@ -63,35 +68,35 @@ public class Camera {
 	}
 
 	/**
-	 * Saves the current position as prevPosition.
-	 * Must be called at the start of each tick, before any entity updates the camera.
+	 * Sichert die aktuelle Position als prevPosition.
+	 * Muss zu Beginn jedes Ticks aufgerufen werden, bevor eine Entity die Kamera aktualisiert.
 	 */
 	public void savePrevPosition() {
 		prevPosition.set(position);
 	}
 
 	/**
-	 * Returns the untransformed projection matrix (no camera translation applied).
-	 * @return The raw projection matrix.
+	 * Gibt die untransformierte Projektionsmatrix zurück (ohne Kamera-Translation).
+	 * @return die rohe Projektionsmatrix
 	 */
 	public Matrix4f getUntransformedProjection() {
 		return projection;
 	}
 
 	/**
-	 * Returns the projection matrix translated by the current camera position.
-	 * Use only where interpolation is not needed (e.g. GUI).
-	 * @return The projection matrix.
+	 * Gibt die Projektionsmatrix mit der aktuellen Kamera-Position zurück.
+	 * Nur verwenden, wo keine Interpolation benötigt wird (z.B. GUI).
+	 * @return die Projektionsmatrix
 	 */
 	public Matrix4f getProjection() {
 		return projection.translate(position, projectionScratch);
 	}
 
 	/**
-	 * Returns the projection matrix with the camera position interpolated between
-	 * the last tick and the current tick. Use this for all in-world rendering.
-	 * @param alpha Interpolation factor 0.0–1.0 (from the game loop).
-	 * @return The interpolated projection matrix.
+	 * Gibt die Projektionsmatrix mit der zwischen letztem und aktuellem Tick
+	 * interpolierten Kamera-Position zurück. Für alles In-World-Rendering verwenden.
+	 * @param alpha Interpolationsfaktor 0.0–1.0 (aus der Spielschleife)
+	 * @return die interpolierte Projektionsmatrix
 	 */
 	public Matrix4f getProjection(final float alpha) {
 		prevPosition.lerp(position, alpha, interpolatedScratch);

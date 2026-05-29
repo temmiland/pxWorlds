@@ -12,29 +12,29 @@ import javax.imageio.ImageIO;
 import org.lwjgl.BufferUtils;
 
 public class Texture implements AutoCloseable {
-	/** The OpenGL texture object ID. */
+	/** Die OpenGL-Textur-Objekt-ID. */
 	private int textureObject;
-	/** The width of the texture. */
+	/** Die Breite der Textur. */
 	private int width;
-	/** The height of the texture. */
+	/** Die Höhe der Textur. */
 	private int height;
 
-	// Texture loading constants
-	/** The number of bytes per pixel. */
+	// Textur-Ladekonstanten
+	/** Anzahl Bytes pro Pixel. */
 	private static final int BYTES_PER_PIXEL = 4;
-	/** The bit shift for the red color component. */
+	/** Bit-Shift für die Rot-Farbkomponente. */
 	private static final int RED_SHIFT = 16;
-	/** The bit shift for the green color component. */
+	/** Bit-Shift für die Grün-Farbkomponente. */
 	private static final int GREEN_SHIFT = 8;
-	/** The bit shift for the blue color component. */
+	/** Bit-Shift für die Blau-Farbkomponente. */
 	private static final int BLUE_SHIFT = 0;
-	/** The bit shift for the alpha color component. */
+	/** Bit-Shift für die Alpha-Farbkomponente. */
 	private static final int ALPHA_SHIFT = 24;
-	/** The color mask for extracting color components. */
+	/** Farbmaske zum Extrahieren von Farbkomponenten. */
 	private static final int COLOR_MASK = 0xFF;
-	/** The texture level for OpenGL. */
+	/** Textur-Level für OpenGL. */
 	private static final int TEXTURE_LEVEL = 0;
-	/** The maximum number of sampler units. */
+	/** Maximale Anzahl an Sampler-Units. */
 	private static final int MAX_SAMPLER_UNITS = 31;
 
 	public Texture(String filename) {
@@ -68,7 +68,7 @@ public class Texture implements AutoCloseable {
 			glTexImage2D(GL_TEXTURE_2D, TEXTURE_LEVEL, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new IllegalStateException("Textur konnte nicht geladen werden: /textures/" + filename, e);
 		}
 	}
 

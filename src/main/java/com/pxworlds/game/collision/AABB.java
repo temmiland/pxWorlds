@@ -258,14 +258,14 @@ public class AABB {
      * @param data  Kollisionsdaten von {@link #getCollision(AABB)}
      */
     public void correctPosition(AABB box2, Collision data) {
-        if (data.distance.x > data.distance.y) {
+        if (data.getDistance().x > data.getDistance().y) {
             final float dirX;
             if (box2.getCenterX() - getCenterX() > 0) {
                 dirX = 1f;
             } else {
                 dirX = -1f;
             }
-            move(data.distance.x * dirX, 0);
+            move(data.getDistance().x * dirX, 0);
         } else {
             final float dirY;
             if (box2.getCenterY() - getCenterY() > 0) {
@@ -273,7 +273,7 @@ public class AABB {
             } else {
                 dirY = -1f;
             }
-            move(0, data.distance.y * dirY);
+            move(0, data.getDistance().y * dirY);
         }
     }
 }
