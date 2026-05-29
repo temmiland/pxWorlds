@@ -33,6 +33,18 @@ public abstract class GameState {
     }
 
     /**
+     * Zeichnet GUI-Overlays (Menüs, Buttons etc.) nach den Debug-Boxen.
+     * Wird nach {@link #renderDebug} aufgerufen, damit GUIs immer oben liegen.
+     *
+     * <p>Standard-Implementierung ist ein No-op.</p>
+     *
+     * @param alpha Interpolationsfaktor 0.0–1.0
+     */
+    public void renderGui(final float alpha) {
+        // no-op by default
+    }
+
+    /**
      * Liefert state-spezifische Zeilen für das F3-Debug-Panel.
      *
      * <p>Standard-Implementierung gibt ein leeres Array zurück.

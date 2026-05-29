@@ -111,6 +111,10 @@ public class LevelState extends GameState {
     @Override
     public void render(float alpha) {
         world.render(tiles, shader, camera, alpha);
+    }
+
+    @Override
+    public void renderGui(final float alpha) {
         if (paused) {
             pauseGui.render();
         }

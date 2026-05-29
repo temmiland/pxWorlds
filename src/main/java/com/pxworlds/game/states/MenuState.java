@@ -74,6 +74,10 @@ public class MenuState extends GameState {
     @Override
     public void render(float alpha) {
         world.render(tiles, shader, camera, alpha);
+    }
+
+    @Override
+    public void renderGui(final float alpha) {
         gui.render();
     }
 }

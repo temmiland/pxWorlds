@@ -61,6 +61,15 @@ public class GameStateManager {
     }
 
     /**
+     * Zeichnet GUI-Overlays des aktuellen States nach den Debug-Boxen.
+     *
+     * @param alpha Interpolationsfaktor 0.0–1.0
+     */
+    public void renderGui(final float alpha) {
+        gameStates.get(currentState).renderGui(alpha);
+    }
+
+    /**
      * Liefert state-spezifische Debug-Zeilen für das F3-Panel.
      * @return Zeilen die unter dem Separator im Debug-Panel erscheinen
      */

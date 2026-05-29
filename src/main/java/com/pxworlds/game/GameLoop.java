@@ -126,6 +126,7 @@ public final class GameLoop {
                 } else {
                     debugLines = NO_DEBUG_LINES;
                 }
+                gsm.renderGui(alpha);
                 debugOverlay.render(window, alpha, debugLines);
                 window.swapBuffers();
                 frames++;
