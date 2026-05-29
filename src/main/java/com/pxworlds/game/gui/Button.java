@@ -17,64 +17,38 @@ import static org.lwjgl.opengl.GL20.glUseProgram;
 
 
 public class Button {
-	/** Tile coordinates for button rendering. */
-	/** Top left corner tile. */
-	private static final int BUTTON_CORNER_TOP_LEFT = 4;
-	/** Top right corner tile. */
-	private static final int BUTTON_CORNER_TOP_RIGHT = 7;
-	/** Bottom left corner tile. */
-	private static final int BUTTON_CORNER_BOTTOM_LEFT = 1;
-	/** Bottom right corner tile. */
-	private static final int BUTTON_CORNER_BOTTOM_RIGHT = 1;
-	/** Top edge tile. */
-	private static final int BUTTON_EDGE_TOP = 4;
-	/** Bottom edge tile. */
-	private static final int BUTTON_EDGE_BOTTOM = 7;
-	/** Fill row tile. */
-	private static final int BUTTON_FILL_ROW = 1;
-	/** Top row. */
-	private static final int BUTTON_TOP_ROW = 0;
-	/** Bottom row. */
-	private static final int BUTTON_BOTTOM_ROW = 2;
-	/** Left column. */
-	private static final int BUTTON_LEFT_COL = 3;
-	/** Right column. */
-	private static final int BUTTON_RIGHT_COL = 5;
-	/** Left selected column. */
-	private static final int BUTTON_LEFT_SELECTED_COL = 6;
-	/** Right selected column. */
-	private static final int BUTTON_RIGHT_SELECTED_COL = 8;
-	/** Left idle column. */
-	private static final int BUTTON_LEFT_IDLE_COL = 0;
-	/** Right idle column. */
-	private static final int BUTTON_RIGHT_IDLE_COL = 2;
-	/** Top left corner column. */
-	private static final int BUTTON_CORNER_TOP_LEFT_COL = 3;
-	/** Top right corner column. */
-	private static final int BUTTON_CORNER_TOP_RIGHT_COL = 5;
-	/** Bottom left corner column. */
-	private static final int BUTTON_CORNER_BOTTOM_LEFT_COL = 3;
-	/** Bottom right corner column. */
-	private static final int BUTTON_CORNER_BOTTOM_RIGHT_COL = 5;
-	/** Selected left corner column. */
-	private static final int BUTTON_CORNER_SELECTED_LEFT_COL = 6;
-	/** Selected right corner column. */
-	private static final int BUTTON_CORNER_SELECTED_RIGHT_COL = 8;
-	/** Idle left corner column. */
-	private static final int BUTTON_CORNER_IDLE_LEFT_COL = 0;
-	/** Idle right corner column. */
-	private static final int BUTTON_CORNER_IDLE_RIGHT_COL = 2;
-	/** Corner size. */
+	/**
+	 * Tile-Koordinaten für das Button-Rendering.
+	 * {@code baseCol} ist die Spalte im IDLE-Zustand; SELECTED addiert +3, CLICKED +6.
+	 * {@code row} ist die feste Zeile im Tilesheet (0=oben, 1=mitte, 2=unten).
+	 */
+	private enum ButtonTile {
+		FILL(1, 1),
+		TOP(1, 0),
+		BOTTOM(1, 2),
+		LEFT(0, 1),
+		RIGHT(2, 1),
+		CORNER_TOP_LEFT(0, 0),
+		CORNER_TOP_RIGHT(2, 0),
+		CORNER_BOTTOM_LEFT(0, 2),
+		CORNER_BOTTOM_RIGHT(2, 2);
+
+		final int baseCol;
+		final int row;
+
+		ButtonTile(int baseCol, int row) {
+			this.baseCol = baseCol;
+			this.row = row;
+		}
+
+		int col(ButtonState state) {
+			return baseCol + state.ordinal() * 3;
+		}
+	}
+
+	/** Corner size in pixels. */
 	private static final int BUTTON_CORNER_SIZE = 16;
-	/** Top left corner row. */
-	private static final int BUTTON_CORNER_TOP_LEFT_ROW = 0;
-	/** Top right corner row. */
-	private static final int BUTTON_CORNER_TOP_RIGHT_ROW = 0;
-	/** Bottom left corner row. */
-	private static final int BUTTON_CORNER_BOTTOM_LEFT_ROW = 2;
-	/** Bottom right corner row. */
-	private static final int BUTTON_CORNER_BOTTOM_RIGHT_ROW = 2;
-	/** Border size. */
+	/** Border size in pixels. */
 	private static final int BUTTON_BORDER_SIZE = 16;
 
 	/** STBEasyFont font height in coordinate units. */
@@ -141,21 +115,7 @@ public class Button {
 	public void render(Camera camera, TileSheet sheet, Shader shader) {
 		final Vector2f position = boundingBox.getCenter(), scale = boundingBox.getHalfExtent();
 
-		transform.identity().translate(position.x, position.y, 0).scale(scale.x, scale.y, 1); // Middle/Fill
-
-		shader.setUniform("projection", camera.getProjection().mul(transform));
-		switch (selectedState) {
-			case SELECTED :
-				sheet.bindTile(shader, BUTTON_CORNER_TOP_LEFT, BUTTON_FILL_ROW);
-				break;
-			case CLICKED :
-				sheet.bindTile(shader, BUTTON_CORNER_TOP_RIGHT, BUTTON_FILL_ROW);
-				break;
-			default :
-				sheet.bindTile(shader, BUTTON_CORNER_BOTTOM_LEFT, BUTTON_FILL_ROW);
-				break;
-		}
-		Assets.getModel().render();
+		renderTile(position.x, position.y, scale.x, scale.y, ButtonTile.FILL, camera, sheet, shader);
 
 		renderSides(position, scale, camera, sheet, shader);
 		renderCorners(position, scale, camera, sheet, shader);
@@ -164,134 +124,23 @@ public class Button {
 	}
 
 	private void renderSides(Vector2f position, Vector2f scale, Camera camera, TileSheet sheet, Shader shader) {
-		transform.identity().translate(position.x, position.y + scale.y - BUTTON_BORDER_SIZE, 0).scale(scale.x, BUTTON_BORDER_SIZE, 1); // Top
-
-		shader.setUniform("projection", camera.getProjection().mul(transform));
-		switch (selectedState) {
-			case SELECTED :
-				sheet.bindTile(shader, BUTTON_EDGE_TOP, BUTTON_TOP_ROW);
-				break;
-			case CLICKED :
-				sheet.bindTile(shader, BUTTON_EDGE_BOTTOM, BUTTON_TOP_ROW);
-				break;
-			default :
-				sheet.bindTile(shader, BUTTON_CORNER_BOTTOM_LEFT, BUTTON_TOP_ROW);
-				break;
-		}
-		Assets.getModel().render();
-
-		transform.identity().translate(position.x, position.y - scale.y + BUTTON_BORDER_SIZE, 0).scale(scale.x, BUTTON_BORDER_SIZE, 1); // Bottom
-
-		shader.setUniform("projection", camera.getProjection().mul(transform));
-		switch (selectedState) {
-			case SELECTED :
-				sheet.bindTile(shader, BUTTON_EDGE_TOP, BUTTON_BOTTOM_ROW);
-				break;
-			case CLICKED :
-				sheet.bindTile(shader, BUTTON_EDGE_BOTTOM, BUTTON_BOTTOM_ROW);
-				break;
-			default :
-				sheet.bindTile(shader, BUTTON_CORNER_BOTTOM_LEFT, BUTTON_BOTTOM_ROW);
-				break;
-		}
-		Assets.getModel().render();
-
-		transform.identity().translate(position.x - scale.x + BUTTON_BORDER_SIZE, position.y, 0).scale(BUTTON_BORDER_SIZE, scale.y, 1); // Left
-
-		shader.setUniform("projection", camera.getProjection().mul(transform));
-		switch (selectedState) {
-			case SELECTED :
-				sheet.bindTile(shader, BUTTON_LEFT_COL, BUTTON_FILL_ROW);
-				break;
-			case CLICKED :
-				sheet.bindTile(shader, BUTTON_LEFT_SELECTED_COL, BUTTON_FILL_ROW);
-				break;
-			default :
-				sheet.bindTile(shader, BUTTON_LEFT_IDLE_COL, BUTTON_FILL_ROW);
-				break;
-		}
-		Assets.getModel().render();
-
-		transform.identity().translate(position.x + scale.x - BUTTON_BORDER_SIZE, position.y, 0).scale(BUTTON_BORDER_SIZE, scale.y, 1); // Right
-
-		shader.setUniform("projection", camera.getProjection().mul(transform));
-		switch (selectedState) {
-			case SELECTED :
-				sheet.bindTile(shader, BUTTON_RIGHT_COL, BUTTON_FILL_ROW);
-				break;
-			case CLICKED :
-				sheet.bindTile(shader, BUTTON_RIGHT_SELECTED_COL, BUTTON_FILL_ROW);
-				break;
-			default :
-				sheet.bindTile(shader, BUTTON_RIGHT_IDLE_COL, BUTTON_FILL_ROW);
-				break;
-		}
-		Assets.getModel().render();
+		renderTile(position.x, position.y + scale.y - BUTTON_BORDER_SIZE, scale.x, BUTTON_BORDER_SIZE, ButtonTile.TOP, camera, sheet, shader);
+		renderTile(position.x, position.y - scale.y + BUTTON_BORDER_SIZE, scale.x, BUTTON_BORDER_SIZE, ButtonTile.BOTTOM, camera, sheet, shader);
+		renderTile(position.x - scale.x + BUTTON_BORDER_SIZE, position.y, BUTTON_BORDER_SIZE, scale.y, ButtonTile.LEFT, camera, sheet, shader);
+		renderTile(position.x + scale.x - BUTTON_BORDER_SIZE, position.y, BUTTON_BORDER_SIZE, scale.y, ButtonTile.RIGHT, camera, sheet, shader);
 	}
 
 	private void renderCorners(Vector2f position, Vector2f scale, Camera camera, TileSheet sheet, Shader shader) {
-		transform.identity().translate(position.x - scale.x + BUTTON_CORNER_SIZE, position.y + scale.y - BUTTON_CORNER_SIZE, 0).scale(BUTTON_CORNER_SIZE, BUTTON_CORNER_SIZE, 1); // Top Left
+		renderTile(position.x - scale.x + BUTTON_CORNER_SIZE, position.y + scale.y - BUTTON_CORNER_SIZE, BUTTON_CORNER_SIZE, BUTTON_CORNER_SIZE, ButtonTile.CORNER_TOP_LEFT, camera, sheet, shader);
+		renderTile(position.x + scale.x - BUTTON_CORNER_SIZE, position.y + scale.y - BUTTON_CORNER_SIZE, BUTTON_CORNER_SIZE, BUTTON_CORNER_SIZE, ButtonTile.CORNER_TOP_RIGHT, camera, sheet, shader);
+		renderTile(position.x - scale.x + BUTTON_CORNER_SIZE, position.y - scale.y + BUTTON_CORNER_SIZE, BUTTON_CORNER_SIZE, BUTTON_CORNER_SIZE, ButtonTile.CORNER_BOTTOM_LEFT, camera, sheet, shader);
+		renderTile(position.x + scale.x - BUTTON_CORNER_SIZE, position.y - scale.y + BUTTON_CORNER_SIZE, BUTTON_CORNER_SIZE, BUTTON_CORNER_SIZE, ButtonTile.CORNER_BOTTOM_RIGHT, camera, sheet, shader);
+	}
 
+	private void renderTile(float x, float y, float w, float h, ButtonTile tile, Camera camera, TileSheet sheet, Shader shader) {
+		transform.identity().translate(x, y, 0).scale(w, h, 1);
 		shader.setUniform("projection", camera.getProjection().mul(transform));
-		switch (selectedState) {
-			case SELECTED :
-				sheet.bindTile(shader, BUTTON_CORNER_TOP_LEFT_COL, BUTTON_CORNER_TOP_LEFT_ROW);
-				break;
-			case CLICKED :
-				sheet.bindTile(shader, BUTTON_CORNER_SELECTED_LEFT_COL, BUTTON_CORNER_TOP_LEFT_ROW);
-				break;
-			default :
-				sheet.bindTile(shader, BUTTON_CORNER_IDLE_LEFT_COL, BUTTON_CORNER_TOP_LEFT_ROW);
-				break;
-		}
-		Assets.getModel().render();
-
-		transform.identity().translate(position.x + scale.x - BUTTON_CORNER_SIZE, position.y + scale.y - BUTTON_CORNER_SIZE, 0).scale(BUTTON_CORNER_SIZE, BUTTON_CORNER_SIZE, 1); // Top Right
-
-		shader.setUniform("projection", camera.getProjection().mul(transform));
-		switch (selectedState) {
-			case SELECTED :
-				sheet.bindTile(shader, BUTTON_CORNER_TOP_RIGHT_COL, BUTTON_CORNER_TOP_RIGHT_ROW);
-				break;
-			case CLICKED :
-				sheet.bindTile(shader, BUTTON_CORNER_SELECTED_RIGHT_COL, BUTTON_CORNER_TOP_RIGHT_ROW);
-				break;
-			default :
-				sheet.bindTile(shader, BUTTON_CORNER_IDLE_RIGHT_COL, BUTTON_CORNER_TOP_RIGHT_ROW);
-				break;
-		}
-		Assets.getModel().render();
-
-		transform.identity().translate(position.x - scale.x + BUTTON_CORNER_SIZE, position.y - scale.y + BUTTON_CORNER_SIZE, 0).scale(BUTTON_CORNER_SIZE, BUTTON_CORNER_SIZE, 1); // Bottom Left
-
-		shader.setUniform("projection", camera.getProjection().mul(transform));
-		switch (selectedState) {
-			case SELECTED :
-				sheet.bindTile(shader, BUTTON_CORNER_BOTTOM_LEFT_COL, BUTTON_CORNER_BOTTOM_LEFT_ROW);
-				break;
-			case CLICKED :
-				sheet.bindTile(shader, BUTTON_CORNER_SELECTED_LEFT_COL, BUTTON_CORNER_BOTTOM_LEFT_ROW);
-				break;
-			default :
-				sheet.bindTile(shader, BUTTON_CORNER_IDLE_LEFT_COL, BUTTON_CORNER_BOTTOM_LEFT_ROW);
-				break;
-		}
-		Assets.getModel().render();
-
-		transform.identity().translate(position.x + scale.x - BUTTON_CORNER_SIZE, position.y - scale.y + BUTTON_CORNER_SIZE, 0).scale(BUTTON_CORNER_SIZE, BUTTON_CORNER_SIZE, 1); // Bottom Right
-
-		shader.setUniform("projection", camera.getProjection().mul(transform));
-		switch (selectedState) {
-			case SELECTED :
-				sheet.bindTile(shader, BUTTON_CORNER_BOTTOM_RIGHT_COL, BUTTON_CORNER_BOTTOM_RIGHT_ROW);
-				break;
-			case CLICKED :
-				sheet.bindTile(shader, BUTTON_CORNER_SELECTED_RIGHT_COL, BUTTON_CORNER_BOTTOM_RIGHT_ROW);
-				break;
-			default :
-				sheet.bindTile(shader, BUTTON_CORNER_IDLE_RIGHT_COL, BUTTON_CORNER_BOTTOM_RIGHT_ROW);
-				break;
-		}
+		sheet.bindTile(shader, tile.col(selectedState), tile.row);
 		Assets.getModel().render();
 	}
 
