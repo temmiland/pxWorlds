@@ -11,6 +11,13 @@ public class Constants {
 
     /** Aktuelle Spielversion, aus pom.xml via Filtered Resources ermittelt. */
     public static final String VERSION               = loadVersion();
+    /** {@code true} wenn das Spiel nicht aus einer JAR gestartet wurde (d.h. via mvnw/IDE). */
+    public static final boolean DEV_MODE             = detectDevMode();
+
+    private static boolean detectDevMode() {
+        final java.net.URL url = Constants.class.getResource("Constants.class");
+        return url == null || !"jar".equals(url.getProtocol());
+    }
     /** Titel der Anwendung. */
     public static final String TITLE                 = "pxWorlds - Let's Adventure!";
     /** Name des Programmverzeichnisses. */
@@ -52,8 +59,7 @@ public class Constants {
             }
             properties.load(input);
             return properties.getProperty("app.version", "dev");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             return "dev";
         }
     }

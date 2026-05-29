@@ -1,6 +1,8 @@
 package com.pxworlds.game.states;
 
+import com.pxworlds.Constants;
 import com.pxworlds.game.gui.MenuGui;
+import com.pxworlds.game.io.InputAction;
 import com.pxworlds.game.io.Window;
 import com.pxworlds.game.states.GameStateType;
 import com.pxworlds.game.rendering.Camera;
@@ -21,6 +23,8 @@ public class MenuState extends GameState {
 
     /** Menü-GUI. */
     private MenuGui gui;
+    /** Debug-UI sichtbar (nur im Dev-Mode per F4 umschaltbar). */
+    private boolean debugUiVisible = false;
 
     /** Die Hintergrundwelt. */
     private World world;
@@ -45,13 +49,12 @@ public class MenuState extends GameState {
 
         final World newWorld = WorldLoadingService.load(WORLD_NAME, newCamera, false, getClass());
 
-        this.gui = new MenuGui(newWindow, "menustate", MENU_GUI_SCALE,
-                () -> gsm.setState(GameStateType.LEVEL));
         this.camera = newCamera;
         this.world = newWorld;
         this.tiles = newTiles;
         this.shader = newShader;
         this.window = newWindow;
+        rebuildGui();
 
         world.calculateView(newCamera);
     }
@@ -67,6 +70,10 @@ public class MenuState extends GameState {
     public void update(double delta) {
         world.update((float) delta, window, camera);
         world.correctCamera(camera);
+        if (Constants.DEV_MODE && window.getInputProcessor().wasPressed(InputAction.DEBUG_UI_TOGGLE)) {
+            debugUiVisible = !debugUiVisible;
+            rebuildGui();
+        }
         gui.update(window.getInputProcessor(), window.getMousePosition(),
                    window.getWidth(), window.getHeight());
     }
@@ -79,5 +86,12 @@ public class MenuState extends GameState {
     @Override
     public void renderGui(final float alpha) {
         gui.render();
+    }
+
+    private void rebuildGui() {
+        this.gui = new MenuGui(window, "menustate", MENU_GUI_SCALE,
+                () -> gsm.setState(GameStateType.WORLD_SELECT),
+                () -> gsm.showMigrationError("Debug: Simulated migration error for testing."),
+                Constants.DEV_MODE && debugUiVisible);
     }
 }
