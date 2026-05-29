@@ -1,6 +1,5 @@
 package com.pxworlds.game.states;
 
-import com.pxworlds.Constants;
 import com.pxworlds.game.gui.PauseGui;
 import com.pxworlds.game.io.InputAction;
 import com.pxworlds.game.io.Window;
@@ -9,21 +8,12 @@ import com.pxworlds.game.rendering.Camera;
 import com.pxworlds.game.rendering.Shader;
 import com.pxworlds.game.rendering.tiles.TileRenderer;
 import com.pxworlds.game.world.World;
-import com.pxworlds.game.world.WorldIO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import com.pxworlds.game.world.WorldLoadingService;
 
 /**
  * Created by temmiland on 28.09.2017.
  */
 public class LevelState extends GameState {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(LevelState.class);
 
     /** Name des aktuellen Levels (Unterordner unter {@code /levels/} und Dateiname ohne Endung). */
     private static final String WORLD_NAME = "test_level";
@@ -68,19 +58,7 @@ public class LevelState extends GameState {
         final TileRenderer newTiles = new TileRenderer();
         final Shader newShader = new Shader("shader");
 
-        // Lade-Reihenfolge:
-        //  1. User-Datei  (~/.pxworlds/worlds/<name>.pxwl) — enthält Letztposition
-        //  2. Classpath-Resource (/levels/<name>.pxwl)     — initiales Level
-        final File userFile = new File(Constants.WORLDS_DIRECTORY_PATH, WORLD_NAME + ".pxwl");
-        final World newWorld;
-        try {
-            newWorld = loadFromPxwl(userFile.exists()
-                    ? new java.io.FileInputStream(userFile)
-                    : getClass().getResourceAsStream("/levels/" + WORLD_NAME + ".pxwl"),
-                    newCamera);
-        } catch (IOException e) {
-            throw new RuntimeException("Kann Level '" + WORLD_NAME + "' nicht laden", e);
-        }
+        final World newWorld = WorldLoadingService.load(WORLD_NAME, newCamera, true, getClass());
 
         this.camera = newCamera;
         this.tiles  = newTiles;
@@ -154,57 +132,8 @@ public class LevelState extends GameState {
         return world.getDebugLines(camera);
     }
 
-    /**
-     * Lädt eine Welt aus dem gegebenen Stream und spawnt den Spieler.
-     *
-     * <ul>
-     *   <li>Ist ein Spawn in der Datei gespeichert (Version ≥ 2), wird
-     *       {@link World#spawnPlayer} verwendet — das nutzt automatisch die
-     *       Lastpos (Version 3) wenn vorhanden.</li>
-     *   <li>{@code stream == null} wirft eine IOException.</li>
-     * </ul>
-     *
-     * @param stream  Quell-Stream der .pxwl-Datei; wird nach dem Lesen geschlossen
-     * @param camera  wird auf die Startposition gesetzt
-     * @return geladene, fertig initialisierte Welt
-     * @throws IOException wenn stream null ist oder das Format ungültig ist
-     */
-    private World loadFromPxwl(final InputStream stream, final Camera camera) throws IOException {
-        if (stream == null) {
-            throw new IOException("Kein .pxwl-Stream verfügbar für '" + WORLD_NAME + "'");
-        }
-        try (InputStream s = stream) {
-            final World w = WorldIO.load(s);
-            w.spawnPlayer(camera, true);
-            LOGGER.info("Level '{}' geladen (Lastpos={}, SpawnTile={}/{})",
-                    WORLD_NAME, w.hasLastPos(),
-                    w.getSpawnTileX(), w.getSpawnTileY());
-            return w;
-        }
-    }
-
-    /**
-     * Speichert die aktuelle Welt als {@code <worldName>.pxwl} in
-     * {@link Constants#WORLDS_DIRECTORY_PATH}. Wird beim Schließen des Spiels
-     * aufgerufen.
-     *
-     * <p>Ist die Welt noch nicht initialisiert (z.B. wenn der LevelState
-     * nie aktiv war), wird nichts gespeichert.</p>
-     */
     @Override
     public void save() {
-        if (world == null) {
-            return;
-        }
-        final File dir = new File(Constants.WORLDS_DIRECTORY_PATH);
-        dir.mkdirs();
-        final File file = new File(dir, WORLD_NAME + ".pxwl");
-        world.capturePlayerPosition();
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            WorldIO.save(world, fos);
-            LOGGER.info("Welt gespeichert: {}", file.getAbsolutePath());
-        } catch (IOException e) {
-            LOGGER.error("Fehler beim Speichern der Welt '{}'", WORLD_NAME, e);
-        }
+        WorldLoadingService.save(world, WORLD_NAME);
     }
 }

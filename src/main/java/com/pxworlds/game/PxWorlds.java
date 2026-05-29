@@ -4,8 +4,6 @@ import com.pxworlds.Constants;
 import com.pxworlds.configuration.ConfigurationStorage;
 import com.pxworlds.game.assets.Assets;
 import com.pxworlds.game.debug.DebugOverlay;
-import com.pxworlds.game.io.InputAction;
-import com.pxworlds.game.io.Timer;
 import com.pxworlds.game.io.Window;
 import com.pxworlds.game.states.GameStateManager;
 import org.lwjgl.opengl.GL;
@@ -14,8 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PxWorlds {
 	/** The logger for PxWorlds. */
@@ -36,9 +32,6 @@ public class PxWorlds {
 	/** The configuration storage for saving on exit. */
 	private ConfigurationStorage configurationStorage;
 
-    /** Wiederverwendbares leeres Array — vermeidet Heap-Allokation pro Render-Frame. */
-    private static final String[] NO_DEBUG_LINES = new String[0];
-
 	public PxWorlds(String newTitle, int newWidth, int newHeight, boolean newFullscreen, int newFpsRate, ConfigurationStorage newConfigurationStorage) {
 		this.title = newTitle;
 		this.width = newWidth;
@@ -54,7 +47,6 @@ public class PxWorlds {
 	}
 
 	public void run() {
-
 		Window.setCallbacks();
 
 		if (!glfwInit()) {
@@ -67,113 +59,34 @@ public class PxWorlds {
 		window.setFullscreen(fullscreen);
 		window.createWindow(title);
 
-		GL.createCapabilities();
+		initOpenGL(window);
+		Assets.initAsset();
+		gsm.init(window);
 
+		final DebugOverlay debugOverlay = new DebugOverlay();
+		final GameLoop loop = new GameLoop(gsm, debugOverlay, fpsRate, fromShutdownHook -> {
+			gsm.save();
+		});
+
+		try {
+			loop.run(window);
+		} finally {
+			Assets.deleteAsset();
+			configurationStorage.getScreenConfiguration()
+					.setLastWidth(window.getWidth())
+					.setLastHeight(window.getHeight());
+			configurationStorage.saveAllConfigurations();
+			window.cleanUp();
+			glfwTerminate();
+		}
+	}
+
+	/** Initialises OpenGL capabilities and base render state for the given window. */
+	private void initOpenGL(final Window window) {
+		GL.createCapabilities();
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glViewport(0, 0, window.getFramebufferWidth(), window.getFramebufferHeight());
-
-        Assets.initAsset();
-
-        gsm.init(window);
-
-        // Shutdown-Hook: sichert Spielstand auch bei IDE-Stop (SIGTERM).
-        // AtomicBoolean verhindert Doppel-Save wenn der Loop normal endet.
-        final AtomicBoolean saveGuard = new AtomicBoolean(false);
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (saveGuard.compareAndSet(false, true)) {
-                LOGGER.info("Shutdown-Hook: Spielstand wird gesichert...");
-                gsm.save();
-            }
-        }, "pxworlds-save-hook"));
-
-        final DebugOverlay debugOverlay = new DebugOverlay();
-
-        // Logik läuft fest mit TICK_RATE, Rendering mit fpsRate — entkoppelt
-		final double tickDuration = 1.0 / Constants.TICK_RATE;
-		final double renderCap   = 1.0 / fpsRate;
-
-		double tickAccumulator   = 0;
-		double renderAccumulator = 0;
-		double frameTime         = 0;
-		int frames               = 0;
-
-		double time = Timer.getTime();
-
-        try {
-            while (!window.shouldClose()) {
-
-                final double now    = Timer.getTime();
-                final double passed = now - time;
-                time = now;
-
-                tickAccumulator   += passed;
-                renderAccumulator += passed;
-                frameTime         += passed;
-
-                // Spiral-of-Death-Schutz: bei Lag-Spikes maximale Nachholzeit begrenzen
-                if (tickAccumulator > tickDuration * Constants.MAX_UPDATES_PER_FRAME) {
-                    tickAccumulator = tickDuration * Constants.MAX_UPDATES_PER_FRAME;
-                }
-
-                // --- Logik: fixer Zeitschritt (TICK_RATE TPS) ---
-                while (tickAccumulator >= tickDuration) {
-                    tickAccumulator -= tickDuration;
-
-                    window.update();
-
-                    if (window.hasResized()) {
-                        gsm.resize();
-                        glViewport(0, 0, window.getFramebufferWidth(), window.getFramebufferHeight());
-                    }
-
-                    if (window.getInputProcessor().wasPressed(InputAction.DEBUG_TOGGLE)) {
-                        debugOverlay.toggleDetailed();
-                    }
-
-                    gsm.update(tickDuration);
-                }
-
-                // --- Rendering: fpsRate cap ---
-                if (renderAccumulator >= renderCap) {
-                    renderAccumulator -= renderCap;
-
-                    // Wie weit sind wir zwischen letztem und nächstem Tick? (0.0 – 1.0)
-                    final float alpha = (float) (tickAccumulator / tickDuration);
-
-                    glClear(GL_COLOR_BUFFER_BIT);
-                    gsm.render(alpha);
-                    final String[] debugLines;
-                    if (debugOverlay.isShowDetailed()) {
-                        gsm.renderDebug(alpha);
-                        debugLines = gsm.getDebugLines(); // nur wenn F3-Panel sichtbar
-                    } else {
-                        debugLines = NO_DEBUG_LINES;
-                    }
-                    debugOverlay.render(window, alpha, debugLines);
-                    window.swapBuffers();
-                    frames++;
-
-                    if (frameTime >= 1.0) {
-                        frameTime = 0;
-                        debugOverlay.updateFps(frames);
-                        frames = 0;
-                    }
-                }
-            }
-        } finally {
-            // Normaler Exit-Pfad: saveGuard verhindert Doppel-Save mit dem Shutdown-Hook
-            if (saveGuard.compareAndSet(false, true)) {
-                gsm.save();
-            }
-            Assets.deleteAsset();
-            configurationStorage.getScreenConfiguration()
-                    .setLastWidth(window.getWidth())
-                    .setLastHeight(window.getHeight());
-            configurationStorage.saveAllConfigurations();
-            window.cleanUp();
-            glfwTerminate();
-        }
 	}
 
 }

@@ -1,6 +1,5 @@
 package com.pxworlds.game.states;
 
-import com.pxworlds.Constants;
 import com.pxworlds.game.gui.MenuGui;
 import com.pxworlds.game.io.Window;
 import com.pxworlds.game.states.GameStateType;
@@ -8,12 +7,7 @@ import com.pxworlds.game.rendering.Camera;
 import com.pxworlds.game.rendering.Shader;
 import com.pxworlds.game.rendering.tiles.TileRenderer;
 import com.pxworlds.game.world.World;
-import com.pxworlds.game.world.WorldIO;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import com.pxworlds.game.world.WorldLoadingService;
 
 /**
  * Created by temmiland on 28.09.2017.
@@ -49,22 +43,7 @@ public class MenuState extends GameState {
         final TileRenderer newTiles = new TileRenderer();
         final Shader newShader = new Shader("shader");
 
-        final File userFile = new File(Constants.WORLDS_DIRECTORY_PATH, WORLD_NAME + ".pxwl");
-        final World newWorld;
-        try {
-            final InputStream stream = userFile.exists()
-                    ? new FileInputStream(userFile)
-                    : getClass().getResourceAsStream("/levels/" + WORLD_NAME + ".pxwl");
-            if (stream == null) {
-                throw new IOException("Kein .pxwl-Stream verfügbar für '" + WORLD_NAME + "'");
-            }
-            try (InputStream s = stream) {
-                newWorld = WorldIO.load(s);
-                newWorld.spawnPlayer(newCamera, false);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Kann Menü-Level '" + WORLD_NAME + "' nicht laden", e);
-        }
+        final World newWorld = WorldLoadingService.load(WORLD_NAME, newCamera, false, getClass());
 
         this.gui = new MenuGui(newWindow, "menustate", MENU_GUI_SCALE,
                 () -> gsm.setState(GameStateType.LEVEL));
