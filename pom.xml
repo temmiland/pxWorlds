@@ -15,6 +15,7 @@
 		<joml.version>1.10.7</joml.version>
 		<slf4j.version>2.0.16</slf4j.version>
 		<logback.version>1.5.12</logback.version>
+		<rollercoaster.version>0.0.1d</rollercoaster.version>
 	</properties>
 
 	<profiles>
@@ -52,7 +53,7 @@
 								<argument>-XstartOnFirstThread</argument>
 								<argument>-classpath</argument>
 								<classpath/>
-								<argument>com.pxworlds.Main</argument>
+								<argument>temmiland.pxworlds.Main</argument>
 							</arguments>
 						</configuration>
 					</plugin>
@@ -81,7 +82,7 @@
 								<argument>-XstartOnFirstThread</argument>
 								<argument>-classpath</argument>
 								<classpath/>
-								<argument>com.pxworlds.Main</argument>
+								<argument>temmiland.pxworlds.Main</argument>
 							</arguments>
 						</configuration>
 					</plugin>
@@ -149,7 +150,6 @@
                 <version>3.5.0</version>
                 <configuration>
                     <configLocation>checkstyle.xml</configLocation>
-                    <encoding>UTF-8</encoding>
                     <consoleOutput>true</consoleOutput>
                     <failsOnError>true</failsOnError>
                 </configuration>
@@ -174,7 +174,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>com.pxworlds.Main</mainClass>
+							<mainClass>temmiland.pxworlds.Main</mainClass>
 						</manifest>
 					</archive>
 					<appendAssemblyId>false</appendAssemblyId>
@@ -207,13 +207,20 @@
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>3.5.0</version>
 				<configuration>
-					<mainClass>com.pxworlds.Main</mainClass>
+					<mainClass>temmiland.pxworlds.Main</mainClass>
 				</configuration>
 			</plugin>
         </plugins>
     </build>
 
 	<dependencies>
+		<!-- Rollercoaster Framework -->
+		<dependency>
+			<groupId>temmiland</groupId>
+			<artifactId>rollercoaster</artifactId>
+			<version>${rollercoaster.version}</version>
+		</dependency>
+
 		<!-- LWJGL Core -->
 		<dependency>
 			<groupId>org.lwjgl</groupId>
