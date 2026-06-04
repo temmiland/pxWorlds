@@ -31,7 +31,11 @@ public class PxGameStateManager extends GameStateManager<PxGameStateManager> {
         this.configurationStorage = configurationStorage;
     }
 
-    /** Returns the configuration storage accessible to all game states. */
+    /**
+     * Returns the configuration storage accessible to all game states.
+     *
+     * @return the configuration storage
+     */
     public ConfigurationStorage getConfigurationStorage() {
         return configurationStorage;
     }

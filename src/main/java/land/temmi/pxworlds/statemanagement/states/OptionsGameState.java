@@ -214,7 +214,13 @@ public class OptionsGameState extends GameState<PxGameStateManager> {
         if (g.button("<", ARROW_L_X, ROW3_Y, ARROW_HW, ARROW_HH)) {
             vsyncEnabled = !vsyncEnabled;
         }
-        g.label(VSYNC_LABELS[vsyncEnabled ? 1 : 0], 0, ROW3_Y, VALUE_SCALE, WHITE, WHITE, COL_VAL_B);
+        final int vsyncLabelIdx;
+        if (vsyncEnabled) {
+            vsyncLabelIdx = 1;
+        } else {
+            vsyncLabelIdx = 0;
+        }
+        g.label(VSYNC_LABELS[vsyncLabelIdx], 0, ROW3_Y, VALUE_SCALE, WHITE, WHITE, COL_VAL_B);
         if (g.button(">", ARROW_R_X, ROW3_Y, ARROW_HW, ARROW_HH)) {
             vsyncEnabled = !vsyncEnabled;
         }

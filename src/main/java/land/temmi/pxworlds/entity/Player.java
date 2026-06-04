@@ -16,9 +16,12 @@ public class Player extends Entity {
 
     private enum MovementSpeed {
 
+        /** Default walk speed in tiles per second. */
         WALKING(5),
+        /** Sprint speed in tiles per second. */
         RUNNING(8);
 
+        /** Speed value in tiles per second. */
         private final int movementSpeed;
 
         MovementSpeed(int movementSpeed) {
@@ -30,17 +33,31 @@ public class Player extends Entity {
         }
     }
 
-    private enum Anim { IDLE, WALK, RUN }
+    private enum Anim {
+        /** Idle animation slot. */
+        IDLE,
+        /** Walk animation slot. */
+        WALK,
+        /** Run animation slot. */
+        RUN
+    }
 
+    /** Frames per second for the idle animation. */
     private static final int   IDLE_FPS                  = 3;
+    /** Speed multiplier applied when moving diagonally. */
     private static final float DIAGONAL_SPEED_MULTIPLIER = 1.5f;
+    /** Lerp factor for smooth camera follow. */
     private static final float CAMERA_LERP_FACTOR        = 0.09f;
     // 65 % of texture width — narrower hitbox than the render sprite
+    /** Hitbox half-width as a fraction of the tile scale. */
     private static final float HITBOX_WIDTH = 0.65f;
 
+    /** Current movement speed value (walking or running). */
     private int movementSpeed = MovementSpeed.WALKING.getValue();
 
+    /** Accumulated movement vector for the current tick. */
     private final Vector2f movement     = new Vector2f();
+    /** Reusable camera target vector. */
     private final Vector3f cameraTarget = new Vector3f();
 
     public Player(float posX, float posY) {
@@ -76,17 +93,38 @@ public class Player extends Entity {
         final boolean isUp    = input.isHeld(InputAction.MOVE_UP.getDefaultKey());
         final boolean isDown  = input.isHeld(InputAction.MOVE_DOWN.getDefaultKey());
 
-        final float dx       = (isRight ? 1f : 0f) - (isLeft ? 1f : 0f);
-        final float dy       = (isUp ? 1f : 0f) - (isDown ? 1f : 0f);
-        final boolean diag   = dx != 0 && dy != 0;
-        final float speed    = movementSpeed * delta * (diag ? 1f / DIAGONAL_SPEED_MULTIPLIER : 1f);
+        float dx = 0f;
+        if (isRight) {
+            dx += 1f;
+        }
+        if (isLeft) {
+            dx -= 1f;
+        }
+        float dy = 0f;
+        if (isUp) {
+            dy += 1f;
+        }
+        if (isDown) {
+            dy -= 1f;
+        }
+        final boolean diag = dx != 0 && dy != 0;
+        final float diagFactor;
+        if (diag) {
+            diagFactor = 1f / DIAGONAL_SPEED_MULTIPLIER;
+        } else {
+            diagFactor = 1f;
+        }
+        final float speed = movementSpeed * delta * diagFactor;
         movement.set(dx * speed, dy * speed);
 
         moveClipped(movement.x, movement.y, world);
 
         if (movement.x != 0 || movement.y != 0) {
-            useAnimation(movementSpeed == MovementSpeed.RUNNING.getValue()
-                ? Anim.RUN.ordinal() : Anim.WALK.ordinal());
+            if (movementSpeed == MovementSpeed.RUNNING.getValue()) {
+                useAnimation(Anim.RUN.ordinal());
+            } else {
+                useAnimation(Anim.WALK.ordinal());
+            }
         } else {
             useAnimation(Anim.IDLE.ordinal());
         }

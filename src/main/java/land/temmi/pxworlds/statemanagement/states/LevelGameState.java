@@ -93,8 +93,12 @@ public class LevelGameState extends GameState<PxGameStateManager> {
 
         // Release old OpenGL resources before creating new ones —
         // prevents a GPU leak on repeated init() (e.g. state transition).
-        if (tiles  != null) tiles.close();
-        if (world  != null) world.close();
+        if (tiles != null) {
+            tiles.close();
+        }
+        if (world != null) {
+            world.close();
+        }
 
         final Camera camera = new Camera(window.getWidth(), window.getHeight());
         final TileRenderer tiles = new TileRenderer();

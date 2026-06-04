@@ -44,5 +44,7 @@ public class BrandGameState extends GameState<PxGameStateManager> {
     protected void onRender(final float alpha) {}
 
     @Override
-    protected boolean onDebugOverlayEnabled() { return false; }
+    protected boolean onDebugOverlayEnabled() {
+        return false;
+    }
 }

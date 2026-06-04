@@ -16,6 +16,15 @@ public final class Logo {
     /** Vertical offset (in half-heights) between the three logo rows. */
     private static final int ROW_OFFSET = 2;
 
+    /** Index of the horizontal-offset-factor in a column entry. */
+    private static final int COL_FACTOR = 0;
+    /** Index of the top tile in a column entry. */
+    private static final int COL_TOP    = 1;
+    /** Index of the center tile in a column entry. */
+    private static final int COL_MID    = 2;
+    /** Index of the bottom tile in a column entry. */
+    private static final int COL_BOT    = 3;
+
     /**
      * Per column: {horizontal-offset-factor, top-tile, center-tile, bottom-tile}.
      * The x position is {@code cx - hw * factor}.
@@ -48,10 +57,10 @@ public final class Logo {
     public static void draw(final GuiContext g, final float cx, final float cy,
                             final float hw, final float hh) {
         for (final Object[] col : COLUMNS) {
-            final float x   = cx - hw * (int) col[0];
-            final Tile  top = (Tile) col[1];
-            final Tile  mid = (Tile) col[2];
-            final Tile  bot = (Tile) col[3];
+            final float x   = cx - hw * (int) col[COL_FACTOR];
+            final Tile  top = (Tile) col[COL_TOP];
+            final Tile  mid = (Tile) col[COL_MID];
+            final Tile  bot = (Tile) col[COL_BOT];
             g.sprite(top.getTexture(), x, cy + hh * ROW_OFFSET, hw, hh);
             g.sprite(mid.getTexture(), x, cy,                    hw, hh);
             g.sprite(bot.getTexture(), x, cy - hh * ROW_OFFSET,  hw, hh);

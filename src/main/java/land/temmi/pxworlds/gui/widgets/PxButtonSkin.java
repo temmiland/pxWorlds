@@ -46,15 +46,23 @@ public final class PxButtonSkin implements ButtonSkin {
         },
     };
 
-    // Slice indices within a state row
+    /** Slice index: top-left corner. */
     private static final int TOP_LEFT      = 0;
+    /** Slice index: top-center edge. */
     private static final int TOP_CENTER    = 1;
+    /** Slice index: top-right corner. */
     private static final int TOP_RIGHT     = 2;
+    /** Slice index: center-left edge. */
     private static final int CENTER_LEFT   = 3;
+    /** Slice index: center fill. */
     private static final int CENTER_CENTER = 4;
+    /** Slice index: center-right edge. */
     private static final int CENTER_RIGHT  = 5;
+    /** Slice index: bottom-left corner. */
     private static final int BOTTOM_LEFT   = 6;
+    /** Slice index: bottom-center edge. */
     private static final int BOTTOM_CENTER = 7;
+    /** Slice index: bottom-right corner. */
     private static final int BOTTOM_RIGHT  = 8;
 
     @Override

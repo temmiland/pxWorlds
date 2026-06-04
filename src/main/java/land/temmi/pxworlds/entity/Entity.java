@@ -14,16 +14,32 @@ import java.util.List;
 /** Base class for all movable, collidable, animated game objects. */
 public abstract class Entity {
 
+    /** Bounding box in world coordinates. */
     protected AABB boundingBox;
+    /** Animation array indexed by animation slot. */
     protected Animation[] animations;
+    /** Index of the currently active animation. */
     private int useAnimation;
 
+    /** Current position in world coordinates. */
     protected float posX, posY;
+    /** Scale in world units (half-extent). */
     protected final float scaleX, scaleY;
+    /** Position at the start of the previous tick (for interpolation). */
     protected float prevX, prevY;
 
     // Reused each tick to avoid a heap allocation in moveClipped
+    /** Scratch bounds expanded for sweep tests — avoids per-tick allocation. */
     private final AABB sweptBounds = new AABB(0, 0, 0, 0);
+
+    /** UV array index: first U coordinate. */
+    private static final int UV_U1 = 0;
+    /** UV array index: first V coordinate. */
+    private static final int UV_V1 = 1;
+    /** UV array index: second U coordinate. */
+    private static final int UV_U2 = 2;
+    /** UV array index: second V coordinate. */
+    private static final int UV_V2 = 3;
 
     public Entity(int maxAnimations, float initPosX, float initPosY, float initScaleX, float initScaleY) {
         this.animations = new Animation[maxAnimations];
@@ -37,8 +53,13 @@ public abstract class Entity {
         boundingBox = new AABB(initPosX - initScaleX, initPosY - initScaleY, initPosX + initScaleX, initPosY + initScaleY);
     }
 
-    public float getPosX() { return posX; }
-    public float getPosY() { return posY; }
+    public float getPosX() {
+        return posX;
+    }
+
+    public float getPosY() {
+        return posY;
+    }
 
     public void getInterpolatedBoundingBox(final float alpha, final AABB out) {
         final float rx = prevX + (posX - prevX) * alpha;
@@ -68,13 +89,17 @@ public abstract class Entity {
 
     public void pauseAnimations() {
         for (final Animation anim : animations) {
-            if (anim != null) anim.pause();
+            if (anim != null) {
+                anim.pause();
+            }
         }
     }
 
     public void resumeAnimations() {
         for (final Animation anim : animations) {
-            if (anim != null) anim.resume();
+            if (anim != null) {
+                anim.resume();
+            }
         }
     }
 
@@ -83,10 +108,14 @@ public abstract class Entity {
         final List<AABB> boxes = world.getCollidingBoxes(sweptBounds);
 
         // Y first: prevents corner bugs on simultaneous X/Y contact
-        for (AABB b : boxes) ya = b.clipY(boundingBox, ya);
+        for (AABB b : boxes) {
+            ya = b.clipY(boundingBox, ya);
+        }
         boundingBox.move(0, ya);
 
-        for (AABB b : boxes) xa = b.clipX(boundingBox, xa);
+        for (AABB b : boxes) {
+            xa = b.clipX(boundingBox, xa);
+        }
         boundingBox.move(xa, 0);
 
         posX = boundingBox.getCenterX();
@@ -126,15 +155,23 @@ public abstract class Entity {
 
     public void render(final SpriteBatch batch, final TextureAtlas atlas, final float alpha) {
         final float[] uv = animations[useAnimation].getUV(atlas);
-        if (uv == null) return;
+        if (uv == null) {
+            return;
+        }
         final float rx = prevX + (posX - prevX) * alpha;
         final float ry = prevY + (posY - prevY) * alpha;
-        batch.draw(rx, ry, scaleX, scaleY, uv[0], uv[1], uv[2], uv[3]);
+        final float u1 = uv[UV_U1];
+        final float v1 = uv[UV_V1];
+        final float u2 = uv[UV_U2];
+        final float v2 = uv[UV_V2];
+        batch.draw(rx, ry, scaleX, scaleY, u1, v1, u2, v2);
     }
 
     public void collideWithEntity(Entity entity) {
         final Collision collision = boundingBox.getCollision(entity.boundingBox);
-        if (!collision.isIntersecting()) return;
+        if (!collision.isIntersecting()) {
+            return;
+        }
 
         final float sepX = entity.boundingBox.getCenterX() - boundingBox.getCenterX();
         final float sepY = entity.boundingBox.getCenterY() - boundingBox.getCenterY();
@@ -143,11 +180,21 @@ public abstract class Entity {
         final float halfDy = collision.getDistance().y * 0.5f;
 
         if (collision.getDistance().x > collision.getDistance().y) {
-            final float dirX = sepX > 0 ? 1f : -1f;
+            final float dirX;
+            if (sepX > 0) {
+                dirX = 1f;
+            } else {
+                dirX = -1f;
+            }
             boundingBox.move(halfDx * dirX, 0);
             entity.boundingBox.move(halfDx * -dirX, 0);
         } else {
-            final float dirY = sepY > 0 ? 1f : -1f;
+            final float dirY;
+            if (sepY > 0) {
+                dirY = 1f;
+            } else {
+                dirY = -1f;
+            }
             boundingBox.move(0, halfDy * dirY);
             entity.boundingBox.move(0, halfDy * -dirY);
         }

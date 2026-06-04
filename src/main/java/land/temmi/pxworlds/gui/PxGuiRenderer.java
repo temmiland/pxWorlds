@@ -38,6 +38,15 @@ import static org.lwjgl.opengl.GL20.glUseProgram;
  */
 public final class PxGuiRenderer implements GuiRenderer {
 
+    /** UV array index: first U coordinate. */
+    private static final int UV_U1 = 0;
+    /** UV array index: first V coordinate. */
+    private static final int UV_V1 = 1;
+    /** UV array index: second U coordinate. */
+    private static final int UV_U2 = 2;
+    /** UV array index: second V coordinate. */
+    private static final int UV_V2 = 3;
+
     /** Font line height in STBEasyFont units (before scaling). */
     private static final float FONT_HEIGHT = 7.0f;
     /** Halving factor for centering. */
@@ -106,7 +115,11 @@ public final class PxGuiRenderer implements GuiRenderer {
             for (int col = 0; col < cols; col++) {
                 final float cx = startX + col * BACKGROUND_TILE;
                 final float cy = startY + row * BACKGROUND_TILE;
-                batch.draw(cx, cy, half, half, uv[0], uv[1], uv[2], uv[3]);
+                final float u1 = uv[UV_U1];
+                final float v1 = uv[UV_V1];
+                final float u2 = uv[UV_U2];
+                final float v2 = uv[UV_V2];
+                batch.draw(cx, cy, half, half, u1, v1, u2, v2);
             }
         }
         atlas.bind(0);
@@ -121,7 +134,11 @@ public final class PxGuiRenderer implements GuiRenderer {
             return;
         }
         batch.begin();
-        batch.draw(cx, cy, halfWidth, halfHeight, uv[0], uv[1], uv[2], uv[3]);
+        final float u1 = uv[UV_U1];
+        final float v1 = uv[UV_V1];
+        final float u2 = uv[UV_U2];
+        final float v2 = uv[UV_V2];
+        batch.draw(cx, cy, halfWidth, halfHeight, u1, v1, u2, v2);
         atlas.bind(0);
         batch.end(shader, camera.getProjection());
     }

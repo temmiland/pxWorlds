@@ -37,6 +37,7 @@ import java.util.List;
  */
 public class WorldSelectGameState extends GameState<PxGameStateManager> {
 
+    /** Logger of this class. */
     private static final Logger LOGGER = LoggerFactory.getLogger(WorldSelectGameState.class);
 
     /** Display mode of the screen. */
@@ -663,7 +664,12 @@ public class WorldSelectGameState extends GameState<PxGameStateManager> {
             gsm.setLevelState(name);
         } catch (final Exception e) {
             LOGGER.error("Migration failed for '{}'", meta.name(), e);
-            migrationError = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+            final String msg = e.getMessage();
+            if (msg != null) {
+                migrationError = msg;
+            } else {
+                migrationError = e.getClass().getSimpleName();
+            }
             pending = null;
             mode = Mode.MIGRATION_ERROR;
         }

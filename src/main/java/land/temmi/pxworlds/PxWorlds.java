@@ -55,7 +55,7 @@ public class PxWorlds extends Game<PxGameStateManager> {
 	 */
 	public PxWorlds(Window window, ConfigurationStorage configurationStorage) {
 		super(window, configurationStorage, new PxGameStateManager(configurationStorage));
-		WorldManager wm = new WorldManager();
+		final WorldManager wm = new WorldManager();
 		wm.init();
 	}
 

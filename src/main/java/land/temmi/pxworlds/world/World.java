@@ -60,7 +60,9 @@ public class World extends TileWorld {
     private final int scale;
 
     /** @return world scale (pixel multiplier) */
-    public int getScale() { return scale; }
+    public int getScale() {
+        return scale;
+    }
 
     /** All entities in the world. */
     private List<Entity> entities;
@@ -70,12 +72,16 @@ public class World extends TileWorld {
 
     /** Reusable array for getDebugLines() — avoids per-frame allocation. */
     private static final int DEBUG_LINE_COUNT = 3;
+    /** Pre-allocated debug line buffer. */
     private final String[] debugLines = new String[DEBUG_LINE_COUNT];
 
-    /** Invisible boundary walls at the four world edges. */
+    /** Invisible boundary wall on the left world edge. */
     private AABB boundaryLeft;
+    /** Invisible boundary wall on the right world edge. */
     private AABB boundaryRight;
+    /** Invisible boundary wall on the top world edge. */
     private AABB boundaryTop;
+    /** Invisible boundary wall on the bottom world edge. */
     private AABB boundaryBottom;
 
     /** Spawn point and last position of the player. */
@@ -122,7 +128,13 @@ public class World extends TileWorld {
      * @param y    global tile Y coordinate
      */
     public void setTile(final Tile tile, final int x, final int y) {
-        setTileId(x, y, tile != null ? tile.getId() : TileChunk.EMPTY);
+        final byte tileId;
+        if (tile != null) {
+            tileId = tile.getId();
+        } else {
+            tileId = TileChunk.EMPTY;
+        }
+        setTileId(x, y, tileId);
     }
 
     /**
@@ -246,10 +258,18 @@ public class World extends TileWorld {
     public List<AABB> getCollidingBoxes(final AABB area) {
         scratchColliders.clear();
 
-        if (area.minX < boundaryLeft.maxX)    { scratchColliders.add(boundaryLeft); }
-        if (area.maxX > boundaryRight.minX)   { scratchColliders.add(boundaryRight); }
-        if (area.maxY > boundaryTop.minY)     { scratchColliders.add(boundaryTop); }
-        if (area.minY < boundaryBottom.maxY)  { scratchColliders.add(boundaryBottom); }
+        if (area.minX < boundaryLeft.maxX) {
+            scratchColliders.add(boundaryLeft);
+        }
+        if (area.maxX > boundaryRight.minX) {
+            scratchColliders.add(boundaryRight);
+        }
+        if (area.maxY > boundaryTop.minY) {
+            scratchColliders.add(boundaryTop);
+        }
+        if (area.minY < boundaryBottom.maxY) {
+            scratchColliders.add(boundaryBottom);
+        }
 
         final int x0 = (int) Math.floor( area.minX / TILE_SIZE) - 1;
         final int x1 = (int) Math.ceil(  area.maxX / TILE_SIZE) + 1;
@@ -279,7 +299,11 @@ public class World extends TileWorld {
     // -------------------------------------------------------------------------
     // Entity management
 
-    /** Adds an entity to the world. */
+    /**
+     * Adds an entity to the world.
+     *
+     * @param entity the entity to add
+     */
     public void addEntity(final Entity entity) {
         entities.add(entity);
     }
@@ -291,43 +315,69 @@ public class World extends TileWorld {
 
     /** Stops render interpolation for all entities. */
     public void snapAllEntities() {
-        for (final Entity entity : entities) { entity.snapPrevPosition(); }
+        for (final Entity entity : entities) {
+            entity.snapPrevPosition();
+        }
     }
 
     /** Pauses the animations of all entities. */
     public void pauseAllAnimations() {
-        for (final Entity entity : entities) { entity.pauseAnimations(); }
+        for (final Entity entity : entities) {
+            entity.pauseAnimations();
+        }
     }
 
     /** Resumes the animations of all entities. */
     public void resumeAllAnimations() {
-        for (final Entity entity : entities) { entity.resumeAnimations(); }
+        for (final Entity entity : entities) {
+            entity.resumeAnimations();
+        }
     }
 
     // -------------------------------------------------------------------------
     // Spawn
 
     /** @return spawn tile X, or {@value #NO_SPAWN} if no spawn is set */
-    public int getSpawnTileX() { return spawnState.getSpawnTileX(); }
+    public int getSpawnTileX() {
+        return spawnState.getSpawnTileX();
+    }
 
     /** @return spawn tile Y, or {@value #NO_SPAWN} if no spawn is set */
-    public int getSpawnTileY() { return spawnState.getSpawnTileY(); }
+    public int getSpawnTileY() {
+        return spawnState.getSpawnTileY();
+    }
 
-    /** Sets the spawn point in tile coordinates. */
+    /**
+     * Sets the spawn point in tile coordinates.
+     *
+     * @param tileX spawn tile X
+     * @param tileY spawn tile Y
+     */
     public void setSpawn(final int tileX, final int tileY) {
         spawnState.setSpawn(tileX, tileY);
     }
 
     /** @return last saved X position, or {@link Float#NaN} if not set */
-    public float getLastSavedPosX() { return spawnState.getLastSavedPosX(); }
+    public float getLastSavedPosX() {
+        return spawnState.getLastSavedPosX();
+    }
 
     /** @return last saved Y position, or {@link Float#NaN} if not set */
-    public float getLastSavedPosY() { return spawnState.getLastSavedPosY(); }
+    public float getLastSavedPosY() {
+        return spawnState.getLastSavedPosY();
+    }
 
     /** @return {@code true} if a last saved position is available */
-    public boolean hasLastPos() { return spawnState.hasLastPos(); }
+    public boolean hasLastPos() {
+        return spawnState.hasLastPos();
+    }
 
-    /** Sets the last saved position in entity world-space coordinates. */
+    /**
+     * Sets the last saved position in entity world-space coordinates.
+     *
+     * @param x X position in world space
+     * @param y Y position in world space
+     */
     public void setLastPos(final float x, final float y) {
         spawnState.setLastPos(x, y);
     }
@@ -381,7 +431,10 @@ public class World extends TileWorld {
     public String[] getDebugLines(final Camera cam) {
         Entity playerEntity = null;
         for (final Entity e : entities) {
-            if (e instanceof Player) { playerEntity = e; break; }
+            if (e instanceof Player) {
+                playerEntity = e;
+                break;
+            }
         }
 
         final int tileX;
