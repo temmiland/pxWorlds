@@ -1,0 +1,101 @@
+name: Auditing
+
+on:
+    workflow_dispatch:
+    schedule:
+        - cron: "00 00 * * 1"
+    pull_request:
+        branches:
+            - main
+
+permissions:
+    contents: read
+
+jobs:
+    ossindex-audit:
+        name: OSS Index audit
+        runs-on: ubuntu-latest
+        outputs:
+            found: ${{ steps.audit.outputs.found }}
+            summary: ${{ steps.audit.outputs.summary }}
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              with:
+                  persist-credentials: false
+
+            - name: Use Java
+              uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+              with:
+                  java-version: "21"
+                  distribution: "temurin"
+                  cache: "maven"
+
+            - name: Run OSS Index audit
+              id: audit
+              run: |
+                  set +e
+                  OUTPUT=$(./mvnw -B org.sonatype.ossindex.maven:ossindex-maven-plugin:3.2.0:audit 2>&1)
+                  EXIT_CODE=$?
+                  set -e
+                  echo "$OUTPUT"
+
+                  DELIM="EOF_$(openssl rand -hex 8)"
+                  {
+                      echo "summary<<$DELIM"
+                      echo "$OUTPUT"
+                      echo "$DELIM"
+                  } >> "$GITHUB_OUTPUT"
+
+                  if [ "$EXIT_CODE" -ne 0 ]; then
+                      echo "found=true" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "found=false" >> "$GITHUB_OUTPUT"
+                  fi
+
+    # Opens (or updates) a single tracking issue instead of spamming a new one
+    # per run. Needs the repo's Actions setting "Read and write permissions"
+    # enabled so the built-in token can create issues.
+    report:
+        needs: ossindex-audit
+        if: always() && needs.ossindex-audit.outputs.found == 'true'
+        runs-on: ubuntu-latest
+        permissions:
+            issues: write
+        steps:
+            - name: Create or update security issue
+              env:
+                  GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
+                  API_URL: ${{ gitea.api_url }}
+                  REPO: ${{ gitea.repository }}
+                  RUN_URL: ${{ gitea.server_url }}/${{ gitea.repository }}/actions/runs/${{ gitea.run_id }}
+                  SUMMARY: ${{ needs.ossindex-audit.outputs.summary }}
+              run: |
+                  TITLE="OSS Index audit: offene Funde"
+
+                  BODY="Automatisch erkannte Sicherheitsfunde vom $(date -u +'%Y-%m-%d %H:%M UTC') ([Lauf]($RUN_URL)).
+
+                  \`\`\`
+                  $SUMMARY
+                  \`\`\`"
+
+                  EXISTING=$(curl -s -H "Authorization: token $GITEA_TOKEN" \
+                      "$API_URL/repos/$REPO/issues?state=open&type=issues&limit=50" \
+                      | jq -r --arg t "$TITLE" '[.[] | select(.title == $t)] | .[0].number // empty')
+
+                  if [ -n "$EXISTING" ]; then
+                      echo "Updating issue #$EXISTING"
+                      jq -n --arg body "$BODY" '{body: $body}' \
+                          | curl -s -X PATCH -H "Authorization: token $GITEA_TOKEN" -H "Content-Type: application/json" \
+                              "$API_URL/repos/$REPO/issues/$EXISTING" -d @-
+                      jq -n --arg body "**Neuer Scan mit offenen Funden:**
+
+                  $BODY" '{body: $body}' \
+                          | curl -s -X POST -H "Authorization: token $GITEA_TOKEN" -H "Content-Type: application/json" \
+                              "$API_URL/repos/$REPO/issues/$EXISTING/comments" -d @-
+                  else
+                      echo "Creating new issue"
+                      jq -n --arg title "$TITLE" --arg body "$BODY" '{title: $title, body: $body}' \
+                          | curl -s -X POST -H "Authorization: token $GITEA_TOKEN" -H "Content-Type: application/json" \
+                              "$API_URL/repos/$REPO/issues" -d @-
+                  fi
